@@ -1,0 +1,178 @@
+@import "tailwindcss";
+
+/* Il tema scuro segue data-theme sull'html (impostato prima del primo paint). */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Palette ispirata ai vetrini di istologia. Valori documentati in docs/PIANO.md */
+:root {
+  color-scheme: light;
+  --bg: #f6f8fb; /* vetro */
+  --surface: #ffffff;
+  --surface-2: #eef0f7; /* vetro appena tinto */
+  --ink: #1a1b2e; /* inchiostro */
+  --ink-muted: #545670;
+  --line: #d9dce8;
+
+  --primary: #3b2c85; /* ematossilina */
+  --on-primary: #ffffff;
+  --primary-soft: #e7e3f7;
+
+  --accent: #c2185b; /* eosina */
+  --on-accent: #ffffff;
+  --accent-soft: #fce4ee;
+
+  --otc: #1b7a47; /* verde: solo "Senza ricetta" */
+  --otc-soft: #dff3e7;
+
+  --calm: #2d5f80;
+  --calm-soft: #e1edf5;
+  --amber: #8a5300;
+  --amber-soft: #fdf0d8;
+  --orange: #b4400c;
+  --orange-soft: #fde6da;
+  --red: #b42318;
+  --on-red: #ffffff;
+  --red-soft: #fde4e1;
+
+  --focus: #c2185b;
+  --text-scale: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12121f;
+    --surface: #1c1c2e;
+    --surface-2: #26263b;
+    --ink: #edebf7;
+    --ink-muted: #b4b1c9;
+    --line: #36364f;
+    --primary: #b3a8ff;
+    --on-primary: #1a1440;
+    --primary-soft: #2c2650;
+    --accent: #ff8db8;
+    --on-accent: #3a0a1e;
+    --accent-soft: #3d1a2b;
+    --otc: #6fd49d;
+    --otc-soft: #163527;
+    --calm: #8fc1e3;
+    --calm-soft: #1a2c3a;
+    --amber: #f2b661;
+    --amber-soft: #3a2a10;
+    --orange: #ff9e6e;
+    --orange-soft: #3d2014;
+    --red: #ff8a80;
+    --on-red: #3a0805;
+    --red-soft: #3f1715;
+    --focus: #ff8db8;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12121f;
+  --surface: #1c1c2e;
+  --surface-2: #26263b;
+  --ink: #edebf7;
+  --ink-muted: #b4b1c9;
+  --line: #36364f;
+  --primary: #b3a8ff;
+  --on-primary: #1a1440;
+  --primary-soft: #2c2650;
+  --accent: #ff8db8;
+  --on-accent: #3a0a1e;
+  --accent-soft: #3d1a2b;
+  --otc: #6fd49d;
+  --otc-soft: #163527;
+  --calm: #8fc1e3;
+  --calm-soft: #1a2c3a;
+  --amber: #f2b661;
+  --amber-soft: #3a2a10;
+  --orange: #ff9e6e;
+  --orange-soft: #3d2014;
+  --red: #ff8a80;
+  --on-red: #3a0805;
+  --red-soft: #3f1715;
+  --focus: #ff8db8;
+}
+
+/* Dimensione del testo scelta nel Profilo */
+:root[data-text-size="large"] {
+  --text-scale: 1.125;
+}
+:root[data-text-size="xlarge"] {
+  --text-scale: 1.25;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-otc: var(--otc);
+  --color-otc-soft: var(--otc-soft);
+  --color-calm: var(--calm);
+  --color-calm-soft: var(--calm-soft);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-orange: var(--orange);
+  --color-orange-soft: var(--orange-soft);
+  --color-red: var(--red);
+  --color-on-red: var(--on-red);
+  --color-red-soft: var(--red-soft);
+  --color-focus: var(--focus);
+
+  --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme {
+  /* Scala tipografica: display 32 / titolo 24 / sezione 20 / corpo 17 / piccolo 15 */
+  --text-display: 2rem;
+  --text-display--line-height: 1.15;
+  --text-title: 1.5rem;
+  --text-title--line-height: 1.2;
+  --text-heading: 1.25rem;
+  --text-heading--line-height: 1.3;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.55;
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.45;
+}
+
+html {
+  font-size: calc(100% * var(--text-scale));
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
