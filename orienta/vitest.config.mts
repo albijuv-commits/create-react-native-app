@@ -6,6 +6,8 @@ export default defineConfig({
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
       "@data": fileURLToPath(new URL("./data", import.meta.url)),
+      // Nei test girano anche i moduli solo-server: la protezione di Next qui non serve
+      "server-only": fileURLToPath(new URL("./node_modules/server-only/empty.js", import.meta.url)),
     },
   },
   test: {

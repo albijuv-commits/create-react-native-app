@@ -100,6 +100,35 @@ export const SCENE_TITLES: Record<SceneId, string> = {
   corpo: "Mappa del corpo",
 };
 
+/** Passo mostrato nelle anteprime delle card: quello più rappresentativo della scena */
+export const PREVIEW_STEP: Record<SceneId, number> = {
+  "infezione-virale": 1,
+  "herpes-latenza": 2,
+  "infezione-batterica": 1,
+  "reazione-allergica": 0,
+  infiammazione: 2,
+  "seni-nasali": 2,
+  "orecchio-medio": 2,
+  "onda-emicrania": 1,
+  "tensione-muscolare": 2,
+  reflusso: 2,
+  "intestino-sensibile": 2,
+  bronchi: 2,
+  "vie-aeree-sonno": 1,
+  "ciclo-sonno": 0,
+  allarme: 2,
+  "circolo-umore": 0,
+  "globuli-rossi": 0,
+  tiroide: 0,
+  "vaso-pressione": 1,
+  glicemia: 1,
+  "bilancio-acqua": 0,
+  termoregolazione: 1,
+  pelle: 2,
+  fibre: 0,
+  corpo: 1,
+};
+
 /** Barra di scala: `units` è la lunghezza della barra nelle coordinate della scena (viewBox 200). */
 export interface SceneScale {
   label: string;
@@ -140,11 +169,11 @@ export function sceneScale(spec: SceneSpec, step: number): SceneScale | null {
     case "pelle":
       return { label: "0,1 mm", units: 30 };
     case "fibre":
-      return { label: "1 mm", units: 30 };
+      return { label: "5 mm", units: 30 };
     case "bronchi":
       return { label: "1 mm", units: 26 };
     case "seni-nasali":
-      return { label: "2 cm", units: 28 };
+      return { label: "2 cm", units: 20 };
     case "orecchio-medio":
       return { label: "1 cm", units: 36 };
     case "onda-emicrania":
@@ -154,7 +183,7 @@ export function sceneScale(spec: SceneSpec, step: number): SceneScale | null {
     case "vaso-pressione":
       return { label: "5 mm", units: 40 };
     case "tiroide":
-      return { label: "2 cm", units: 30 };
+      return { label: "2 cm", units: 18 };
     default:
       return null;
   }

@@ -176,3 +176,140 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ------------------------------------------------------------------ Vetrino
+ * Movimenti continui leggeri delle scene. Partono solo quando la scena è in riproduzione
+ * (data-playing="true") e non esistono con prefers-reduced-motion.
+ */
+.slide-svg {
+  font-family: var(--font-sans);
+}
+.slide-label {
+  letter-spacing: 0.01em;
+}
+.slide-halo {
+  paint-order: stroke;
+  stroke: #ffffff;
+  stroke-width: 2.4px;
+  stroke-linejoin: round;
+}
+.slide-svg .idle-float,
+.slide-svg .idle-drift,
+.slide-svg .idle-spin,
+.slide-svg .idle-pulse,
+.slide-svg .idle-beat,
+.slide-svg .idle-wiggle,
+.slide-svg .idle-sway,
+.slide-svg .idle-blink,
+.slide-svg .idle-breathe,
+.slide-svg .idle-grind {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.slide-svg .idle-float {
+  animation: slide-float 5s ease-in-out infinite;
+}
+.slide-svg .idle-drift {
+  animation: slide-drift 8s ease-in-out infinite;
+}
+.slide-svg .idle-spin {
+  animation: slide-spin 28s linear infinite;
+}
+.slide-svg .idle-pulse {
+  animation: slide-pulse 2.4s ease-in-out infinite;
+}
+.slide-svg .idle-beat {
+  animation: slide-beat 0.9s ease-in-out infinite;
+}
+.slide-svg .idle-wiggle {
+  animation: slide-wiggle 1.4s ease-in-out infinite;
+}
+.slide-svg .idle-sway {
+  transform-origin: bottom center;
+  animation: slide-sway 1.8s ease-in-out infinite;
+}
+.slide-svg .idle-blink {
+  animation: slide-blink 2.2s ease-in-out infinite;
+}
+.slide-svg .idle-breathe {
+  animation: slide-breathe 4s ease-in-out infinite;
+}
+.slide-svg .idle-grind {
+  animation: slide-grind 0.5s ease-in-out infinite;
+}
+.slide-svg .idle-flow {
+  stroke-dasharray: 3 7;
+  animation: slide-flow 1.4s linear infinite;
+}
+.slide-svg .idle-flow-slow {
+  stroke-dasharray: 2 10;
+  animation: slide-flow 3s linear infinite;
+}
+.slide-svg .idle-stream {
+  animation: slide-stream 2.2s linear infinite;
+}
+.slide-svg .idle-rise {
+  animation: slide-rise 6s linear infinite;
+}
+.slide-svg[data-playing="false"] * {
+  animation-play-state: paused !important;
+}
+@keyframes slide-float {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(0, -3px); }
+}
+@keyframes slide-drift {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(3px, -2px) rotate(8deg); }
+  66% { transform: translate(-2px, 2px) rotate(-6deg); }
+}
+@keyframes slide-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes slide-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+@keyframes slide-beat {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.14); }
+  40% { transform: scale(1); }
+}
+@keyframes slide-wiggle {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+@keyframes slide-sway {
+  0%, 100% { transform: rotate(-9deg); }
+  50% { transform: rotate(9deg); }
+}
+@keyframes slide-blink {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+@keyframes slide-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@keyframes slide-grind {
+  0%, 100% { transform: translateX(-1px); }
+  50% { transform: translateX(1.5px); }
+}
+@keyframes slide-stream {
+  from { transform: translateX(0); }
+  to { transform: translateX(26px); }
+}
+@keyframes slide-rise {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(-34px); opacity: 0; }
+}
+@keyframes slide-flow {
+  to { stroke-dashoffset: -20; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide-svg * {
+    animation: none !important;
+  }
+}

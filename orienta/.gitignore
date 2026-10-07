@@ -43,3 +43,7 @@ next-env.d.ts
 
 # script temporanei di verifica in locale
 /.scratch/
+
+# risultati dei test end-to-end
+/test-results/
+/playwright-report/
