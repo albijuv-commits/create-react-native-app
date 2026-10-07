@@ -93,7 +93,7 @@ export function SlideViewer({ spec, subject }: { spec: SceneSpec; subject: strin
               aria-current={i === step ? "step" : undefined}
               className="grid size-11 place-items-center rounded-full"
             >
-              <span className={cn("block rounded-full transition-all", i === step ? "h-2.5 w-6 bg-accent" : "size-2.5 bg-line")} />
+              <span className={cn("block rounded-full transition-colors duration-150", i === step ? "h-2.5 w-6 bg-accent" : "size-2.5 bg-line")} />
             </button>
           ))}
         </div>
@@ -146,7 +146,7 @@ function ControlButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "inline-flex min-h-11 min-w-11 flex-col items-center justify-center rounded-xl px-2 text-[0.75rem] font-bold disabled:opacity-35",
+        "inline-flex min-h-11 min-w-11 flex-col items-center justify-center rounded-xl px-2 py-1 text-[0.8125rem] font-bold transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] disabled:opacity-35 disabled:active:scale-100",
         primary ? "bg-primary text-on-primary" : "bg-surface-2 text-primary",
       )}
     >

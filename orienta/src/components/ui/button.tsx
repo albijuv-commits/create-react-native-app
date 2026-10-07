@@ -6,8 +6,9 @@ export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-2xl font-bold transition-colors " +
-  "disabled:cursor-not-allowed disabled:opacity-50 select-none";
+  "inline-flex items-center justify-center gap-2 rounded-2xl text-center font-bold select-none " +
+  "transition-[color,background-color,border-color,transform,filter] duration-150 ease-out active:scale-[0.97] " +
+  "disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100";
 
 const variants: Record<ButtonVariant, string> = {
   primary: "bg-primary text-on-primary hover:brightness-110 active:brightness-95",
@@ -17,8 +18,8 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 const sizes: Record<ButtonSize, string> = {
-  md: "min-h-11 px-4 text-body",
-  lg: "min-h-14 px-6 text-heading",
+  md: "min-h-11 px-4 py-2 text-body",
+  lg: "min-h-14 px-6 py-3 text-heading",
 };
 
 export function buttonClasses(

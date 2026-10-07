@@ -145,6 +145,9 @@
   --text-body--line-height: 1.55;
   --text-small: 0.9375rem;
   --text-small--line-height: 1.45;
+
+  /* Uscita decisa per le transizioni dell'interfaccia (pressione, colori): mai rimbalzi */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 html {
@@ -163,7 +166,35 @@ body {
 :focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
-  border-radius: 6px;
+}
+
+/* Le barre fisse (in alto e in basso) non devono coprire l'elemento con il focus né i titoli raggiunti con un'ancora */
+html {
+  scroll-padding-top: calc(3.5rem + env(safe-area-inset-top) + 1rem);
+  scroll-padding-bottom: calc(4rem + env(safe-area-inset-bottom) + 1rem);
+  -webkit-tap-highlight-color: color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+a,
+button,
+input,
+label,
+select,
+summary,
+textarea {
+  touch-action: manipulation;
+}
+
+/* Titoli senza parole orfane, testi lunghi senza vedove */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+p,
+li,
+figcaption {
+  text-wrap: pretty;
 }
 
 @media (prefers-reduced-motion: reduce) {
