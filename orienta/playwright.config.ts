@@ -25,7 +25,7 @@ export default defineConfig({
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
-    // Medici: solo dati di esempio, nessuna chiamata a Google o a Overpass durante i test
-    env: { DOCTORS_PROVIDER: "esempio" },
+    // Solo dati di esempio: nessuna chiamata a Google o a Overpass, catalogo dei farmaci di esempio
+    env: { DOCTORS_PROVIDER: "esempio", MEDICINES_SOURCE: "esempio" },
   },
 });

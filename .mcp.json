@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest",
+        "--headless",
+        "--isolated",
+        "--no-sandbox",
+        "--executable-path",
+        "${PLAYWRIGHT_MCP_EXECUTABLE:-/opt/pw-browsers/chromium}",
+        "--viewport-size",
+        "390x844",
+        "--blocked-origins",
+        "https://tile.openstreetmap.org"
+      ],
+      "env": {}
+    }
+  }
+}

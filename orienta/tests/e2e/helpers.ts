@@ -32,7 +32,8 @@ export async function completeCystitisInterview(page: Page) {
   const results = page.getByRole("heading", { level: 1, name: "Cosa potrebbe essere" });
   const no = page.getByRole("button", { name: "No", exact: true });
   for (let i = 0; i < 12; i++) {
-    await expect(results.or(no).first()).toBeVisible();
+    // Al primo avvio del server, con tutti i test in parallelo, il passaggio tra le domande può superare i 5 secondi
+    await expect(results.or(no).first()).toBeVisible({ timeout: 15_000 });
     if (await results.isVisible()) break;
     const title = (await page.getByRole("heading", { level: 1 }).first().textContent()) ?? "";
     const yes = /urine torbide|basso ventre/i.test(title);
