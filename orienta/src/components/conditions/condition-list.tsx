@@ -1,12 +1,17 @@
 "use client";
 
 import { ChevronRight, Search, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import tutte from "@/assets/illustrations/vetrino-cellule.webp";
+import nessunRisultato from "@/assets/illustrations/stato-nessun-risultato.webp";
 import { useEffect, useId, useMemo, useRef } from "react";
 import type { BodyAreaId } from "@data/vocab/body";
 import { SlidePreview } from "@/components/slide/slide-preview";
+import { TiltIllustration } from "@/components/ui/tilt-illustration";
 import { cn } from "@/lib/cn";
 import { searchConditions, type ConditionListItem } from "@/lib/conditions/search";
+import { AREA_TILES } from "@/lib/illustrations/areas";
 import { useUrlParams } from "@/lib/use-url-params";
 
 interface Area {
@@ -75,21 +80,30 @@ export function ConditionList({ items, areas }: { items: ConditionListItem[]; ar
         </div>
       </div>
 
-      <div ref={chipsRef} role="group" aria-label="Filtra per area del corpo" className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
-        {[{ id: null, label: "Tutte" } as const, ...areas].map((a) => {
+      <div ref={chipsRef} role="group" aria-label="Filtra per area del corpo" className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2">
+        {[{ id: null, label: "Tutte le condizioni" } as const, ...areas].map((a) => {
           const active = area === a.id;
+          const tile = a.id ? AREA_TILES[a.id] : { image: tutte, short: "Tutte" };
           return (
             <button
               key={a.id ?? "tutte"}
               type="button"
               aria-pressed={active}
+              aria-label={a.label}
               onClick={() => setArea(a.id)}
               className={cn(
-                "min-h-11 shrink-0 whitespace-nowrap rounded-full border-2 px-4 py-2 text-small font-bold transition-[color,background-color,border-color,transform] duration-150 ease-out active:scale-[0.97]",
-                active ? "border-primary bg-primary text-on-primary" : "border-line bg-surface text-ink hover:border-primary",
+                "group flex w-[5.75rem] shrink-0 snap-start flex-col items-center gap-1 rounded-3xl border-2 px-1.5 pb-2 pt-1.5 text-center",
+                "transition-[color,background-color,border-color,transform] duration-150 ease-out active:scale-[0.96]",
+                active ? "border-primary bg-primary-soft text-primary" : "border-line bg-surface text-ink hover:border-primary/60",
               )}
             >
-              {a.label}
+              <Image
+                src={tile.image}
+                alt=""
+                sizes="56px"
+                className={cn("size-14 transition-transform duration-200 ease-out group-hover:-translate-y-0.5", active && "scale-110")}
+              />
+              <span className="text-[0.8125rem] font-bold leading-tight">{tile.short}</span>
             </button>
           );
         })}
@@ -102,15 +116,18 @@ export function ConditionList({ items, areas }: { items: ConditionListItem[]; ar
       </p>
 
       {results.length === 0 ? (
-        <div className="space-y-2 rounded-2xl bg-surface-2 p-5">
-          <p className="font-bold">Nessuna condizione trovata.</p>
-          <p className="text-small text-ink-muted">
-            Prova con un&apos;altra parola o con un sintomo, ad esempio «tosse». Se non sai da dove partire,{" "}
-            <Link href="/sintomi/intervista" className="font-bold text-primary underline underline-offset-2">
-              descrivi cosa senti
-            </Link>
-            .
-          </p>
+        <div className="flex items-center gap-4 rounded-2xl bg-surface-2 p-5">
+          <TiltIllustration src={nessunRisultato} sizes="88px" className="w-22 shrink-0" />
+          <div className="min-w-0 space-y-2">
+            <p className="font-bold">Nessuna condizione trovata.</p>
+            <p className="text-small text-ink-muted">
+              Prova con un&apos;altra parola o con un sintomo, ad esempio «tosse». Se non sai da dove partire,{" "}
+              <Link href="/sintomi/intervista" className="font-bold text-primary underline underline-offset-2">
+                descrivi cosa senti
+              </Link>
+              .
+            </p>
+          </div>
         </div>
       ) : searching ? (
         <ul className="divide-y divide-line">

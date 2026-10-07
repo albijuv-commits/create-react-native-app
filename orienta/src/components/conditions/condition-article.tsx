@@ -7,9 +7,12 @@ import { SlideViewer } from "@/components/slide/slide-viewer";
 import { Badge } from "@/components/ui/badge";
 import { ButtonAnchor, ButtonLink } from "@/components/ui/button";
 import { Callout } from "@/components/ui/callout";
+import { TiltIllustration } from "@/components/ui/tilt-illustration";
 import { cn } from "@/lib/cn";
 import { SOURCES_CHECKED_AT, formatItalianDate } from "@/lib/conditions/catalog";
 import type { Condition } from "@/lib/conditions/schema";
+import { CONDITION_ILLUSTRATIONS } from "@/lib/illustrations/conditions";
+import { SPECIALIST_ILLUSTRATIONS } from "@/lib/illustrations/specialists";
 
 const SECTIONS = [
   { id: "panoramica", label: "Panoramica" },
@@ -75,9 +78,14 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
           <ArrowLeft aria-hidden className="size-5" />
           Tutte le condizioni
         </Link>
-        <div className="space-y-2">
-          <h1 className="text-display font-bold text-ink">{c.name}</h1>
-          {c.aliases.length > 0 && <p className="text-ink-muted">Detta anche: {c.aliases.join(", ")}</p>}
+        <div className="flex items-center gap-4">
+          <div className="min-w-0 flex-1 space-y-2">
+            <h1 className="text-display font-bold text-ink">{c.name}</h1>
+            {c.aliases.length > 0 && <p className="text-ink-muted">Detta anche: {c.aliases.join(", ")}</p>}
+          </div>
+          {CONDITION_ILLUSTRATIONS[c.id] && (
+            <TiltIllustration src={CONDITION_ILLUSTRATIONS[c.id]!} sizes="128px" priority className="w-28 shrink-0 sm:w-32" />
+          )}
         </div>
         <ul className="flex flex-wrap gap-2" aria-label="Aree del corpo">
           {c.areas.map((a) => (
@@ -222,7 +230,12 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
 
       <Section id="specialista" title="Specialista di riferimento">
         <div className="space-y-3 rounded-2xl bg-primary-soft p-5">
-          <p className="text-heading font-bold text-primary">{specialist.label}</p>
+          <div className="flex items-center gap-3">
+            <p className="min-w-0 flex-1 text-heading font-bold text-primary">{specialist.label}</p>
+            {SPECIALIST_ILLUSTRATIONS[c.specialist.id] && (
+              <TiltIllustration src={SPECIALIST_ILLUSTRATIONS[c.specialist.id]!} sizes="80px" className="w-20 shrink-0" />
+            )}
+          </div>
           <p>{c.specialist.why}</p>
           <p className="text-small text-ink-muted">{specialist.description}</p>
           {emergency ? (

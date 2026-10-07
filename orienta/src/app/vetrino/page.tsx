@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CONDITIONS } from "@data/conditions";
+import microscopio from "@/assets/illustrations/microscopio.webp";
 import { PageHeader } from "@/components/ui/page-header";
 import { SceneGallery } from "./scene-gallery";
 
@@ -13,7 +14,7 @@ export default function VetrinoPage() {
   const items = CONDITIONS.map((c) => ({ id: c.id, name: c.name, spec: c.animation }));
   return (
     <>
-      <PageHeader title="Galleria del vetrino" lead="Tutte le scene animate delle schede, passo per passo, per la revisione." />
+      <PageHeader title="Galleria del vetrino" lead="Tutte le scene animate delle schede, passo per passo, per la revisione." illustration={microscopio} />
       <SceneGallery items={items} />
     </>
   );

@@ -1,9 +1,9 @@
 /* Service worker di Orienta.
  * - Le route /api/ non passano MAI dalla cache: contengono o producono dati sanitari.
  * - Navigazione: prima la rete, poi la copia in cache, infine la pagina /offline.
- * - Asset statici versionati (/_next/static, /icons): prima la cache.
+ * - Asset statici (/_next/static, /icons, /models): prima la cache.
  */
-const VERSION = "orienta-v1";
+const VERSION = "orienta-v2";
 const PRECACHE = ["/offline", "/emergenza", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -46,7 +46,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/")) {
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/") || url.pathname.startsWith("/models/")) {
     event.respondWith(
       caches.match(req).then(
         (hit) =>
