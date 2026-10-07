@@ -81,3 +81,8 @@ export interface InterviewCondition extends TriageCondition {
 export function interviewConditions(): InterviewCondition[] {
   return CONDITIONS.map((c) => ({ ...triageFields(c), teaser: firstSentence(c.overview), animation: c.animation }));
 }
+
+/** Per la sezione Medici: nome della condizione e specialista di riferimento, per chi arriva da una scheda o dai risultati */
+export function conditionSpecialists(): Record<string, { name: string; specialist: Condition["specialist"]["id"] }> {
+  return Object.fromEntries(CONDITIONS.map((c) => [c.id, { name: c.name, specialist: c.specialist.id }]));
+}

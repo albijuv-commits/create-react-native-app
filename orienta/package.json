@@ -16,6 +16,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
     "jspdf": "^4.2.1",
+    "leaflet": "^1.9.4",
     "lucide-react": "^1.52.0",
     "motion": "^14.0.0",
     "next": "16.4.0",
@@ -28,6 +29,7 @@
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@tailwindcss/turbopack": "^4",
+    "@types/leaflet": "^1.9.22",
     "@types/node": "^22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",

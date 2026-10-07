@@ -16,6 +16,7 @@ import { Button, ButtonAnchor, ButtonLink } from "@/components/ui/button";
 import { TiltIllustration } from "@/components/ui/tilt-illustration";
 import { UrgencyIndicator } from "@/components/ui/urgency-indicator";
 import type { InterviewCondition } from "@/lib/conditions/catalog";
+import { saveSummaryForDoctors } from "@/lib/doctors/handoff";
 import { cn } from "@/lib/cn";
 import { URGENCY, type UrgencyLevel } from "@/lib/design/urgency";
 import { CONDITION_ILLUSTRATIONS } from "@/lib/illustrations/conditions";
@@ -148,7 +149,7 @@ export function ResultsView({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.08 * i, ease: [0.23, 1, 0.32, 1] }}
               >
-                <ConditionCard condition={c} result={r} rank={i + 1} age={age} reduced={reduced} />
+                <ConditionCard condition={c} result={r} rank={i + 1} age={age} reduced={reduced} onFindSpecialist={() => saveSummaryForDoctors(summary)} />
               </motion.li>
             ))}
           </ol>
@@ -315,12 +316,15 @@ function ConditionCard({
   rank,
   age,
   reduced,
+  onFindSpecialist,
 }: {
   condition: InterviewCondition;
   result: ResultCondition;
   rank: number;
   age: number;
   reduced: boolean;
+  /** Prima di andare a Medici: il riepilogo resta pronto per l'email al medico, solo in questa scheda */
+  onFindSpecialist: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const titleId = `risultato-${condition.id}`;
@@ -387,7 +391,7 @@ function ConditionCard({
         <ButtonLink href={`/condizioni/${condition.id}`} variant="secondary" icon={<BookOpen aria-hidden className="size-5" />}>
           Scopri di più
         </ButtonLink>
-        <ButtonLink href={`/medici?${params.toString()}`} variant="ghost" className="justify-start gap-3 py-2 text-left">
+        <ButtonLink href={`/medici?${params.toString()}`} onClick={onFindSpecialist} variant="ghost" className="justify-start gap-3 py-2 text-left">
           {SPECIALIST_ILLUSTRATIONS[specialist.id] && (
             <Image src={SPECIALIST_ILLUSTRATIONS[specialist.id]!} alt="" sizes="48px" className="size-12 shrink-0" />
           )}

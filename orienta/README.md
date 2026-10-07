@@ -21,7 +21,7 @@ npm run dev                  # http://localhost:3000
 | `npm run build && npm start` | Build di produzione (il service worker si attiva solo qui) |
 | `npm run lint` / `npm run typecheck` | Controlli statici |
 | `npm test` | Test unitari (Vitest) |
-| `npm run test:e2e` | Test end-to-end (Playwright) su una build di produzione. Se il browser di Playwright non è installato, indica un Chromium con `CHROMIUM_PATH=/percorso/chromium` |
+| `npm run test:e2e` | Test end-to-end (Playwright) su una build di produzione, con i medici di esempio e senza scaricare tile. Se il browser di Playwright non è installato, indica un Chromium con `CHROMIUM_PATH=/percorso/chromium` |
 | `npm run check:sources` | Verifica che i link delle fonti delle schede esistano; con `-- --write` aggiorna `data/conditions/sources-report.json` |
 | `npm run icons` | Rigenera le icone PWA dall'illustrazione `scripts/icon-source.webp` (favicon vettoriale da `scripts/icon-source.svg`) |
 | `node scripts/gen-illustration-maps.mjs` | Aggiorna le mappe delle illustrazioni di condizioni e specialisti dopo aver aggiunto o tolto un file |
@@ -38,6 +38,17 @@ npm run dev                  # http://localhost:3000
 - Senza `ANTHROPIC_API_KEY`, o senza il consenso facoltativo all'AI, il motore a regole gira tutto nel browser e nessun dato sanitario lascia il dispositivo. Con la chiave e il consenso, `/api/triage` usa Claude con uscita strutturata validata da Zod: il modello può scegliere solo tra le schede della base di conoscenza, un'uscita non valida viene riprovata una volta e poi si propone il metodo semplificato; l'urgenza non scende mai sotto quella delle regole. Il server non registra i dati.
 - I risultati mostrano sempre «Questa non è una diagnosi. Solo un medico può valutare i tuoi sintomi.», il livello di urgenza con colore, icona e testo, da 1 a 5 condizioni compatibili con i fattori che le rendono più o meno probabili, e il riepilogo per il medico da copiare, condividere o scaricare in PDF (creato nel browser).
 
+## Medici
+
+- Chi cercare: il medico di base è sempre il primo passo proposto; dai risultati dell'intervista e dalle schede si arriva con lo specialista di riferimento già scelto (per i più piccoli il pediatra). Dove: posizione del browser, con il permesso della persona, oppure città o CAP.
+- La posizione parte dal telefono già arrotondata a circa 100 metri; la route `/api/medici` la usa solo per la ricerca, senza salvarla né scriverla nei log. Il riepilogo dei sintomi per l'email resta nella scheda del browser (`sessionStorage`) e non va mai al server.
+- Fonti (`src/lib/doctors/`), dietro l'interfaccia `DoctorProvider`:
+  - `GooglePlacesProvider` (Places API, Text Search), se c'è `GOOGLE_PLACES_API_KEY`: nome, indirizzo, distanza, telefono, sito, valutazione e orari. Come chiedono i termini di Google, i risultati non si mettono in cache, si mostrano con l'attribuzione «Google Maps» e non vanno su mappe non Google: con questa fonte la vista mappa si disattiva e le indicazioni usano i link di Google.
+  - `OsmProvider` (OpenStreetMap tramite Overpass, gratuito), anche con l'email quando è nei dati. Una richiesta alla volta, pausa di 30 secondi dopo un 429, cache di un'ora e istanze di riserva (`OVERPASS_URL`). Città e CAP si cercano con Nominatim: una richiesta al secondo, risultati in cache, ricerca solo all'invio (niente completamento automatico).
+  - `ExampleProvider`: DATI DI ESEMPIO quando i servizi reali non rispondono, sempre etichettati. Nomi fittizi, nessun numero di telefono, email e siti solo su `example.com`.
+- La mappa usa Leaflet con le tile di OpenStreetMap, caricate solo quando si apre la vista mappa e con l'attribuzione sempre visibile. I contatti presi da OpenStreetMap diventano link solo se sono davvero un telefono, un'email o un sito http/https.
+- Il riquadro «Come prenotare» spiega la visita privata e il percorso con il Servizio sanitario nazionale (ricetta del medico di base, poi CUP), con la fonte del Ministero della Salute.
+
 ## Illustrazioni e oggetti 3D
 
 - Le illustrazioni in stile argilla (`src/assets/illustrations/`, WebP con trasparenza) e gli oggetti 3D (`public/models/`, GLB compressi con meshopt e texture WebP) sono stati generati con Higgsfield (immagini con GPT Image 2.5, modelli 3D con Tripo H3.1) partendo da un'unica immagine di riferimento per avere uno stile coerente, poi ritagliati e ottimizzati con sharp e glTF-Transform. Non contengono testo né persone.
@@ -50,5 +61,9 @@ npm run dev                  # http://localhost:3000
 | --- | --- |
 | `ANTHROPIC_API_KEY` | Intervista con Claude; senza, motore a regole nel browser |
 | `CLAUDE_MODEL` | Modello per l'intervista (predefinito `claude-sonnet-5-5`) |
-| `GOOGLE_PLACES_API_KEY` | Facoltativa, ricerca dei medici (fase 4) |
+| `GOOGLE_PLACES_API_KEY` | Facoltativa: ricerca dei medici con Google Places; senza, OpenStreetMap |
+| `DOCTORS_PROVIDER` | Facoltativa: forza la fonte dei medici (`google`, `osm`, `esempio`) |
+| `OVERPASS_URL` | Facoltativa: istanze Overpass separate da virgole (per un uso reale, un'istanza propria) |
+| `NOMINATIM_URL` | Facoltativa: servizio per cercare città e CAP |
+| `OSM_CONTACT` | Facoltativa: contatto del gestore nel User-Agent verso Overpass e Nominatim |
 | `NEXT_PUBLIC_SITE_URL` | Indirizzo pubblico dell'app, per i link assoluti delle anteprime di condivisione |
