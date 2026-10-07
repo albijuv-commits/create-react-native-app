@@ -1,0 +1,1045 @@
+{
+  "checkedAt": "2026-10-07",
+  "results": [
+    {
+      "url": "https://medlineplus.gov/acne.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/acne.html",
+      "title": "Acne | Blackheads | Pimple | Zits | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/acutebronchitis.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/acutebronchitis.html",
+      "title": "Acute Bronchitis | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/allergy.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/allergy.html",
+      "title": "Allergies | Hypersensivity | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/anemia.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/anemia.html",
+      "title": "Anemia | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/anxiety.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/anxiety.html",
+      "title": "Anxiety: MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/asthma.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/asthma.html",
+      "title": "Asthma | Asthma Symptoms | Asthma Attack | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/backpain.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/backpain.html",
+      "title": "Back Pain",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/carbonmonoxidepoisoning.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/carbonmonoxidepoisoning.html",
+      "title": "Carbon Monoxide Poisoning: MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/chickenpox.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/chickenpox.html",
+      "title": "Chickenpox | Varicella | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/coldsores.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/coldsores.html",
+      "title": "Cold Sores: MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/commoncold.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/commoncold.html",
+      "title": "Common Cold | Viral Infection | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/covid19coronavirusdisease2019.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/covid19coronavirusdisease2019.html",
+      "title": "COVID-19 | Coronavirus Disease 2019 | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/dehydration.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/dehydration.html",
+      "title": "Dehydration: MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/depression.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/depression.html",
+      "title": "Depression: MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/diabetestype2.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/diabetestype2.html",
+      "title": "Type 2 Diabetes | Diabetes Type 2 | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/earinfections.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/earinfections.html",
+      "title": "Ear Infections | Otitis Media | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/eczema.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/eczema.html",
+      "title": "Eczema | Dermatitis | Atopic Dermatitis | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/ency/article/000584.htm",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/ency/article/000584.htm",
+      "title": "Iron deficiency anemia: MedlinePlus Medical Encyclopedia",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/ency/article/000797.htm",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/ency/article/000797.htm",
+      "title": "Tension headache: MedlinePlus Medical Encyclopedia",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/ency/article/000869.htm",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/ency/article/000869.htm",
+      "title": "Contact dermatitis: MedlinePlus Medical Encyclopedia",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/ency/article/001413.htm",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/ency/article/001413.htm",
+      "title": "Bruxism: MedlinePlus Medical Encyclopedia",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/flu.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/flu.html",
+      "title": "Flu | Flu Symptoms | Stomach Flu | Influenza | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/gastroenteritis.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/gastroenteritis.html",
+      "title": "Gastroenteritis | Stomach Flu | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/gerd.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/gerd.html",
+      "title": "GERD | Gastroesophageal Reflux Disease | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/hayfever.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/hayfever.html",
+      "title": "Hay Fever | Pollen | Allergies | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/heatillness.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/heatillness.html",
+      "title": "Heat Illness: MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/highbloodpressure.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/highbloodpressure.html",
+      "title": "High Blood Pressure | Hypertension | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/hives.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/hives.html",
+      "title": "Hives | Rash | Skin Rash | Itchy Skin | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/hypothyroidism.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/hypothyroidism.html",
+      "title": "Hypothyroidism | Hashimoto&#x27;s Disease | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/infectiousmononucleosis.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/infectiousmononucleosis.html",
+      "title": "Infectious Mononucleosis | Mono | Mono Symptoms | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/insomnia.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/insomnia.html",
+      "title": "Insomnia | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/irritablebowelsyndrome.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/irritablebowelsyndrome.html",
+      "title": "Irritable Bowel Syndrome | IBS | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/migraine.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/migraine.html",
+      "title": "Migraine | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/pinkeye.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/pinkeye.html",
+      "title": "Conjunctivitis | Pink Eye | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/psoriasis.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/psoriasis.html",
+      "title": "Psoriasis | Psoriatic Arthritis | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/sinusitis.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/sinusitis.html",
+      "title": "Sinus Infection | Sinusitis | Sinus infection Symptoms | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/sleepapnea.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/sleepapnea.html",
+      "title": "Sleep Apnea | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/sorethroat.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/sorethroat.html",
+      "title": "Sore Throat | Pharyngitis | Sore Throat Causes | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/sprainsandstrains.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/sprainsandstrains.html",
+      "title": "Strains | Sprains | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/tendinitis.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/tendinitis.html",
+      "title": "Tendinitis: MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://medlineplus.gov/urinarytractinfections.html",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://medlineplus.gov/urinarytractinfections.html",
+      "title": "Urinary Tract Infections | UTI | UTI Symptoms | MedlinePlus",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/falsi-miti-e-bufale/salute-mentale/la-depressione-si-supera-con-la-volonta",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/falsi-miti-e-bufale/salute-mentale/la-depressione-si-supera-con-la-volonta",
+      "title": "La depressione si supera con la volontà?",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/acne",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/acne",
+      "title": "Acne: lieve, moderata o grave, come evitarla e curarla - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/allergia-agli-acari-della-polvere",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/allergia-agli-acari-della-polvere",
+      "title": "Allergia agli acari della polvere: cosa sapere e cosa fare - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/anemia-da-carenza-di-ferro",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/anemia-da-carenza-di-ferro",
+      "title": "Anemia da carenza di ferro: disturbi, cause e cura- ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/ansia-nell-adulto-disturbo-d-ansia-generalizzata-dag",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/ansia-nell-adulto-disturbo-d-ansia-generalizzata-dag",
+      "title": "Ansia nell'adulto: lieve o grave, cos'è e come si manifesta - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/apnea-notturna-ostruttiva",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/apnea-notturna-ostruttiva",
+      "title": "Apnea notturna ostruttiva: di cosa si tratta, cause e cure - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/asma",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/a/asma",
+      "title": "Asma: disturbi, cause e cura - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/b/bronchite",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/b/bronchite",
+      "title": "Bronchite: che cos'è e come si cura",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/c/cefalea-di-tipo-tensivo",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/c/cefalea-di-tipo-tensivo",
+      "title": "Cefalea di tipo tensivo: quando rivolgersi al medico – ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/c/cistite",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/c/cistite",
+      "title": "Cistite: cause, terapie e consigli per la prevenzione - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/c/colpo-di-calore-e-insolazione",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/c/colpo-di-calore-e-insolazione",
+      "title": "Colpo di calore e Insolazione: due problemi diversi - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/c/congiuntivite",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/c/congiuntivite",
+      "title": "Congiuntivite: cause, sintomi, diagnosi e cura - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/c/covid-19",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/c/covid-19",
+      "title": "COVID-19: cause, disturbi, accertamento, possibili cure, prevenzione - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/d/dermatite",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/d/dermatite",
+      "title": "Eczema: che cos'è e come si cura - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/d/diabete-di-tipo-2",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/d/diabete-di-tipo-2",
+      "title": "Diabete di tipo 2: che cos'è, cause e cura - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/e/eczema",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/e/eczema",
+      "title": "Eczema: che cos'è e come si cura - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/e/emicrania",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/e/emicrania",
+      "title": "Emicrania: con aura, senz'aura, silente - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/f/faringite",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/f/faringite",
+      "title": "Faringite: rimedi contro il mal di gola - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/g/gastroenteriti",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/g/gastroenteriti",
+      "title": "Gastroenteriti: diversi disturbi, cause e cure - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/h/herpes-labiale",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/h/herpes-labiale",
+      "title": "Herpes labiale: manifestazioni, complicazioni e prevenzione - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/i/influenza",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/i/influenza",
+      "title": "Influenza: una malattia stagionale, come evitarla - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/i/insonnia",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/i/insonnia",
+      "title": "Insonnia: cause, cure e accorgimenti utili per evitarla - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/i/ipertensione-arteriosa-o-pressione-alta",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/i/ipertensione-arteriosa-o-pressione-alta",
+      "title": "Ipertensione arteriosa (Pressione alta) - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/i/ipotiroidismo",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/i/ipotiroidismo",
+      "title": "Ipotiroidismo: disturbi, cause e cure – ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/m/mal-di-schiena",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/m/mal-di-schiena",
+      "title": "Mal di schiena: cause, prevenzione e trattamenti - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/m/mononucleosi-infettiva",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/m/mononucleosi-infettiva",
+      "title": "Mononucleosi: cos'è e come si trasmette - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/o/orticaria",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/o/orticaria",
+      "title": "Orticaria: di cosa si tratta, cause e terapie - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/o/otite",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/o/otite",
+      "title": "Otite: disturbi, cause e cura - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/p/psoriasi",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/p/psoriasi",
+      "title": "Psoriasi: disturbi, cause e cura - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/r/raffreddore",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/r/raffreddore",
+      "title": "Raffreddore: disturbi, cause e cura - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/r/reflusso-gastroesofageo",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/r/reflusso-gastroesofageo",
+      "title": "Reflusso gastroesofageo: disturbi, cause e cura - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/r/rinite-allergica",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/r/rinite-allergica",
+      "title": "Rinite allergica: cos'è, come prevenire e curare - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/s/sindrome-dell-intestino-irritabile",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/s/sindrome-dell-intestino-irritabile",
+      "title": "Sindrome dell'intestino irritabile: cosa fare e non fare – ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/s/sinusite",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/s/sinusite",
+      "title": "Sinusite: un disturbo comune, cause e cure - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/t/tendinite",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/t/tendinite",
+      "title": "Tendinite: di cosa si tratta, come evitarla, come trattarla - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/t/tonsillite",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/t/tonsillite",
+      "title": "Tonsillite: che cos'è e come curarla - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/v/varicella",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/la-salute-dalla-a-alla-z-menu/v/varicella",
+      "title": "Varicella: disturbi, cause e cure - ISSalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.issalute.it/index.php/stili-di-vita-e-ambiente-menu/ambiente/nichel",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.issalute.it/index.php/stili-di-vita-e-ambiente-menu/ambiente/nichel",
+      "title": "Il nichel (Ni): effetti sulla salute - Issalute",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/acne/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/acne/",
+      "title": "Acne - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/allergic-rhinitis/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/allergic-rhinitis/",
+      "title": "Allergic rhinitis - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/asthma/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/asthma/",
+      "title": "Asthma - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/atopic-eczema/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/atopic-eczema/",
+      "title": "Atopic eczema - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/back-pain/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/back-pain/",
+      "title": "Back pain - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/bronchitis/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/bronchitis/",
+      "title": "Bronchitis - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/carbon-monoxide-poisoning/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/carbon-monoxide-poisoning/",
+      "title": "Carbon monoxide poisoning - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/chickenpox/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/chickenpox/",
+      "title": "Chickenpox - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/cold-sores/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/cold-sores/",
+      "title": "Cold sores - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/common-cold/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/common-cold/",
+      "title": "Common cold - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/conjunctivitis/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/conjunctivitis/",
+      "title": "Conjunctivitis - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/contact-dermatitis/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/contact-dermatitis/",
+      "title": "Contact dermatitis - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/covid-19/covid-19-symptoms-and-what-to-do/",
+      "title": "COVID-19 symptoms and what to do - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/dehydration/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/dehydration/",
+      "title": "Dehydration - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/ear-infections/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/ear-infections/",
+      "title": "Ear infections - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/flu/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/flu/",
+      "title": "Flu - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/glandular-fever/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/glandular-fever/",
+      "title": "Glandular fever - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/heartburn-and-acid-reflux/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/heartburn-and-acid-reflux/",
+      "title": "Heartburn and acid reflux - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/heat-exhaustion-heatstroke/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/heat-exhaustion-heatstroke/",
+      "title": "Heat exhaustion and heatstroke - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/high-blood-pressure/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/high-blood-pressure/",
+      "title": "High blood pressure - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/hives/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/hives/",
+      "title": "Hives - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/insomnia/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/insomnia/",
+      "title": "Insomnia - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/iron-deficiency-anaemia/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/iron-deficiency-anaemia/",
+      "title": "Iron deficiency anaemia - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/irritable-bowel-syndrome-ibs/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/irritable-bowel-syndrome-ibs/",
+      "title": "Irritable bowel syndrome (IBS) - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/migraine/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/migraine/",
+      "title": "Migraine - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/norovirus/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/norovirus/",
+      "title": "Norovirus (vomiting bug) - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/psoriasis/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/psoriasis/",
+      "title": "Psoriasis - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/sinusitis-sinus-infection/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/sinusitis-sinus-infection/",
+      "title": "Sinusitis (sinus infection) - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/sleep-apnoea/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/sleep-apnoea/",
+      "title": "Sleep apnoea - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/sprains-and-strains/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/sprains-and-strains/",
+      "title": "Sprains and strains - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/tendonitis/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/tendonitis/",
+      "title": "Tendonitis - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/tension-headaches/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/tension-headaches/",
+      "title": "Tension headaches - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/tonsillitis/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/tonsillitis/",
+      "title": "Tonsillitis - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/type-2-diabetes/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/type-2-diabetes/",
+      "title": "Type 2 diabetes - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/",
+      "title": "Underactive thyroid (hypothyroidism) - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/conditions/urinary-tract-infections-utis/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/conditions/urinary-tract-infections-utis/",
+      "title": "Urinary tract infections (UTIs) - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/mental-health/conditions/depression-in-adults/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/mental-health/conditions/depression-in-adults/",
+      "title": "Depression in adults - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/mental-health/conditions/generalised-anxiety-disorder-gad/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/mental-health/conditions/generalised-anxiety-disorder-gad/",
+      "title": "Generalised anxiety disorder (GAD) - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/symptoms/diarrhoea-and-vomiting/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/symptoms/diarrhoea-and-vomiting/",
+      "title": "Diarrhoea and vomiting - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/symptoms/sore-throat/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/symptoms/sore-throat/",
+      "title": "Sore throat - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.nhs.uk/symptoms/teeth-grinding/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.nhs.uk/symptoms/teeth-grinding/",
+      "title": "Teeth grinding (bruxism) - NHS",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.salute.gov.it/new/it/scheda-malattia/asma-bronchiale/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.salute.gov.it/new/it/scheda-malattia/asma-bronchiale/",
+      "title": "Ministero della Salute - Asma bronchiale",
+      "via": "browser"
+    },
+    {
+      "url": "https://www.salute.gov.it/new/it/scheda-malattia/ipertensione-arteriosa/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.salute.gov.it/new/it/scheda-malattia/ipertensione-arteriosa/",
+      "title": "Ministero della Salute - Ipertensione arteriosa",
+      "via": "browser"
+    },
+    {
+      "url": "https://www.salute.gov.it/new/it/scheda-malattia/sindrome-da-apnee-ostruttive-del-sonno/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.salute.gov.it/new/it/scheda-malattia/sindrome-da-apnee-ostruttive-del-sonno/",
+      "title": "Ministero della Salute - Sindrome da apnee ostruttive del sonno",
+      "via": "fetch"
+    },
+    {
+      "url": "https://www.salute.gov.it/new/it/tema/covid-19/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.salute.gov.it/new/it/tema/covid-19/",
+      "title": "Ministero della Salute - Covid-19",
+      "via": "browser"
+    },
+    {
+      "url": "https://www.salute.gov.it/new/it/tema/diabete/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.salute.gov.it/new/it/tema/diabete/",
+      "title": "Ministero della Salute - Diabete",
+      "via": "browser"
+    },
+    {
+      "url": "https://www.salute.gov.it/new/it/tema/influenza/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.salute.gov.it/new/it/tema/influenza/",
+      "title": "Ministero della Salute - Influenza",
+      "via": "browser"
+    },
+    {
+      "url": "https://www.salute.gov.it/new/it/tema/ondate-di-calore/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.salute.gov.it/new/it/tema/ondate-di-calore/",
+      "title": "Ministero della Salute - Ondate di calore",
+      "via": "browser"
+    },
+    {
+      "url": "https://www.salute.gov.it/new/it/tema/ondate-di-calore/dieci-consigli-utili/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.salute.gov.it/new/it/tema/ondate-di-calore/dieci-consigli-utili/",
+      "title": "Ministero della Salute - Dieci consigli utili",
+      "via": "browser"
+    },
+    {
+      "url": "https://www.salute.gov.it/new/it/tema/salute-mentale/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.salute.gov.it/new/it/tema/salute-mentale/",
+      "title": "Ministero della Salute - Salute mentale",
+      "via": "browser"
+    },
+    {
+      "url": "https://www.salute.gov.it/new/it/tema/vaccinazioni/malattie-prevenibili-con-i-vaccini/",
+      "ok": true,
+      "status": 200,
+      "finalUrl": "https://www.salute.gov.it/new/it/tema/vaccinazioni/malattie-prevenibili-con-i-vaccini/",
+      "title": "Ministero della Salute - Malattie prevenibili con i vaccini",
+      "via": "browser"
+    }
+  ]
+}
