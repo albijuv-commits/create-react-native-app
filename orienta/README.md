@@ -30,7 +30,7 @@ npm run dev                  # http://localhost:3000
 ## Base di conoscenza e vetrino
 
 - Le schede delle condizioni sono file TypeScript tipizzati in `data/conditions/`, validati con Zod all'avvio e nei test. Ogni scheda resta «da revisionare» finché un medico non la controlla, e l'app lo segnala.
-- Le animazioni del vetrino sono scene SVG originali in `src/components/slide/scenes/`, descritte in `src/lib/slides/catalog.ts`. La pagina `/vetrino` (non indicizzata) mostra tutte le scene passo per passo, utile per la revisione.
+- Le animazioni del vetrino sono scene SVG originali in `src/components/slide/scenes/`, descritte in `src/lib/slides/catalog.ts`. La pagina `/vetrino` (non indicizzata) mostra tutte le scene passo per passo, utile per la revisione. L'app nativa ha le stesse scene, convertite per `react-native-svg` in `../orienta-app/src/components/slide/scenes/`: se cambi una scena qui, aggiorna anche quella (la galleria `/vetrino` delle due app permette il confronto). Le forme della sagoma del corpo sono condivise in `src/components/body-map/body-shapes.ts`.
 
 ### Come aggiungere una condizione
 

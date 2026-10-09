@@ -1,30 +1,11 @@
-import { Tabs, useRouter } from "expo-router";
-import { HeartPulse, Microscope, Pill, Siren, Stethoscope, UserRound, type LucideIcon } from "lucide-react-native";
-import { Pressable, StyleSheet, type ColorValue } from "react-native";
+import { Tabs } from "expo-router";
+import { HeartPulse, Microscope, Pill, Stethoscope, UserRound, type LucideIcon } from "lucide-react-native";
+import type { ColorValue } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Brand } from "~/components/brand";
-import { Txt } from "~/components/ui/text";
+import { EmergencyButton } from "~/components/emergency/emergency-button";
 import { useTheme } from "~/theme/theme";
 import { FONTS } from "~/theme/type";
-
-/** Il pulsante Emergenza, sempre visibile in alto su ogni scheda */
-function EmergencyButton() {
-  const { colors } = useTheme();
-  const router = useRouter();
-  return (
-    <Pressable
-      role="button"
-      accessibilityLabel="Emergenza"
-      accessibilityHint="Apre il 112 e i numeri di aiuto"
-      onPress={() => router.push("/emergenza")}
-      style={({ pressed }) => [styles.emergency, { backgroundColor: colors.red, transform: [{ scale: pressed ? 0.96 : 1 }] }]}
-    >
-      <Siren color={colors.onRed} size={20} strokeWidth={2.2} />
-      <Txt bold style={{ color: colors.onRed }}>
-        Emergenza
-      </Txt>
-    </Pressable>
-  );
-}
 
 // I colori delle schede sono sempre stringhe (vedi tabBarActiveTintColor): lucide vuole una stringa
 function tabIcon(Icon: LucideIcon) {
@@ -35,6 +16,7 @@ function tabIcon(Icon: LucideIcon) {
 
 export default function TabsLayout() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
@@ -46,20 +28,18 @@ export default function TabsLayout() {
         headerShadowVisible: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.inkMuted,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.line },
-        tabBarLabelStyle: { fontFamily: FONTS.bold, fontSize: 12 },
+        // Barra alta 60 pt più l'area sicura: icona ed etichetta in Atkinson ci stanno senza essere tagliate
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.line, height: 60 + insets.bottom, paddingTop: 4, paddingBottom: insets.bottom + 6 },
+        tabBarLabelStyle: { fontFamily: FONTS.bold, fontSize: 12, lineHeight: 16, flexShrink: 0 },
         sceneStyle: { backgroundColor: colors.bg },
       }}
     >
       <Tabs.Screen name="index" options={{ title: "Sintomi", tabBarIcon: tabIcon(HeartPulse) }} />
-      <Tabs.Screen name="condizioni" options={{ title: "Condizioni", tabBarIcon: tabIcon(Microscope) }} />
+      {/* Condizioni ha una sua pila di schermate (elenco e scheda), con le intestazioni in condizioni/_layout */}
+      <Tabs.Screen name="condizioni" options={{ title: "Condizioni", headerShown: false, tabBarIcon: tabIcon(Microscope) }} />
       <Tabs.Screen name="medici" options={{ title: "Medici", tabBarIcon: tabIcon(Stethoscope) }} />
       <Tabs.Screen name="mercato" options={{ title: "Mercato", tabBarIcon: tabIcon(Pill) }} />
       <Tabs.Screen name="profilo" options={{ title: "Profilo", tabBarIcon: tabIcon(UserRound) }} />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  emergency: { flexDirection: "row", alignItems: "center", gap: 6, minHeight: 44, paddingHorizontal: 16, borderRadius: 999 },
-});

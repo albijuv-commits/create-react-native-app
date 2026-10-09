@@ -3,6 +3,8 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvide
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo } from "react";
+import { StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ThemeProvider, useTheme } from "~/theme/theme";
 import { FONTS } from "~/theme/type";
 
@@ -12,11 +14,15 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({ AtkinsonHyperlegible_400Regular, AtkinsonHyperlegible_700Bold });
   if (!loaded && !error) return null;
   return (
-    <ThemeProvider>
-      <AppStack />
-    </ThemeProvider>
+    <GestureHandlerRootView style={styles.root}>
+      <ThemeProvider>
+        <AppStack />
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({ root: { flex: 1 } });
 
 function AppStack() {
   const { scheme, colors, ready } = useTheme();
@@ -43,6 +49,7 @@ function AppStack() {
       <Stack screenOptions={{ headerTintColor: colors.primary, headerShadowVisible: false, contentStyle: { backgroundColor: colors.bg } }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false, title: "Orienta" }} />
         <Stack.Screen name="emergenza" options={{ title: "Emergenza", headerTintColor: colors.red }} />
+        <Stack.Screen name="vetrino" options={{ title: "Galleria del vetrino" }} />
       </Stack>
     </NavigationThemeProvider>
   );

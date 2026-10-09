@@ -1,3 +1,4 @@
+import type { Ref } from "react";
 import { Text, type TextProps } from "react-native";
 import type { Palette } from "~/theme/colors";
 import { useTheme } from "~/theme/theme";
@@ -13,7 +14,7 @@ export function Txt({
   header,
   style,
   ...rest
-}: TextProps & { variant?: TextVariant; bold?: boolean; tone?: TextTone; header?: boolean }) {
+}: TextProps & { variant?: TextVariant; bold?: boolean; tone?: TextTone; header?: boolean; ref?: Ref<Text> }) {
   const { colors, scale } = useTheme();
   const strong = bold ?? (variant === "display" || variant === "title" || variant === "heading");
   return <Text role={header ? "heading" : rest.role} style={[textStyle(variant, scale, strong), { color: colors[tone] }, style]} {...rest} />;
