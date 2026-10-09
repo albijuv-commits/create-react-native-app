@@ -3,7 +3,7 @@
 Web app in italiano, mobile-first e installabile come PWA, che aiuta a capire i propri sintomi e a trovare il professionista giusto.
 **Orienta, non diagnostica**: ogni risultato è una possibilità e porta sempre verso un medico o un farmacista.
 
-Piano, struttura delle cartelle e design system: [docs/PIANO.md](docs/PIANO.md). Prima di pubblicare l'app leggi la [nota sul Regolamento UE sui dispositivi medici](#regolamento-ue-sui-dispositivi-medici-mdr).
+Piano, struttura delle cartelle e design system: [docs/PIANO.md](docs/PIANO.md). L'app nativa per iOS e Android (Expo) è in [`../orienta-app`](../orienta-app) e usa la stessa base di conoscenza e le stesse regole. Prima di pubblicare l'app leggi la [nota sul Regolamento UE sui dispositivi medici](#regolamento-ue-sui-dispositivi-medici-mdr).
 
 ## Avvio rapido
 
