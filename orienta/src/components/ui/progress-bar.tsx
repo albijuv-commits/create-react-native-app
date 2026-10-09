@@ -1,10 +1,11 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
+import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
 
 /** Barra di avanzamento: si muove solo quando cambia il valore (risponde a un'azione). */
 export function ProgressBar({ value, max, label }: { value: number; max: number; label: string }) {
-  const reduce = useReducedMotion();
+  const reduce = usePrefersReducedMotion();
   const pct = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
   return (
     <div

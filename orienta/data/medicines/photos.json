@@ -1,0 +1,43 @@
+[
+  {
+    "file": "augmentin-875-125-belgio.webp",
+    "brand": "AUGMENTIN",
+    "strength": "875 mg + 125 mg",
+    "formFamily": "compresse",
+    "country": "Belgio",
+    "shows": "Augmentin 875 mg/125 mg, compresse rivestite con film",
+    "author": "Bree",
+    "license": "CC0 1.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Augmentin_Amoxicilline-acide_clavulanique_875mg-125mg.JPG"
+  },
+  {
+    "file": "eutirox-100-125-italia.webp",
+    "brand": "EUTIROX",
+    "formFamily": "compresse",
+    "country": "Italia",
+    "shows": "Eutirox 100 e 125 microgrammi, compresse",
+    "author": "Anna.Massini",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Levotiroxina_sodica_-_EUTIROX_100_-_EUTIROX_125.jpg"
+  },
+  {
+    "file": "fluimucil-300-fiale-italia.webp",
+    "brand": "FLUIMUCIL",
+    "strength": "300 mg/3 ml",
+    "country": "Italia",
+    "shows": "Fluimucil 300 mg/3 ml, 10 fiale",
+    "author": "Syd Storm",
+    "license": "CC0 1.0",
+    "source": "https://commons.wikimedia.org/wiki/File:FLUIMUCIL_Zambon.jpg"
+  },
+  {
+    "file": "ventolin-100-spray-repubblica-ceca.webp",
+    "brand": "VENTOLIN",
+    "strength": "100 mcg",
+    "country": "Repubblica Ceca",
+    "shows": "Ventolin 100 microgrammi per dose, sospensione pressurizzata per inalazione",
+    "author": "Tomino de WS",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ventolin_Inhaler_N_100_ug_inh.jpg"
+  }
+]

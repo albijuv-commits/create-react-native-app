@@ -145,6 +145,9 @@
   --text-body--line-height: 1.55;
   --text-small: 0.9375rem;
   --text-small--line-height: 1.45;
+
+  /* Uscita decisa per le transizioni dell'interfaccia (pressione, colori): mai rimbalzi */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 html {
@@ -163,7 +166,35 @@ body {
 :focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
-  border-radius: 6px;
+}
+
+/* Le barre fisse (in alto e in basso) non devono coprire l'elemento con il focus né i titoli raggiunti con un'ancora */
+html {
+  scroll-padding-top: calc(3.5rem + env(safe-area-inset-top) + 1rem);
+  scroll-padding-bottom: calc(4rem + env(safe-area-inset-bottom) + 1rem);
+  -webkit-tap-highlight-color: color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+a,
+button,
+input,
+label,
+select,
+summary,
+textarea {
+  touch-action: manipulation;
+}
+
+/* Titoli senza parole orfane, testi lunghi senza vedove */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+p,
+li,
+figcaption {
+  text-wrap: pretty;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -311,5 +342,112 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .slide-svg * {
     animation: none !important;
+  }
+}
+
+/* ------------------------------------------------------------------ Mappa dei medici (Leaflet)
+ * Segnaposto numerati come la lista, il punto «sei qui», controlli e attribuzione con i colori dell'app.
+ */
+.orienta-map {
+  font-family: var(--font-sans);
+}
+.orienta-map .leaflet-control-attribution {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+.orienta-map .leaflet-control-attribution a {
+  color: var(--primary);
+}
+.orienta-map .leaflet-bar a {
+  width: 2.75rem;
+  height: 2.75rem;
+  line-height: 2.75rem;
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+.orienta-map .leaflet-bar a:hover {
+  background: var(--surface-2);
+}
+.orienta-map .leaflet-container:focus-visible,
+.orienta-map.leaflet-container:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+/* Le tile sono chiare: nel tema scuro si invertono, con colori smorzati */
+[data-theme="dark"] .orienta-map .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.55);
+}
+
+.orienta-pin {
+  background: none;
+  border: 0;
+}
+.orienta-pin__body {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--primary);
+  border: 2px solid var(--surface);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.28);
+  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out);
+}
+.orienta-pin__label {
+  transform: rotate(45deg);
+  color: var(--on-primary);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+.orienta-pin__body.is-selected {
+  background: var(--accent);
+  transform: rotate(-45deg) scale(1.18);
+}
+.orienta-pin__body.is-selected .orienta-pin__label {
+  color: var(--on-accent);
+}
+.leaflet-marker-icon.orienta-pin:focus-visible {
+  outline: none;
+}
+.leaflet-marker-icon.orienta-pin:focus-visible .orienta-pin__body {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.orienta-me {
+  background: none;
+  border: 0;
+}
+.orienta-me__dot {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: var(--calm);
+  border: 3px solid var(--surface);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--calm) 25%, transparent);
+}
+
+/* ------------------------------------------------------------------ Pannello in basso (email al medico) */
+.sheet[open] {
+  animation: sheet-in 220ms var(--ease-out);
+}
+.sheet::backdrop {
+  animation: sheet-fade 220ms var(--ease-out);
+}
+@keyframes sheet-in {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+@keyframes sheet-fade {
+  from {
+    opacity: 0;
   }
 }

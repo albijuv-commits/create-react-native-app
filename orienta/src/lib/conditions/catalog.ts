@@ -3,6 +3,8 @@ import { CONDITIONS } from "@data/conditions";
 import sourcesReport from "@data/conditions/sources-report.json";
 import { bodyAreaLabel } from "@data/vocab/body";
 import { SYMPTOMS } from "@data/vocab/symptoms";
+import type { SceneSpec } from "@/lib/slides/catalog";
+import type { TriageCondition } from "@/lib/triage/engine";
 import type { Condition } from "./schema";
 import { normalizeSearch, type ConditionListItem } from "./search";
 
@@ -48,4 +50,39 @@ export function formatItalianDate(isoDate: string): string {
   return new Intl.DateTimeFormat("it-IT", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(
     new Date(Date.UTC(y ?? 1970, (m ?? 1) - 1, d ?? 1)),
   );
+}
+
+function triageFields(c: Condition): TriageCondition {
+  return {
+    id: c.id,
+    name: c.name,
+    matchable: c.triage.matchable,
+    keySymptoms: c.triage.keySymptoms,
+    otherSymptoms: c.triage.otherSymptoms,
+    typicalUrgency: c.triage.typicalUrgency,
+    bodyZones: c.bodyZones,
+    specialistId: c.specialist.id,
+    moreLikelyIf: c.triage.moreLikelyIf,
+    lessLikelyIf: c.triage.lessLikelyIf,
+  };
+}
+
+/** I dati delle condizioni che servono al motore dell'intervista (molto più leggeri delle schede complete) */
+export function triageConditions(): TriageCondition[] {
+  return CONDITIONS.map(triageFields);
+}
+
+/** Per l'interfaccia dell'intervista: i dati del motore più l'anteprima del vetrino e la prima frase */
+export interface InterviewCondition extends TriageCondition {
+  teaser: string;
+  animation: SceneSpec;
+}
+
+export function interviewConditions(): InterviewCondition[] {
+  return CONDITIONS.map((c) => ({ ...triageFields(c), teaser: firstSentence(c.overview), animation: c.animation }));
+}
+
+/** Per la sezione Medici: nome della condizione e specialista di riferimento, per chi arriva da una scheda o dai risultati */
+export function conditionSpecialists(): Record<string, { name: string; specialist: Condition["specialist"]["id"] }> {
+  return Object.fromEntries(CONDITIONS.map((c) => [c.id, { name: c.name, specialist: c.specialist.id }]));
 }

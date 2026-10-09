@@ -31,7 +31,7 @@ function Segmented<T extends string>({
             <label
               key={o.value}
               className={cn(
-                "flex min-h-11 cursor-pointer items-center justify-center gap-1 rounded-xl px-2 text-center text-small has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-focus",
+                "relative flex min-h-11 cursor-pointer items-center justify-center gap-1 rounded-xl px-2 text-center text-small has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-focus",
                 selected ? "bg-surface font-bold text-primary shadow-sm" : "text-ink-muted",
               )}
             >

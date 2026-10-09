@@ -1,5 +1,6 @@
 import type { BodyAreaId } from "@data/vocab/body";
 import type { SceneSpec } from "@/lib/slides/catalog";
+import { normalizeText } from "@/lib/text/normalize";
 
 /** Dati leggeri di una condizione, per l'elenco e la ricerca lato client */
 export interface ConditionListItem {
@@ -15,14 +16,7 @@ export interface ConditionListItem {
 }
 
 /** Minuscolo, senza accenti né punteggiatura: «Rinite allergica, febbre da fieno» → «rinite allergica febbre da fieno» */
-export function normalizeSearch(text: string): string {
-  return text
-    .normalize("NFD")
-    .replace(/\p{Diacritic}/gu, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
+export const normalizeSearch = normalizeText;
 
 function score(item: ConditionListItem, tokens: string[], query: string): number {
   const { name, aliases, rest } = item.index;

@@ -1,11 +1,18 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight, Hand, Pause, Play, RotateCcw } from "lucide-react";
+import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from "react";
 import { SCENE_STEPS, SCENE_TITLES, type SceneSpec } from "@/lib/slides/catalog";
 import { cn } from "@/lib/cn";
 import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
 import { SlideSvg } from "./slide-svg";
+
+/** Lente d'ingrandimento: diametro in pixel e ingrandimento */
+const LENS = 120;
+const ZOOM = 2.4;
+/** Tenere premuto così a lungo (senza muoversi) apre la lente */
+const HOLD_MS = 280;
+const SWIPE_PX = 50;
 
 /** Tempo per passo: abbastanza per leggere la didascalia (minimo 5 secondi) */
 function stepDuration(caption: string) {
@@ -46,10 +53,73 @@ export function SlideViewer({ spec, subject }: { spec: SceneSpec; subject: strin
 
   const title = `${SCENE_TITLES[spec.scene]}: ${subject}`;
 
+  // Gesti sul vetrino: scorrere di lato cambia passo, tenere premuto apre la lente
+  const press = useRef<{ id: number; x: number; y: number; timer: number; touch: boolean } | null>(null);
+  const [lens, setLens] = useState<{ x: number; y: number; touch: boolean; width: number } | null>(null);
+  const local = (e: PointerEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  };
+  const onDown = (e: PointerEvent<HTMLDivElement>) => {
+    if (press.current || (e.target instanceof Element && e.target.closest("button"))) return;
+    const p = local(e);
+    const touch = e.pointerType !== "mouse";
+    const width = e.currentTarget.clientWidth;
+    const timer = window.setTimeout(() => setLens({ ...p, touch, width }), HOLD_MS);
+    press.current = { id: e.pointerId, x: p.x, y: p.y, timer, touch };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const onMove = (e: PointerEvent<HTMLDivElement>) => {
+    const start = press.current;
+    if (!start || e.pointerId !== start.id) return;
+    const p = local(e);
+    if (lens) setLens({ ...lens, ...p });
+    else if (Math.hypot(p.x - start.x, p.y - start.y) > 8) window.clearTimeout(start.timer);
+  };
+  const onUp = (e: PointerEvent<HTMLDivElement>) => {
+    const start = press.current;
+    if (!start || e.pointerId !== start.id) return;
+    window.clearTimeout(start.timer);
+    press.current = null;
+    if (lens) {
+      setLens(null);
+      return;
+    }
+    const p = local(e);
+    const dx = p.x - start.x;
+    if (Math.abs(dx) > SWIPE_PX && Math.abs(dx) > Math.abs(p.y - start.y) * 1.5) go(step + (dx < 0 ? 1 : -1));
+  };
+  const onCancel = () => {
+    if (press.current) window.clearTimeout(press.current.timer);
+    press.current = null;
+    setLens(null);
+  };
+  const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "ArrowRight") go(step + 1);
+    else if (e.key === "ArrowLeft") go(step - 1);
+    else return;
+    e.preventDefault();
+  };
+
   return (
     <figure className="space-y-3">
-      <div className="relative mx-auto w-full max-w-[19rem]">
+      <div
+        tabIndex={0}
+        onKeyDown={onKey}
+        onPointerDown={onDown}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerCancel={onCancel}
+        onContextMenu={(e) => e.preventDefault()}
+        aria-label={`${title}. Usa le frecce per cambiare passo.`}
+        className="relative mx-auto w-full max-w-[19rem] touch-pan-y rounded-full outline-none select-none [-webkit-touch-callout:none] focus-visible:ring-4 focus-visible:ring-focus/60"
+      >
         <SlideSvg spec={spec} step={step} playing={playing} reduced={reduced} label={`${title}. Passo ${step + 1} di ${SCENE_STEPS}.`} />
+        {lens && (
+          <Lens x={lens.x} y={lens.y} touch={lens.touch} width={lens.width}>
+            <SlideSvg spec={spec} step={step} playing={playing} reduced={reduced} />
+          </Lens>
+        )}
         {!reduced && !started && (
           <button
             type="button"
@@ -61,6 +131,11 @@ export function SlideViewer({ spec, subject }: { spec: SceneSpec; subject: strin
           </button>
         )}
       </div>
+
+      <p className="flex items-center justify-center gap-1.5 text-center text-small text-ink-muted">
+        <Hand aria-hidden className="size-4 shrink-0" />
+        Scorri per cambiare passo · tieni premuto per la lente
+      </p>
 
       <figcaption className="space-y-3">
         {reduced ? (
@@ -93,7 +168,7 @@ export function SlideViewer({ spec, subject }: { spec: SceneSpec; subject: strin
               aria-current={i === step ? "step" : undefined}
               className="grid size-11 place-items-center rounded-full"
             >
-              <span className={cn("block rounded-full transition-all", i === step ? "h-2.5 w-6 bg-accent" : "size-2.5 bg-line")} />
+              <span className={cn("block rounded-full transition-colors duration-150", i === step ? "h-2.5 w-6 bg-accent" : "size-2.5 bg-line")} />
             </button>
           ))}
         </div>
@@ -138,7 +213,7 @@ function ControlButton({
   onClick: () => void;
   disabled?: boolean;
   primary?: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <button
@@ -146,12 +221,32 @@ function ControlButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "inline-flex min-h-11 min-w-11 flex-col items-center justify-center rounded-xl px-2 text-[0.75rem] font-bold disabled:opacity-35",
+        "inline-flex min-h-11 min-w-11 flex-col items-center justify-center rounded-xl px-2 py-1 text-[0.8125rem] font-bold transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] disabled:opacity-35 disabled:active:scale-100",
         primary ? "bg-primary text-on-primary" : "bg-surface-2 text-primary",
       )}
     >
       {children}
       <span>{label}</span>
     </button>
+  );
+}
+
+/**
+ * La lente: un cerchio che ingrandisce il vetrino sotto il dito. Con il tocco sta un po' più in alto,
+ * così il dito non la copre.
+ */
+function Lens({ x, y, touch, width, children }: { x: number; y: number; touch: boolean; width: number; children: ReactNode }) {
+  const cx = x;
+  const cy = touch ? y - LENS * 0.7 : y;
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute z-10 overflow-hidden rounded-full border-4 border-surface bg-surface shadow-[0_12px_30px_-8px_rgb(26_27_46/0.45)] ring-2 ring-primary/40"
+      style={{ width: LENS, height: LENS, left: cx - LENS / 2, top: cy - LENS / 2 }}
+    >
+      <div className="absolute" style={{ width: width * ZOOM, left: LENS / 2 - x * ZOOM, top: LENS / 2 - y * ZOOM }}>
+        {children}
+      </div>
+    </div>
   );
 }

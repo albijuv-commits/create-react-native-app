@@ -6,20 +6,20 @@ type CalloutTone = "info" | "warning" | "danger";
 
 const tones: Record<CalloutTone, { box: string; icon: ReactNode }> = {
   info: {
-    box: "border-primary bg-primary-soft",
+    box: "border-primary/25 bg-primary-soft",
     icon: <Info aria-hidden className="size-5 shrink-0 text-primary" />,
   },
   warning: {
-    box: "border-amber bg-amber-soft",
+    box: "border-amber/30 bg-amber-soft",
     icon: <AlertTriangle aria-hidden className="size-5 shrink-0 text-amber" />,
   },
   danger: {
-    box: "border-red bg-red-soft",
+    box: "border-red/30 bg-red-soft",
     icon: <OctagonAlert aria-hidden className="size-5 shrink-0 text-red" />,
   },
 };
 
-/** Box informativo con bordo laterale: per avvisi e note, non per contenuti principali. */
+/** Box informativo con fondo tinto e icona: per avvisi e note, non per contenuti principali. */
 export function Callout({
   tone = "info",
   title,
@@ -35,7 +35,7 @@ export function Callout({
   return (
     <div
       role={tone === "danger" ? "alert" : undefined}
-      className={cn("flex gap-3 rounded-xl border-l-4 p-4 text-small", t.box, className)}
+      className={cn("flex gap-3 rounded-2xl border p-4 text-small", t.box, className)}
     >
       {t.icon}
       <div className="space-y-1">

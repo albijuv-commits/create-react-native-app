@@ -7,9 +7,12 @@ import { SlideViewer } from "@/components/slide/slide-viewer";
 import { Badge } from "@/components/ui/badge";
 import { ButtonAnchor, ButtonLink } from "@/components/ui/button";
 import { Callout } from "@/components/ui/callout";
+import { TiltIllustration } from "@/components/ui/tilt-illustration";
 import { cn } from "@/lib/cn";
 import { SOURCES_CHECKED_AT, formatItalianDate } from "@/lib/conditions/catalog";
 import type { Condition } from "@/lib/conditions/schema";
+import { CONDITION_ILLUSTRATIONS } from "@/lib/illustrations/conditions";
+import { SPECIALIST_ILLUSTRATIONS } from "@/lib/illustrations/specialists";
 
 const SECTIONS = [
   { id: "panoramica", label: "Panoramica" },
@@ -29,7 +32,7 @@ type SectionId = (typeof SECTIONS)[number]["id"];
 
 function Section({ id, title, children }: { id: SectionId; title: string; children: ReactNode }) {
   return (
-    <section id={id} aria-labelledby={`${id}-titolo`} className="scroll-mt-24 space-y-4">
+    <section id={id} aria-labelledby={`${id}-titolo`} className="space-y-4">
       <h2 id={`${id}-titolo`} className="text-title font-bold text-primary">
         {title}
       </h2>
@@ -58,7 +61,8 @@ function BulletList({ items, marker = "bg-accent" }: { items: readonly string[];
 function medicLink(specialist: SpecialtyId, condition?: string) {
   const params = new URLSearchParams({ specialista: specialist });
   if (condition) params.set("condizione", condition);
-  return `/medici?${params.toString()}`;
+  // Specialista e condizione dopo «#»: non arrivano al server né ai suoi log
+  return `/medici#${params.toString()}`;
 }
 
 export function ConditionArticle({ condition: c }: { condition: Condition }) {
@@ -75,9 +79,14 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
           <ArrowLeft aria-hidden className="size-5" />
           Tutte le condizioni
         </Link>
-        <div className="space-y-2">
-          <h1 className="text-display font-bold text-ink">{c.name}</h1>
-          {c.aliases.length > 0 && <p className="text-ink-muted">Detta anche: {c.aliases.join(", ")}</p>}
+        <div className="flex items-center gap-4">
+          <div className="min-w-0 flex-1 space-y-2">
+            <h1 className="text-display font-bold text-ink">{c.name}</h1>
+            {c.aliases.length > 0 && <p className="text-ink-muted">Detta anche: {c.aliases.join(", ")}</p>}
+          </div>
+          {CONDITION_ILLUSTRATIONS[c.id] && (
+            <TiltIllustration src={CONDITION_ILLUSTRATIONS[c.id]!} sizes="128px" priority className="w-28 shrink-0 sm:w-32" />
+          )}
         </div>
         <ul className="flex flex-wrap gap-2" aria-label="Aree del corpo">
           {c.areas.map((a) => (
@@ -94,16 +103,24 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
         )}
         <nav aria-label="In questa scheda" className="-mx-4 overflow-x-auto px-4">
           <ul className="flex gap-2 pb-1">
-            {SECTIONS.map((s) => (
-              <li key={s.id} className="shrink-0">
-                <a
-                  href={`#${s.id}`}
-                  className="inline-flex min-h-11 items-center rounded-full bg-surface-2 px-4 text-small font-bold text-ink hover:bg-primary-soft hover:text-primary"
-                >
-                  {s.label}
-                </a>
-              </li>
-            ))}
+            {/* La sezione sulla sicurezza viene prima nell'indice: è quella da trovare subito */}
+            {[...SECTIONS.filter((s) => s.id === "quando-andare"), ...SECTIONS.filter((s) => s.id !== "quando-andare")].map((s) => {
+              const safety = s.id === "quando-andare";
+              return (
+                <li key={s.id} className="shrink-0">
+                  <a
+                    href={`#${s.id}`}
+                    className={cn(
+                      "inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-small font-bold transition-[color,background-color,transform] duration-150 ease-out active:scale-[0.97]",
+                      safety ? "bg-red-soft text-red hover:bg-red hover:text-on-red" : "bg-surface-2 text-ink hover:bg-primary-soft hover:text-primary",
+                    )}
+                  >
+                    {safety && <Siren aria-hidden className="size-4" />}
+                    {s.label}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       </header>
@@ -117,7 +134,11 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
       </Section>
 
       <Section id="storia" title="Storia">
-        <p className="border-l-4 border-accent pl-4 italic text-ink-muted">{c.history.nameOrigin}</p>
+        <div className="space-y-1">
+          <SubHeading>Da dove viene il nome</SubHeading>
+          <p>{c.history.nameOrigin}</p>
+        </div>
+        <SubHeading>Le tappe</SubHeading>
         <ol className="relative space-y-5 border-l-2 border-line pl-6">
           {c.history.events.map((e) => (
             <li key={e.when + e.text.slice(0, 20)} className="relative">
@@ -130,12 +151,14 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
       </Section>
 
       <Section id="casi" title={c.cases.length > 1 ? "Casi clinici" : "Un caso clinico"}>
-        {c.cases.map((k) => (
-          <figure key={k.title} className="space-y-3 rounded-2xl bg-surface-2 p-5">
+        {c.cases.map((k, i) => (
+          <article key={k.title} aria-labelledby={`caso-${i + 1}`} className="space-y-3 rounded-2xl bg-surface-2 p-5">
             <Badge tone={k.kind === "illustrativo" ? "primary" : "accent"}>
               {k.kind === "illustrativo" ? "Caso inventato a scopo illustrativo" : "Caso pubblicato"}
             </Badge>
-            <figcaption className="text-heading font-bold">{k.title}</figcaption>
+            <h3 id={`caso-${i + 1}`} className="text-heading font-bold">
+              {k.title}
+            </h3>
             <p>{k.story}</p>
             <p>
               <span className="font-bold">Cosa insegna: </span>
@@ -148,7 +171,7 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
                 <span className="sr-only">(si apre in una nuova scheda)</span>
               </a>
             )}
-          </figure>
+          </article>
         ))}
       </Section>
 
@@ -166,9 +189,9 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
       </Section>
 
       <Section id="cure" title="Cure possibili">
-        <ul className="space-y-3">
+        <ul className="divide-y divide-line border-y border-line">
           {c.treatments.options.map((o) => (
-            <li key={o.title} className="rounded-2xl border border-line p-4">
+            <li key={o.title} className="space-y-0.5 py-3">
               <p className="font-bold">{o.title}</p>
               <p className="text-ink-muted">{o.text}</p>
             </li>
@@ -208,7 +231,12 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
 
       <Section id="specialista" title="Specialista di riferimento">
         <div className="space-y-3 rounded-2xl bg-primary-soft p-5">
-          <p className="text-heading font-bold text-primary">{specialist.label}</p>
+          <div className="flex items-center gap-3">
+            <p className="min-w-0 flex-1 text-heading font-bold text-primary">{specialist.label}</p>
+            {SPECIALIST_ILLUSTRATIONS[c.specialist.id] && (
+              <TiltIllustration src={SPECIALIST_ILLUSTRATIONS[c.specialist.id]!} sizes="80px" className="w-20 shrink-0" />
+            )}
+          </div>
           <p>{c.specialist.why}</p>
           <p className="text-small text-ink-muted">{specialist.description}</p>
           {emergency ? (
@@ -242,17 +270,17 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
 
       <Section id="fonti" title="Fonti">
         <p className="text-small text-ink-muted">
-          Abbiamo scritto la scheda a partire da queste fonti autorevoli. Ultimo aggiornamento: {formatItalianDate(c.updatedAt)}. Link
-          verificati il {formatItalianDate(SOURCES_CHECKED_AT)}.
+          La scheda si basa su queste fonti autorevoli. Ultimo aggiornamento: {formatItalianDate(c.updatedAt)}. Link verificati il{" "}
+          {formatItalianDate(SOURCES_CHECKED_AT)}.
         </p>
-        <ul className="space-y-3">
+        <ul className="divide-y divide-line border-y border-line">
           {c.sources.map((s) => (
             <li key={s.url}>
               <a
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex min-h-11 items-start gap-3 rounded-xl border border-line p-3 hover:border-primary"
+                className="group -mx-2 flex min-h-11 items-start gap-3 rounded-xl px-2 py-3 transition-colors duration-150 ease-out hover:bg-surface-2"
               >
                 <ExternalLink aria-hidden className="mt-1 size-4 shrink-0 text-primary" />
                 <span>

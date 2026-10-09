@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 3100;
+/** Con E2E_BASE_URL i test girano su un server già avviato (per esempio quello di sviluppo) */
+const external = process.env.E2E_BASE_URL;
 
 /**
  * Test end-to-end su una build di produzione, con viewport da telefono.
@@ -15,15 +17,19 @@ export default defineConfig({
   reporter: process.env.CI ? "github" : "list",
   use: {
     ...devices["Pixel 7"],
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: external ?? `http://localhost:${PORT}`,
     locale: "it-IT",
     trace: "retain-on-failure",
     launchOptions: process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {},
   },
-  webServer: {
-    command: `npm run build && npm run start -- -p ${PORT}`,
-    url: `http://localhost:${PORT}`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 300_000,
-  },
+  webServer: external
+    ? undefined
+    : {
+        command: `npm run build && npm run start -- -p ${PORT}`,
+        url: `http://localhost:${PORT}`,
+        reuseExistingServer: !process.env.CI,
+        timeout: 300_000,
+        // Solo dati di esempio: nessuna chiamata a Google o a Overpass, catalogo dei farmaci di esempio
+        env: { DOCTORS_PROVIDER: "esempio", MEDICINES_SOURCE: "esempio" },
+      },
 });
