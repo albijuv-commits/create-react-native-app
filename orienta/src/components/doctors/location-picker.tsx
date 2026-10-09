@@ -1,11 +1,12 @@
 "use client";
 
-import { LoaderCircle, LocateFixed, MapPin, Search } from "lucide-react";
+import { House, LoaderCircle, LocateFixed, MapPin, Search } from "lucide-react";
 import { useId, useRef, useState, type FormEvent } from "react";
 import mappa from "@/assets/illustrations/stato-mappa.webp";
 import { Button } from "@/components/ui/button";
 import { TiltIllustration } from "@/components/ui/tilt-illustration";
 import { DoctorsRequestError, fetchPlace } from "@/lib/doctors/client";
+import { usePrefs } from "@/lib/prefs/use-prefs";
 
 export interface Origin {
   kind: "gps" | "luogo";
@@ -27,7 +28,9 @@ const GEO_ERRORS: Record<number, string> = {
 export function LocationPicker({ origin, onOrigin }: { origin: Origin | null; onOrigin: (origin: Origin) => void }) {
   const [editing, setEditing] = useState(false);
   const [query, setQuery] = useState("");
-  const [busy, setBusy] = useState<"posizione" | "luogo" | null>(null);
+  const [busy, setBusy] = useState<"posizione" | "luogo" | "predefinita" | null>(null);
+  const [prefs] = usePrefs();
+  const defaultCity = prefs.defaultCity.trim();
   const [error, setError] = useState<string | null>(null);
   const controller = useRef<AbortController | null>(null);
   const inputId = useId();
@@ -59,9 +62,12 @@ export function LocationPicker({ origin, onOrigin }: { origin: Origin | null; on
     );
   };
 
-  const search = async (event: FormEvent) => {
+  const search = (event: FormEvent) => {
     event.preventDefault();
-    const q = query.trim();
+    void find(query.trim(), "luogo");
+  };
+
+  const find = async (q: string, kind: "luogo" | "predefinita") => {
     if (q.length < 2) {
       setError("Scrivi il nome di una città o un CAP.");
       return;
@@ -69,7 +75,7 @@ export function LocationPicker({ origin, onOrigin }: { origin: Origin | null; on
     controller.current?.abort();
     const c = new AbortController();
     controller.current = c;
-    setBusy("luogo");
+    setBusy(kind);
     setError(null);
     try {
       const place = await fetchPlace(q, c.signal);
@@ -110,6 +116,19 @@ export function LocationPicker({ origin, onOrigin }: { origin: Origin | null; on
 
       {open && (
         <div className="space-y-3">
+          {defaultCity && (
+            <Button
+              size="lg"
+              variant="secondary"
+              className="w-full"
+              onClick={() => void find(defaultCity, "predefinita")}
+              disabled={busy !== null}
+              icon={busy === "predefinita" ? <LoaderCircle aria-hidden className="size-6 animate-spin" /> : <House aria-hidden className="size-6" />}
+            >
+              {busy === "predefinita" ? `Cerco ${defaultCity}…` : `Cerca a ${defaultCity}`}
+            </Button>
+          )}
+
           <Button
             size="lg"
             className="w-full"

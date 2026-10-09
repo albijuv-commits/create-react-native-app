@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, LockKeyhole, Siren, Sparkles, Stethoscope } from "lucide-react";
+import Link from "next/link";
 import { useRef, useState, type ReactNode, type Ref } from "react";
 import consenso from "@/assets/illustrations/passo-consenso.webp";
 import { Button } from "@/components/ui/button";
@@ -63,7 +64,10 @@ export function ConsentStep({
         </Fact>
         <Fact icon={<LockKeyhole aria-hidden className="size-5" />}>
           <strong>I tuoi dati restano tuoi.</strong> Non li salviamo e in queste pagine non usiamo strumenti di analisi o di
-          tracciamento.
+          tracciamento.{" "}
+          <Link href="/profilo/privacy" className="font-bold text-primary underline underline-offset-2">
+            Leggi l&apos;informativa privacy
+          </Link>
         </Fact>
       </ul>
 
@@ -82,7 +86,7 @@ export function ConsentStep({
           onChange={(health) => onChange({ ...value, health })}
           invalid={tried && !value.health}
           label="Acconsento all'uso dei dati sulla mia salute che inserirò, solo per questa intervista."
-          note="Sono dati particolari secondo l'articolo 9 del GDPR. Restano su questo dispositivo e si cancellano quando chiudi la pagina."
+          note="Sono dati particolari secondo l'articolo 9 del GDPR. Restano su questo dispositivo e si cancellano quando chiudi la pagina, a meno che alla fine tu scelga di salvarli nello storico."
         />
         {aiAvailable && (
           <CheckRow

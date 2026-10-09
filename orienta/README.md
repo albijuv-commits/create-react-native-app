@@ -3,8 +3,7 @@
 Web app in italiano, mobile-first e installabile come PWA, che aiuta a capire i propri sintomi e a trovare il professionista giusto.
 **Orienta, non diagnostica**: ogni risultato è una possibilità e porta sempre verso un medico o un farmacista.
 
-Piano, struttura delle cartelle e design system: [docs/PIANO.md](docs/PIANO.md).
-Il README completo (come aggiungere una condizione, nota sul Regolamento MDR) arriva nella fase 6.
+Piano, struttura delle cartelle e design system: [docs/PIANO.md](docs/PIANO.md). Prima di pubblicare l'app leggi la [nota sul Regolamento UE sui dispositivi medici](#regolamento-ue-sui-dispositivi-medici-mdr).
 
 ## Avvio rapido
 
@@ -21,7 +20,7 @@ npm run dev                  # http://localhost:3000
 | `npm run build && npm start` | Build di produzione (il service worker si attiva solo qui) |
 | `npm run lint` / `npm run typecheck` | Controlli statici |
 | `npm test` | Test unitari (Vitest) |
-| `npm run test:e2e` | Test end-to-end (Playwright) su una build di produzione, con medici e farmaci di esempio e senza scaricare tile. Se il browser di Playwright non è installato, indica un Chromium con `CHROMIUM_PATH=/percorso/chromium` |
+| `npm run test:e2e` | Test end-to-end (Playwright) su una build di produzione, con medici e farmaci di esempio e senza scaricare tile: Sintomi, Specialista, Mercato, Profilo, privacy e accessibilità (axe, tema chiaro e scuro). Se il browser di Playwright non è installato, indica un Chromium con `CHROMIUM_PATH=/percorso/chromium`; con `E2E_BASE_URL=http://localhost:3000` i test usano un server già avviato |
 | `npm run import:aifa` | Importa il catalogo dei medicinali dagli Open Data dell'AIFA (vedi [Mercato](#mercato)) |
 | `npm run import:ema` | Aggiorna i marchi europei dall'elenco dell'EMA (vedi [Mercato](#mercato)) |
 | `npm run check:sources` | Verifica che i link delle fonti delle schede esistano; con `-- --write` aggiorna `data/conditions/sources-report.json` |
@@ -33,16 +32,32 @@ npm run dev                  # http://localhost:3000
 - Le schede delle condizioni sono file TypeScript tipizzati in `data/conditions/`, validati con Zod all'avvio e nei test. Ogni scheda resta «da revisionare» finché un medico non la controlla, e l'app lo segnala.
 - Le animazioni del vetrino sono scene SVG originali in `src/components/slide/scenes/`, descritte in `src/lib/slides/catalog.ts`. La pagina `/vetrino` (non indicizzata) mostra tutte le scene passo per passo, utile per la revisione.
 
+### Come aggiungere una condizione
+
+1. **Scrivi la scheda** in `data/conditions/<id>.ts` con `defineCondition({ ... })`. L'ID è in minuscolo con i trattini (ad esempio `otite-esterna`); lo schema completo è in `src/lib/conditions/schema.ts` e conviene partire da una scheda esistente, come `cistite.ts`. Servono:
+   - nome, sinonimi, aree e zone del corpo (`data/vocab/body.ts`), una panoramica breve;
+   - storia (origine del nome e almeno 3 date), 1 o 2 casi clinici (quelli inventati con `kind: "illustrativo"`), cause, fattori di rischio, sintomi tipici e meno comuni, cure possibili, quando sentire il medico, prevenzione;
+   - lo specialista di riferimento (`data/vocab/specialties.ts`), con il motivo;
+   - almeno 2 fonti autorevoli in https, da editori ammessi (ISSalute, Ministero della Salute, NHS, MedlinePlus e gli altri elencati nello schema);
+   - `animation`: una scena del catalogo (`src/lib/slides/catalog.ts`) con i suoi parametri e una didascalia per ogni passo;
+   - `triage`: almeno 2 `keySymptoms` e gli `otherSymptoms`, scelti tra gli ID di `data/vocab/symptoms.ts` (se un sintomo manca, aggiungilo lì con i suoi sinonimi: servono a riconoscerlo mentre la persona scrive), le frasi «più probabile se» e «meno probabile se», `typicalUrgency` (`home`, `gp`, `soon`, `er`). Con `matchable: false` la scheda resta consultabile ma non compare tra i risultati dell'intervista;
+   - `reviewStatus: "da revisionare"` finché un medico non la controlla, e `updatedAt`.
+2. **Registrala** in `data/conditions/index.ts`: importa il file e aggiungilo all'elenco `RAW`.
+3. **Illustrazione** (facoltativa): salva `src/assets/illustrations/condizione-<id>.webp` e lancia `node scripts/gen-illustration-maps.mjs`. Senza illustrazione la card usa l'anteprima del vetrino.
+4. **Verifica**: `npm test` valida tutte le schede (schema, ID unici, registrazione in `index.ts`, casi illustrativi dichiarati) e `npm run check:sources -- --write` controlla che i link delle fonti esistano.
+
+La nuova scheda compare subito nell'elenco Condizioni, nel motore a regole e tra quelle che l'AI può scegliere: il modello sceglie solo tra gli ID della base di conoscenza, quindi una condizione che non è qui non può mai comparire nei risultati.
+
 ## Intervista sui sintomi
 
 - Flusso: consenso → dati di base (sotto i 14 anni serve un genitore o un tutore, sotto i 18 il tono si adatta) → descrizione a parole, con i sintomi riconosciuti mentre si scrive, e mappa del corpo 3D o semplice → da 5 a 12 domande su carte da sfogliare (c'è sempre «Non so») → risultati.
 - I segnali d'allarme sono regole deterministiche (`src/lib/triage/red-flags.ts`, un test per regola): si controllano nel browser a ogni risposta e sul server prima e dopo ogni chiamata all'AI, e portano alla schermata Emergenza (112; per i pensieri di farsi del male anche Telefono Amico e Telefono Azzurro).
-- Senza `ANTHROPIC_API_KEY`, o senza il consenso facoltativo all'AI, il motore a regole gira tutto nel browser e nessun dato sanitario lascia il dispositivo. Con la chiave e il consenso, `/api/triage` usa Claude con uscita strutturata validata da Zod: il modello può scegliere solo tra le schede della base di conoscenza, un'uscita non valida viene riprovata una volta e poi si propone il metodo semplificato; l'urgenza non scende mai sotto quella delle regole. Il server non registra i dati.
-- I risultati mostrano sempre «Questa non è una diagnosi. Solo un medico può valutare i tuoi sintomi.», il livello di urgenza con colore, icona e testo, da 1 a 5 condizioni compatibili con i fattori che le rendono più o meno probabili, e il riepilogo per il medico da copiare, condividere o scaricare in PDF (creato nel browser).
+- Senza `ANTHROPIC_API_KEY`, o senza il consenso facoltativo all'AI, il motore a regole gira tutto nel browser e nessun dato sanitario lascia il dispositivo. Con la chiave e il consenso, `/api/triage` usa Claude con uscita strutturata validata da Zod: il modello può scegliere solo tra le schede della base di conoscenza, un'uscita non valida viene riprovata una volta e poi si propone il metodo semplificato; l'urgenza non scende mai sotto quella delle regole. Anche con il consenso le domande fisse (segnali d'allarme, durata, intensità) restano nel browser: i dati partono solo quando servono al modello. Il server non registra i dati.
+- I risultati mostrano sempre «Questa non è una diagnosi. Solo un medico può valutare i tuoi sintomi.», il livello di urgenza con colore, icona e testo, da 1 a 5 condizioni compatibili con i fattori che le rendono più o meno probabili, e il riepilogo per il medico da copiare, condividere o scaricare in PDF (creato nel browser). Alla fine la persona può salvare la sessione nello storico del dispositivo.
 
 ## Medici
 
-- Chi cercare: il medico di base è sempre il primo passo proposto; dai risultati dell'intervista e dalle schede si arriva con lo specialista di riferimento già scelto (per i più piccoli il pediatra). Dove: posizione del browser, con il permesso della persona, oppure città o CAP.
+- Chi cercare: il medico di base è sempre il primo passo proposto; dai risultati dell'intervista e dalle schede si arriva con lo specialista di riferimento già scelto (per i più piccoli il pediatra). Dove: posizione del browser, con il permesso della persona, oppure città o CAP, oppure la città predefinita scelta nel Profilo.
 - La posizione parte dal telefono già arrotondata a circa 100 metri; la route `/api/medici` la usa solo per la ricerca, senza salvarla né scriverla nei log. Il riepilogo dei sintomi per l'email resta nella scheda del browser (`sessionStorage`) e non va mai al server.
 - Fonti (`src/lib/doctors/`), dietro l'interfaccia `DoctorProvider`:
   - `GooglePlacesProvider` (Places API, Text Search), se c'è `GOOGLE_PLACES_API_KEY`: nome, indirizzo, distanza, telefono, sito, valutazione e orari. Come chiedono i termini di Google, i risultati non si mettono in cache, si mostrano con l'attribuzione «Google Maps» e non vanno su mappe non Google: con questa fonte la vista mappa si disattiva e le indicazioni usano i link di Google.
@@ -72,6 +87,23 @@ npm run import:ema                                   # marchi europei: scrive da
 
 Il database (circa 86.000 confezioni) non è nel repository: si crea con l'import e va distribuito insieme all'app, oppure indicato con `MEDICINES_DB_PATH`. Senza database, o con `MEDICINES_SOURCE=esempio`, l'app usa il campione di 44 confezioni, sempre etichettato «DATI DI ESEMPIO». Ogni pagina del Mercato riporta l'attribuzione richiesta dalla licenza: «Fonte: AIFA, Open Data (licenza CC BY 4.0)».
 
+## Profilo e privacy
+
+Nessun account: i dati restano sul dispositivo, tranne quello che parte verso l'AI durante l'intervista, e solo con il consenso esplicito.
+
+- **Preferenze** (`src/lib/prefs/`): tema chiaro, scuro o automatico, dimensione del testo e città predefinita per la ricerca dei medici, in `localStorage`. Uno script nell'`<head>` le applica prima del primo disegno, così la pagina non lampeggia.
+- **Storico delle sessioni** (`src/lib/storage/history.ts`): in IndexedDB (database `orienta`), al massimo 50 sessioni. Si salva solo se la persona preme «Salva nello storico» alla fine dell'intervista, perché il consenso dell'intervista vale solo per l'intervista. Ogni voce contiene data, età, metodo, urgenza, condizioni compatibili e riepilogo per il medico; quando si rilegge passa di nuovo da Zod. Dal Profilo si apre il riepilogo (copia o PDF), si elimina una sessione o tutto lo storico.
+- **«Elimina tutti i miei dati»** (`src/lib/storage/erase.ts`), con una conferma: cancella il database IndexedDB, le chiavi `orienta:` di `localStorage` e `sessionStorage` (preferenze, preferiti e confronto del Mercato, riepilogo per l'email), le pagine salvate dal service worker per l'uso senza rete, e riporta le preferenze ai valori iniziali. Restano solo l'app e le pagine Emergenza e offline, che non contengono dati personali. Se una parte non si cancella, l'app lo dice e spiega come farlo dalle impostazioni del browser.
+- **Service worker** (`public/sw.js`): salva le pagine visitate senza la parte dopo «?», così ricerche, specialità e condizioni scritte nell'indirizzo non finiscono nella cache. Le risposte delle API non si salvano mai.
+- **Dati sulla salute (GDPR, art. 9).** Arrivano al server solo con il consenso facoltativo all'AI: `/api/triage` rifiuta ogni richiesta senza `consent: true` (controllato con Zod), non salva né scrive nei log il contenuto (i log del server contengono solo messaggi generici) e risponde con `Cache-Control: no-store`. Nessuno strumento di analisi, nessun cookie, nessun servizio di terze parti sulle pagine dei sintomi. I test lo verificano: `tests/unit/triage-route.test.ts` (consenso e log) e `tests/e2e/privacy.spec.ts` (nessuna richiesta fuori dall'app, nessun cookie, nessun dato inviato senza consenso).
+- **Pagine informative** nel Profilo: Informativa privacy (`/profilo/privacy`, descrive quello che il codice fa davvero), Avvertenze mediche (`/profilo/avvertenze`) e Fonti (`/profilo/fonti`, generata dai dati: fonti delle schede, numeri utili con la data di verifica, date dei dati AIFA ed EMA, crediti delle foto, mappe, caratteri e icone). Prima di pubblicare l'app indica il titolare del trattamento e il contatto per la privacy con `PRIVACY_CONTROLLER` e `PRIVACY_CONTACT` (si leggono durante la build): finché mancano, l'informativa mostra l'avviso «Da completare prima della pubblicazione».
+
+## Accessibilità e movimento
+
+- Contrasto WCAG AA in tema chiaro e scuro, focus sempre visibile, aree di tocco di almeno 44 px, etichette per gli screen reader, urgenza sempre con colore, icona e testo. `tests/e2e/accessibilita.spec.ts` controlla con axe tutte le pagine principali e i risultati dell'intervista, nei due temi.
+- Il movimento risponde a un'azione: la carta della domanda che scorre dopo una risposta, la zona del corpo che si illumina al tocco, la barra di avanzamento, la scena del vetrino quando premi play. Le anteprime delle card delle condizioni si muovono per pochi secondi quando arrivano sullo schermo, poi si fermano.
+- Con `prefers-reduced-motion` le scene diventano illustrazioni statiche con le stesse didascalie e non ci sono animazioni automatiche.
+
 ## Illustrazioni e oggetti 3D
 
 - Le illustrazioni in stile argilla (`src/assets/illustrations/`, WebP con trasparenza) e gli oggetti 3D (`public/models/`, GLB compressi con meshopt e texture WebP) sono stati generati con Higgsfield (immagini con GPT Image 2.5, modelli 3D con Tripo H3.1) partendo da un'unica immagine di riferimento per avere uno stile coerente, poi ritagliati e ottimizzati con sharp e glTF-Transform. Non contengono testo né persone.
@@ -79,6 +111,8 @@ Il database (circa 86.000 confezioni) non è nel repository: si crea con l'impor
 - La mappa del corpo usa un manichino scolpito (`public/models/manichino.glb`), normalizzato con piedi a terra, altezza 1,76 e sguardo verso +z. Le zone si calcolano dalla posizione (`src/components/body-map/mannequin-zones.ts`): la stessa regola, con le stesse soglie, serve in TypeScript per capire cosa si è toccato e in GLSL per colorare la superficie pixel per pixel. Se il modello cambia, le soglie vanno rimisurate. Finché il modello non arriva, o se non si carica, resta il manichino geometrico.
 
 ## Variabili d'ambiente
+
+Si impostano in `.env.local` (vedi `.env.example`). Nessuna chiave arriva al browser: le chiamate esterne passano tutte dalle route server.
 
 | Variabile | A cosa serve |
 | --- | --- |
@@ -92,3 +126,15 @@ Il database (circa 86.000 confezioni) non è nel repository: si crea con l'impor
 | `NEXT_PUBLIC_SITE_URL` | Indirizzo pubblico dell'app, per i link assoluti delle anteprime di condivisione |
 | `MEDICINES_DB_PATH` | Facoltativa: percorso del database dei medicinali (predefinito `data/medicines/orienta.db`) |
 | `MEDICINES_SOURCE` | Facoltativa: `esempio` forza il campione di esempio anche se c'è il database (i test end-to-end lo usano) |
+| `PRIVACY_CONTROLLER` | Da impostare prima di pubblicare: titolare del trattamento mostrato nell'informativa privacy (nome o ragione sociale e indirizzo) |
+| `PRIVACY_CONTACT` | Da impostare prima di pubblicare: contatto per la privacy e per esercitare i diritti (email o pagina web) |
+
+Solo per i test end-to-end: `CHROMIUM_PATH` (un Chromium già installato) ed `E2E_BASE_URL` (un server già avviato invece della build di produzione).
+
+## Regolamento UE sui dispositivi medici (MDR)
+
+**Se l'app venisse pubblicata, un software che aiuta a orientare una diagnosi può rientrare nel Regolamento (UE) 2017/745 sui dispositivi medici (MDR) e richiede una verifica legale prima del lancio.**
+
+Orienta è un prototipo. Un software destinato a dare informazioni usate per decisioni a scopo diagnostico o terapeutico può essere un dispositivo medico, con la classificazione della regola 11 dell'allegato VIII del Regolamento: in quel caso servono, tra l'altro, la marcatura CE, la valutazione clinica e un sistema di gestione della qualità. Frasi come «non è una diagnosi» non bastano da sole a escluderlo: conta lo scopo dichiarato e come il software viene presentato e usato. Prima di una pubblicazione serve quindi una verifica con un esperto legale e regolatorio, che valuti anche il GDPR (dati sanitari, trasferimento dei dati al fornitore dell'AI) e le regole sull'intelligenza artificiale.
+
+Riferimenti: [Regolamento (UE) 2017/745 su EUR-Lex](https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32017R0745), [linee guida MDCG 2019-11 sulla qualificazione e classificazione del software](https://health.ec.europa.eu/medical-devices-sector/new-regulations/guidance-mdcg-endorsed-documents-and-other-guidance_en), [dispositivi medici sul sito del Ministero della Salute](https://www.salute.gov.it/new/it/tema/dispositivi-medici/).

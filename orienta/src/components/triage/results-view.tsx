@@ -23,7 +23,9 @@ import { CONDITION_ILLUSTRATIONS } from "@/lib/illustrations/conditions";
 import { SPECIALIST_ILLUSTRATIONS } from "@/lib/illustrations/specialists";
 import { URGENCY_ILLUSTRATIONS, URGENCY_MODELS } from "@/lib/illustrations/urgency";
 import type { Compatibility, ResultCondition, TriageResponse } from "@/lib/triage/schema";
+import type { HistoryEntry } from "@/lib/storage/history";
 import { DoctorSummary } from "./doctor-summary";
+import { SaveToHistory } from "./save-history";
 import { StepHeader } from "./parts";
 
 type Results = Extract<TriageResponse, { kind: "results" }>;
@@ -50,6 +52,7 @@ export function ResultsView({
   age,
   summary,
   generatedAt,
+  historyEntry,
   onRestart,
   reduced,
   headingRef,
@@ -59,6 +62,7 @@ export function ResultsView({
   age: number;
   summary: string;
   generatedAt: Date;
+  historyEntry: HistoryEntry;
   onRestart: () => void;
   reduced: boolean;
   headingRef: Ref<HTMLHeadingElement>;
@@ -160,6 +164,7 @@ export function ResultsView({
       </section>
 
       <DoctorSummary text={summary} generatedAt={generatedAt} />
+      <SaveToHistory key={historyEntry.id} entry={historyEntry} />
 
       <p className="text-small text-ink-muted">
         {result.source === "ai"

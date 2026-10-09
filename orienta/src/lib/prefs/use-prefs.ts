@@ -52,3 +52,14 @@ export function usePrefs(): [Prefs, (patch: Partial<Prefs>) => void] {
   }, []);
   return [prefs, update];
 }
+
+/** Torna alle preferenze di partenza (usato da «Elimina tutti i miei dati») */
+export function resetPrefs() {
+  try {
+    localStorage.removeItem(PREFS_STORAGE_KEY);
+  } catch {
+    // Archiviazione non disponibile: non c'era niente da togliere
+  }
+  applyPrefs(DEFAULT_PREFS);
+  listeners.forEach((l) => l());
+}

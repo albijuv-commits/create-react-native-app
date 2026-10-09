@@ -17,6 +17,8 @@ import { CORE_QUESTIONS } from "@/lib/triage/questions";
 import { ambiguousTerms, recognizeSymptoms } from "@/lib/triage/recognize";
 import { detectRedFlags } from "@/lib/triage/red-flags";
 import { MAX_QUESTIONS, MIN_QUESTIONS, type Answer, type Question, type TriageRequest, type TriageResponse } from "@/lib/triage/schema";
+import { newSessionId, type HistoryEntry } from "@/lib/storage/history";
+import { makeHistoryEntry } from "@/lib/triage/history-entry";
 import { buildDoctorSummary } from "@/lib/triage/summary";
 import { usePrefersReducedMotion } from "@/lib/use-reduced-motion";
 import { ConsentStep, type ConsentState } from "./consent-step";
@@ -92,7 +94,7 @@ export function Interview({ conditions }: { conditions: InterviewCondition[] }) 
   const [rulesOnly, setRulesOnly] = useState(false);
   const [waitingFor, setWaitingFor] = useState<"passo" | "risultati">("passo");
 
-  const [result, setResult] = useState<{ data: Results; summary: string; at: Date } | null>(null);
+  const [result, setResult] = useState<{ data: Results; summary: string; at: Date; entry: HistoryEntry } | null>(null);
   const [flags, setFlags] = useState<RedFlagId[]>([]);
   const [emergencyFrom, setEmergencyFrom] = useState<"descrizione" | "domande">("descrizione");
   const [error, setError] = useState<string | null>(null);
@@ -189,7 +191,8 @@ export function Interview({ conditions }: { conditions: InterviewCondition[] }) 
     const known = new Set(conditions.map((c) => c.id));
     const data: Results = { ...step, conditions: step.conditions.filter((c) => known.has(c.id)) };
     const at = new Date();
-    setResult({ data, summary: buildDoctorSummary(req, data, conditions, at), at });
+    const summary = buildDoctorSummary(req, data, conditions, at);
+    setResult({ data, summary, at, entry: makeHistoryEntry(newSessionId(), req, data, conditions, summary, at) });
     if (reduced || via === "ai") {
       go("risultati");
       return;
@@ -384,6 +387,7 @@ export function Interview({ conditions }: { conditions: InterviewCondition[] }) 
             age={base.profile.age}
             summary={result.summary}
             generatedAt={result.at}
+            historyEntry={result.entry}
             onRestart={restart}
             reduced={reduced}
             headingRef={headingRef}
