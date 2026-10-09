@@ -3,7 +3,7 @@ import { z } from "zod";
 import { triageConditions } from "@/lib/conditions/catalog";
 import { AiCallError, aiAvailable, aiStep, pendingCoreQuestions } from "@/lib/triage/ai";
 import { redFlagsFor, rulesStep } from "@/lib/triage/engine";
-import { allowRequest, clientKey } from "@/lib/server/rate-limit";
+import { allowRequest, allowTotal, clientKey } from "@/lib/server/rate-limit";
 import { triageRequestSchema, type TriageResponse } from "@/lib/triage/schema";
 
 /**
@@ -30,7 +30,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   // Ogni passo con l'AI ha un costo: un limite per indirizzo evita gli abusi (l'indirizzo non si registra)
-  if (!allowRequest(`triage:${clientKey(request)}`, 60, 10 * 60 * 1000)) {
+  // e un tetto complessivo che tiene sotto controllo il costo anche se le chiavi vengono aggirate
+  if (!allowRequest(`triage:${clientKey(request)}`, 60, 10 * 60 * 1000) || !allowTotal("triage", 300, 10 * 60 * 1000)) {
     return failure(429, "Hai fatto molte richieste in poco tempo: aspetta qualche minuto, oppure continua con il metodo semplificato.");
   }
   let body: unknown;

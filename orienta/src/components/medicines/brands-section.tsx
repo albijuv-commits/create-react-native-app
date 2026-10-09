@@ -15,7 +15,7 @@ function BrandRow({ b, selfName }: { b: BrandEntry; selfName: string }) {
             {b.name} <span className="text-small font-normal text-ink-muted">(questo marchio)</span>
           </p>
         ) : (
-          <Link href={`/mercato/${b.aic}`} className="font-bold text-primary underline-offset-2 hover:underline">
+          <Link href={`/mercato/${b.aic}`} prefetch={false} className="font-bold text-primary underline-offset-2 hover:underline">
             {b.name}
           </Link>
         )}

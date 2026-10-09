@@ -112,8 +112,8 @@ export default function PrivacyPage() {
             sezione Medici dentro la stessa scheda e sparisce quando la chiudi. L&apos;email al medico la invii tu, dalla tua app di posta.
           </li>
           <li>
-            <span className="font-bold">Pagine per l&apos;uso senza rete</span> (service worker): le pagine visitate si conservano senza i parametri
-            dell&apos;indirizzo, per esempio senza il nome di una condizione.
+            <span className="font-bold">Pagine per l&apos;uso senza rete</span> (service worker): le pagine visitate, senza ricerche, filtri o nomi di
+            condizioni.
           </li>
         </ul>
         <p>
@@ -153,6 +153,11 @@ export default function PrivacyPage() {
           <li>
             Per evitare abusi, il server conta le richieste di ogni indirizzo IP per pochi minuti (da 1 a 10, secondo il servizio). Il conteggio resta in memoria e
             non si scrive da nessuna parte.
+          </li>
+          <li>
+            Ricerche, filtri e la condizione per cui cerchi uno specialista stanno nella parte dell&apos;indirizzo dopo «#», che il browser non invia al server:
+            non finiscono nei registri di accesso. Anche i risultati dell&apos;intervista non chiedono al server niente che riveli le condizioni trovate:
+            l&apos;illustrazione e la scheda di una condizione si scaricano solo se le apri tu.
           </li>
           <li>I messaggi di errore del server non contengono i dati inseriti dalle persone.</li>
           <li>Il servizio che ospita l&apos;app può registrare dati tecnici di accesso (indirizzo IP, pagina, data e ora) secondo le proprie condizioni.</li>

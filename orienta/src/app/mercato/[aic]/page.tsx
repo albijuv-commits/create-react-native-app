@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { MedicineDetail } from "@/components/medicines/medicine-detail";
 import { euBrandsFor } from "@/lib/medicines/eu-brands-data";
@@ -31,6 +32,8 @@ export default function MedicinePage({ params }: PageProps<"/mercato/[aic]">) {
 
 async function MedicineContent({ params }: { params: Params }) {
   const { aic } = await params;
+  // Prezzi ed etichetta dal catalogo in uso a ogni richiesta, non da quello presente durante la build
+  await connection();
   const medicine = getMedicine(aic);
   if (!medicine) notFound();
   return (

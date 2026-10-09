@@ -46,7 +46,8 @@ export function DoctorMap({
   const layer = useRef<LayerGroup | null>(null);
   const markers = useRef(new Map<string, { marker: Marker; n: number; name: string }>());
   const select = useRef(onSelect);
-  const [ready, setReady] = useState(false);
+  // Cresce a ogni mappa creata: se la mappa si ricrea (per esempio cambia «meno movimento»), i segnaposto si rimettono
+  const [mapVersion, setMapVersion] = useState(0);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -72,7 +73,7 @@ export function DoctorMap({
         L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(m);
         layer.current = L.layerGroup().addTo(m);
         map.current = m;
-        setReady(true);
+        setMapVersion((v) => v + 1);
       })
       .catch(() => {
         if (!cancelled) setFailed(true);
@@ -91,7 +92,7 @@ export function DoctorMap({
     const L = leaflet.current;
     const m = map.current;
     const group = layer.current;
-    if (!ready || !L || !m || !group) return;
+    if (mapVersion === 0 || !L || !m || !group) return;
     group.clearLayers();
     markers.current.clear();
     group.addLayer(
@@ -110,20 +111,20 @@ export function DoctorMap({
     });
     const bounds = L.latLngBounds([[origin.lat, origin.lon], ...doctors.map((d): [number, number] => [d.lat, d.lon])]);
     m.fitBounds(bounds, { padding: [36, 36], maxZoom: 16, animate: false });
-  }, [ready, origin, doctors]);
+  }, [mapVersion, origin, doctors]);
 
   // Il segnaposto scelto cambia colore e, se serve, la mappa lo porta in vista
   useEffect(() => {
     const L = leaflet.current;
     const m = map.current;
-    if (!ready || !L || !m) return;
+    if (mapVersion === 0 || !L || !m) return;
     for (const [id, { marker, n, name }] of markers.current) {
       const selected = id === selectedId;
       marker.setIcon(pinIcon(L, n, name, selected));
       marker.setZIndexOffset(selected ? 1000 : 0);
       if (selected && !m.getBounds().pad(-0.1).contains(marker.getLatLng())) m.panTo(marker.getLatLng(), { animate: !reduced });
     }
-  }, [ready, selectedId, reduced]);
+  }, [mapVersion, selectedId, reduced]);
 
   if (failed) {
     return <p className="rounded-3xl bg-surface-2 p-4 text-small">Non riusciamo a caricare la mappa. I risultati sono nella vista lista.</p>;

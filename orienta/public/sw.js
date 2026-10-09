@@ -1,8 +1,8 @@
 /* Service worker di Orienta.
  * - Le route /api/ non passano MAI dalla cache: contengono o producono dati sanitari.
  * - Navigazione: prima la rete, poi la copia in cache, infine la pagina /offline. Le pagine si
- *   salvano senza i parametri dell'indirizzo (per esempio ?condizione=…), che possono dire
- *   qualcosa sulla salute di chi usa l'app.
+ *   salvano senza i parametri dell'indirizzo, che possono dire qualcosa sulla salute di chi usa
+ *   l'app (l'app tiene ricerche e filtri dopo «#», che non arriva qui, ma un link può averne).
  * - Asset statici (/_next/static, /icons, /models): prima la cache.
  * - «Elimina tutti i miei dati» chiede di tenere solo le pagine di base (messaggio orienta:svuota-cache).
  */

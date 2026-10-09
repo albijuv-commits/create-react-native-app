@@ -32,7 +32,7 @@ test.describe("Condizioni", () => {
     await expect(page.getByText("Caso inventato a scopo illustrativo").first()).toBeVisible();
     await expect(page.getByRole("link", { name: "Trova vicino a me" })).toHaveAttribute(
       "href",
-      "/medici?specialista=allergologo&condizione=rinite-allergica",
+      "/medici#specialista=allergologo&condizione=rinite-allergica",
     );
     await expect(page.getByRole("link", { name: "Chiama il 112" })).toHaveAttribute("href", "tel:112");
   });
@@ -46,7 +46,7 @@ test.describe("Condizioni", () => {
     await expect(page.getByText("7 condizioni in «Pelle»")).toBeVisible();
     await expect(page.getByRole("link", { name: /Psoriasi/ })).toBeVisible();
     await expect(page.getByRole("link", { name: /Asma/ })).toHaveCount(0);
-    await expect(page).toHaveURL(/\?area=pelle$/);
+    await expect(page).toHaveURL(/#area=pelle$/);
 
     // Ricaricando, ricerca e filtro restano
     await page.getByLabel("Cerca per nome o sintomo").fill("prurito");

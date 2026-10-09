@@ -29,7 +29,7 @@ function groupByLetter(items: ConditionListItem[]) {
 }
 
 export function ConditionList({ items, areas }: { items: ConditionListItem[]; areas: Area[] }) {
-  // Ricerca e filtro stanno nell'indirizzo (?q=…&area=…): si possono condividere e sopravvivono al ricaricamento
+  // Ricerca e filtro stanno nell'indirizzo dopo «#» (#q=…&area=…): si possono condividere, sopravvivono al ricaricamento e non arrivano al server
   const [params, updateParams] = useUrlParams();
   const query = params.get("q") ?? "";
   const area = areas.find((a) => a.id === params.get("area"))?.id ?? null;
@@ -156,10 +156,12 @@ export function ConditionList({ items, areas }: { items: ConditionListItem[]; ar
 function Row({ item }: { item: ConditionListItem }) {
   const id = useId();
   return (
-    // Le righe fuori schermo non vengono disegnate finché non servono (40 vetrini SVG)
+    // Le righe fuori schermo non vengono disegnate finché non servono (40 vetrini SVG); niente
+    // precaricamento, che dopo una ricerca direbbe al server quali schede sono rimaste
     <li className="[contain-intrinsic-size:auto_6rem] [content-visibility:auto]">
       <Link
         href={`/condizioni/${item.id}`}
+        prefetch={false}
         aria-labelledby={`${id}-nome`}
         aria-describedby={`${id}-anteprima`}
         className="group -mx-2 flex items-center gap-4 rounded-2xl px-2 py-3 transition-colors duration-150 ease-out hover:bg-surface-2 active:bg-surface-2"

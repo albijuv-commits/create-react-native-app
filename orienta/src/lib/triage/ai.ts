@@ -110,13 +110,16 @@ export function validateAiStep(
     const raw = step.questions ?? [];
     if (raw.length === 0) throw new AiOutputError("nessuna domanda");
     const questions: Question[] = [];
-    raw.slice(0, Math.min(4, room)).forEach((q, i) => {
+    const limit = Math.min(4, room);
+    for (const q of raw) {
+      if (questions.length >= limit) break;
       if (DOSAGE.some((re) => re.test(q.text) || (q.options ?? []).some((o) => re.test(o.label)))) {
         throw new AiOutputError("dosi o farmaci in una domanda");
       }
-      if (q.symptomId && (present.has(q.symptomId) || absent.has(q.symptomId))) return;
-      if (asked.has(q.text.trim().toLowerCase())) return;
-      const id = `ai-${answered + i + 1}`;
+      if (q.symptomId && (present.has(q.symptomId) || absent.has(q.symptomId))) continue;
+      if (asked.has(q.text.trim().toLowerCase())) continue;
+      // Numerate solo le domande tenute: un buco farebbe riusare un ID già risposto nel passo dopo
+      const id = `ai-${answered + questions.length + 1}`;
       const candidate =
         q.kind === "choice"
           ? { kind: "choice" as const, id, text: q.text, options: (q.options ?? []).map((o, k) => ({ id: slug(o.label, k), label: o.label })) }
@@ -126,7 +129,7 @@ export function validateAiStep(
       const parsed = questionSchema.safeParse(candidate);
       if (!parsed.success) throw new AiOutputError("domanda non valida");
       questions.push(parsed.data);
-    });
+    }
     if (questions.length === 0) throw new AiOutputError("solo domande ripetute");
     return { kind: "questions", source: "ai", questions };
   }
@@ -259,6 +262,20 @@ export class AiCallError extends Error {
   }
 }
 
+/** L'uscita del modello validata con lo schema; null se manca, è troncata o non lo rispetta */
+function readStep(content: readonly Anthropic.Beta.Messages.BetaContentBlock[], schema: ReturnType<typeof aiStepSchema>): AiStep | null {
+  for (const block of content) {
+    if (block.type !== "text") continue;
+    try {
+      const parsed = schema.safeParse(JSON.parse(block.text));
+      return parsed.success ? parsed.data : null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 /** Le domande fisse vanno sempre fatte per prime, dall'app e non dal modello */
 export function pendingCoreQuestions(req: TriageRequest): Question[] {
   const asked = new Set(req.answers.map((a) => a.question.id));
@@ -284,7 +301,8 @@ export async function aiStep(
   for (let attempt = 0; attempt < 2; attempt++) {
     let response;
     try {
-      response = await client.beta.messages.parse({
+      // create e non parse: un JSON troncato o fuori schema deve valere un nuovo tentativo, non un errore dell'API
+      response = await client.beta.messages.create({
         model,
         max_tokens: 4000,
         system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
@@ -299,7 +317,7 @@ export async function aiStep(
       throw new AiCallError("errore-api");
     }
     if (response.stop_reason === "refusal") throw new AiCallError("rifiuto");
-    const parsed = response.parsed_output;
+    const parsed = readStep(response.content, schema);
     if (!parsed) continue;
     try {
       return validateAiStep(parsed, req, conditions);

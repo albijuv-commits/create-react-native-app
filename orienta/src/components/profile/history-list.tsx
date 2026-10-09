@@ -57,9 +57,10 @@ function Entry({ entry }: { entry: HistoryEntry }) {
             <p className="text-small">Nessuna corrispondenza chiara con le schede di Orienta.</p>
           ) : (
             <ul className="text-small">
+              {/* Niente precaricamento: lo storico resta sul dispositivo, anche nei percorsi richiesti al server */}
               {entry.conditions.map((c) => (
                 <li key={c.id}>
-                  <Link href={`/condizioni/${c.id}`} className="font-bold text-primary underline-offset-2 hover:underline">
+                  <Link href={`/condizioni/${c.id}`} prefetch={false} className="font-bold text-primary underline-offset-2 hover:underline">
                     {c.name}
                   </Link>
                   <span className="text-ink-muted">, {COMPATIBILITY[c.compatibility]}</span>

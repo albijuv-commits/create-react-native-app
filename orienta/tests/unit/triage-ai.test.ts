@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Question, TriageRequest } from "@/lib/triage/schema";
 
-const parse = vi.fn();
+const create = vi.fn();
 
 vi.mock("@anthropic-ai/sdk", () => {
   class APIError extends Error {
@@ -9,13 +9,13 @@ vi.mock("@anthropic-ai/sdk", () => {
   }
   class Anthropic {
     static APIError = APIError;
-    beta = { messages: { parse } };
+    beta = { messages: { create } };
   }
   return { default: Anthropic, APIError };
 });
 
 const { triageConditions } = await import("@/lib/conditions/catalog");
-const { AiCallError, AiOutputError, aiStep, aiStepSchema, casePrompt, systemPrompt, validateAiStep } = await import("@/lib/triage/ai");
+const { AiOutputError, aiStep, aiStepSchema, casePrompt, systemPrompt, validateAiStep } = await import("@/lib/triage/ai");
 const { CORE_QUESTIONS } = await import("@/lib/triage/questions");
 
 const CONDITIONS = triageConditions();
@@ -80,6 +80,19 @@ describe("validazione dell'uscita AI: domande", () => {
         CONDITIONS,
       ),
     ).toThrow(AiOutputError);
+  });
+
+  it("numera le domande tenute senza buchi, così nessun ID si ripete nel passo dopo", () => {
+    const out = validateAiStep(
+      questionsStep([
+        { kind: "yesno", text: "Ti brucia quando urini?", symptomId: "bruciore-urinare", options: null },
+        { kind: "yesno", text: "Hai notato sangue nelle urine?", symptomId: "sangue-urine", options: null },
+        { kind: "scale", text: "Quanto è forte il dolore al basso ventre?", symptomId: null, options: null },
+      ]) as never,
+      state(0),
+      CONDITIONS,
+    );
+    expect(out.kind === "questions" && out.questions.map((q) => q.id)).toEqual(["ai-4", "ai-5"]);
   });
 
   it("rifiuta domande troppo corte o scelte con una sola opzione", () => {
@@ -153,37 +166,51 @@ describe("prompt", () => {
 
 describe("chiamata al modello", () => {
   beforeEach(() => {
-    parse.mockReset();
+    create.mockReset();
     process.env.ANTHROPIC_API_KEY = "test";
   });
 
   const valid = resultsStep([{ id: "cistite", compatibility: "alta", matchingSymptoms: ["bruciore-urinare"] }]);
+  /** Una risposta del modello con il testo JSON indicato */
+  const reply = (output: unknown, stop_reason = "end_turn") => ({
+    stop_reason,
+    content: [{ type: "text", text: typeof output === "string" ? output : JSON.stringify(output) }],
+  });
 
   it("se la prima uscita non è valida riprova una volta e usa la seconda", async () => {
-    parse.mockResolvedValueOnce({ stop_reason: "end_turn", parsed_output: null }).mockResolvedValueOnce({ stop_reason: "end_turn", parsed_output: valid });
+    create.mockResolvedValueOnce({ stop_reason: "end_turn", content: [] }).mockResolvedValueOnce(reply(valid));
     const out = await aiStep(state(2), CONDITIONS);
     expect(out.kind).toBe("results");
-    expect(parse).toHaveBeenCalledTimes(2);
+    expect(create).toHaveBeenCalledTimes(2);
+  });
+
+  it("un JSON troncato o fuori schema vale un nuovo tentativo, non un errore dell'API", async () => {
+    create.mockResolvedValueOnce(reply('{"action":"risultati","questions":null,"res', "max_tokens")).mockResolvedValueOnce(reply(valid));
+    expect((await aiStep(state(2), CONDITIONS)).kind).toBe("results");
+    create.mockReset();
+    create.mockResolvedValueOnce(reply({ action: "boh" })).mockResolvedValueOnce(reply(valid));
+    expect((await aiStep(state(2), CONDITIONS)).kind).toBe("results");
+    expect(create).toHaveBeenCalledTimes(2);
   });
 
   it("dopo due uscite non valide si ferma con un errore gentile", async () => {
     const invalid = resultsStep([{ id: "ipertensione", compatibility: "alta", matchingSymptoms: [] }]);
-    parse.mockResolvedValue({ stop_reason: "end_turn", parsed_output: invalid });
+    create.mockResolvedValue(reply(invalid));
     await expect(aiStep(state(2), CONDITIONS)).rejects.toMatchObject({ reason: "non-valido" });
-    expect(parse).toHaveBeenCalledTimes(2);
+    expect(create).toHaveBeenCalledTimes(2);
   });
 
-  it("un rifiuto del modello non viene ripetuto", async () => {
-    parse.mockResolvedValue({ stop_reason: "refusal", parsed_output: null });
-    await expect(aiStep(state(2), CONDITIONS)).rejects.toBeInstanceOf(AiCallError);
-    expect(parse).toHaveBeenCalledTimes(1);
+  it("un rifiuto del modello non viene ripetuto, anche con un JSON a metà", async () => {
+    create.mockResolvedValue(reply('{"action":', "refusal"));
+    await expect(aiStep(state(2), CONDITIONS)).rejects.toMatchObject({ reason: "rifiuto" });
+    expect(create).toHaveBeenCalledTimes(1);
   });
 
   it("usa il modello configurato, la base di conoscenza in cache e il ripiego lato server", async () => {
     process.env.CLAUDE_MODEL = "";
-    parse.mockResolvedValue({ stop_reason: "end_turn", parsed_output: valid });
+    create.mockResolvedValue(reply(valid));
     await aiStep(state(2), CONDITIONS);
-    const params = parse.mock.calls[0]![0];
+    const params = create.mock.calls[0]![0];
     expect(params.model).toBe("claude-sonnet-5-5");
     expect(params.system[0].cache_control).toEqual({ type: "ephemeral" });
     expect(params.fallbacks).toBe("default");

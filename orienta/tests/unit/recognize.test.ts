@@ -27,6 +27,17 @@ describe("riconoscimento dei sintomi nel testo libero", () => {
     expect(recognizeSymptoms("febbre, febbre alta, ho la febbre").present).toEqual(["febbre"]);
   });
 
+  it("«non riesco», «non passa», «non solo» e i confronti con «mai» confermano il sintomo", () => {
+    expect(recognizeSymptoms("non riesco a deglutire").present).toEqual(["difficolta-deglutire"]);
+    expect(recognizeSymptoms("non riesco a inghiottire niente").present).toEqual(["difficolta-deglutire"]);
+    expect(recognizeSymptoms("non mi passa il mal di testa").present).toEqual(["mal-di-testa"]);
+    expect(recognizeSymptoms("ho mal di gola e non solo: anche tosse secca").present).toEqual(["mal-di-gola", "tosse-secca"]);
+    expect(recognizeSymptoms("non ho mai avuto un mal di testa così forte").present).toEqual(["mal-di-testa"]);
+    // Le negazioni vere restano tali
+    expect(recognizeSymptoms("non mi fa male la gola").negated).toEqual(["mal-di-gola"]);
+    expect(recognizeSymptoms("non ho mai avuto la febbre").negated).toEqual(["febbre"]);
+  });
+
   it("le frasi che contengono «non» nel sintomo stesso non sono negate", () => {
     expect(recognizeSymptoms("non riesco ad addormentarmi").present).toEqual(["difficolta-addormentarsi"]);
   });

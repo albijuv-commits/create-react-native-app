@@ -2,6 +2,7 @@
 // - Icone raster: dall'illustrazione in argilla scripts/icon-source.webp (generata con Higgsfield, 1024 px)
 // - Favicon vettoriale: il marchio piatto scripts/icon-source.svg
 import { copyFile, mkdir, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const src = new URL("./icon-source.webp", import.meta.url);
@@ -14,7 +15,7 @@ const rounded = Buffer.from(
 );
 
 async function png(size, { mask = false } = {}) {
-  let img = sharp(src.pathname).resize(size, size, { kernel: "lanczos3" });
+  let img = sharp(fileURLToPath(src)).resize(size, size, { kernel: "lanczos3" });
   if (mask) img = sharp(await img.ensureAlpha().composite([{ input: await sharp(rounded).resize(size, size).png().toBuffer(), blend: "dest-in" }]).png().toBuffer());
   return img.png({ palette: true, quality: 95, effort: 10, dither: 0.8, compressionLevel: 9 }).toBuffer();
 }

@@ -84,7 +84,7 @@ test.describe("Profilo", () => {
   });
 
   test("«Elimina tutti i miei dati» toglie storico, preferiti e preferenze", async ({ page }) => {
-    await page.goto("/mercato?q=torvast", { waitUntil: "networkidle" });
+    await page.goto("/mercato#q=torvast", { waitUntil: "networkidle" });
     await page.getByRole("button", { name: "Aggiungi ai preferiti: Torvast", exact: true }).click();
     await expect(page.getByRole("tab", { name: "Preferiti (1)" })).toBeVisible();
 

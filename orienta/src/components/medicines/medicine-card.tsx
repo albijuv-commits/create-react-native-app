@@ -45,8 +45,10 @@ export function MedicineCard({ medicine: m, note, className }: { medicine: Medic
   return (
     <article aria-labelledby={titleId} className={cn("space-y-3 rounded-3xl border border-line bg-surface p-4", className)}>
       <div className="flex gap-3">
+        {/* Le schede non si precaricano: il percorso direbbe al server quali farmaci cerchi o hai salvato */}
         <Link
           href={`/mercato/${m.aic}`}
+          prefetch={false}
           tabIndex={-1}
           aria-hidden
           className="shrink-0 self-start rounded-2xl bg-surface-2 p-1 transition-transform duration-150 ease-out active:scale-95"
@@ -56,7 +58,7 @@ export function MedicineCard({ medicine: m, note, className }: { medicine: Medic
         <div className="min-w-0 flex-1 space-y-1">
           {note}
           <h3 id={titleId} className="font-bold leading-snug">
-            <Link href={`/mercato/${m.aic}`} className="underline-offset-2 hover:underline">
+            <Link href={`/mercato/${m.aic}`} prefetch={false} className="underline-offset-2 hover:underline">
               {m.name}
             </Link>
           </h3>

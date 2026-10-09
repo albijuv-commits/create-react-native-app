@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { detectPlatform, directionsUrl, emailAddress, openingHoursLines, phoneLink, websiteUrl } from "@/lib/doctors/contact";
-import { buildDoctorEmail, fitBody, MAILTO_BODY_LIMIT, mailtoHref } from "@/lib/doctors/email";
+import { buildDoctorEmail, encodedLength, fitBody, MAILTO_BODY_LIMIT, mailtoHref } from "@/lib/doctors/email";
 import { destination, distanceM, formatDistance, roundCoord, roundPoint } from "@/lib/doctors/geo";
 import { doctorSearchRequestSchema } from "@/lib/doctors/schema";
 
@@ -143,10 +143,20 @@ describe("email precompilata", () => {
     const summary = Array.from({ length: 120 }, (_, i) => `- riga ${i} con un po' di testo per allungare`).join("\n");
     const body = buildDoctorEmail({ specialtyLabel: "Cardiologo", summary }).body;
     const fitted = fitBody(body);
-    expect(fitted.length).toBeLessThanOrEqual(MAILTO_BODY_LIMIT);
+    expect(encodedLength(fitted)).toBeLessThanOrEqual(MAILTO_BODY_LIMIT);
     expect(fitted).toContain("Riepilogo abbreviato");
     expect(fitted).toContain("[Numero di telefono]");
     expect(fitted).not.toMatch(/riga \d+ con un po' di test$/m);
+  });
+
+  it("il limite conta il testo codificato: spazi, a capo e lettere accentate pesano di più", () => {
+    const summary = Array.from({ length: 40 }, (_, i) => `- è già più forte, perché sì (${i})`).join("\n");
+    const body = buildDoctorEmail({ specialtyLabel: null, summary }).body;
+    expect(body.length).toBeLessThan(MAILTO_BODY_LIMIT);
+    expect(encodedLength(body)).toBeGreaterThan(MAILTO_BODY_LIMIT);
+    const href = mailtoHref("studio@esempio.it", { subject: "Richiesta di appuntamento", body });
+    expect(href.length).toBeLessThan(2000);
+    expect(decodeURIComponent(href)).toContain("Riepilogo abbreviato");
   });
 
   it("il link mailto lascia l'indirizzo in chiaro e codifica oggetto e testo con a capo CRLF", () => {

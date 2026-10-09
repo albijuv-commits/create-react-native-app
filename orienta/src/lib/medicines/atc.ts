@@ -19,5 +19,5 @@ export const ATC_GROUPS = {
 export type AtcGroup = keyof typeof ATC_GROUPS;
 
 export function atcGroupLabel(code: string | null | undefined): string | null {
-  return code && code in ATC_GROUPS ? ATC_GROUPS[code as AtcGroup] : null;
+  return code && Object.hasOwn(ATC_GROUPS, code) ? ATC_GROUPS[code as AtcGroup] : null;
 }

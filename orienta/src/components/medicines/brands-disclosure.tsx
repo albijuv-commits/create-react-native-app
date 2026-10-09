@@ -82,7 +82,7 @@ function BrandsBody({ data, medicine: m, all, onShowAll }: { data: BrandsRespons
       {summary && (
         <p>
           <span className="font-bold">{summary.name}.</span> {summary.text}{" "}
-          <Link href={`/mercato/${m.aic}#principio-attivo`} className="font-bold text-primary underline underline-offset-2">
+          <Link href={`/mercato/${m.aic}#principio-attivo`} prefetch={false} className="font-bold text-primary underline underline-offset-2">
             Scheda del principio attivo
           </Link>
         </p>
@@ -113,7 +113,7 @@ function BrandsBody({ data, medicine: m, all, onShowAll }: { data: BrandsRespons
           {shown.map((b) => (
             <li key={b.name} className="flex items-start gap-3 px-3 py-2">
               <div className="min-w-0 flex-1">
-                <Link href={`/mercato/${b.aic}`} className="font-bold text-primary underline-offset-2 hover:underline">
+                <Link href={`/mercato/${b.aic}`} prefetch={false} className="font-bold text-primary underline-offset-2 hover:underline">
                   {b.name}
                 </Link>
                 <p className="text-[0.8125rem] text-ink-muted">{b.companies.map(displayCompany).join(" · ")}</p>
@@ -143,7 +143,7 @@ function BrandsBody({ data, medicine: m, all, onShowAll }: { data: BrandsRespons
           <span>
             In Europa anche come <span className="font-bold">{europe.names.join(", ")}</span>
             {europe.total > europe.names.length && <> e altri {europe.total - europe.names.length} marchi</>}, in {europe.countries} Paesi.{" "}
-            <Link href={`/mercato/${m.aic}#in-europa`} className="font-bold text-primary underline underline-offset-2">
+            <Link href={`/mercato/${m.aic}#in-europa`} prefetch={false} className="font-bold text-primary underline underline-offset-2">
               Cerca per Paese
             </Link>
           </span>

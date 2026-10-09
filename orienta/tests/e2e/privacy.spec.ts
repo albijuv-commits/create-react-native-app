@@ -34,8 +34,13 @@ test.describe("Privacy delle pagine dei sintomi", () => {
     await expect(ai).toBeVisible();
     await expect(ai).not.toBeChecked();
     await completeCystitisInterview(page);
+    // Specialista e condizione restano nell'indirizzo dopo «#»: nessuna richiesta li porta al server
+    await page.getByRole("link", { name: /Trova uno specialista/ }).first().click();
+    await expect(page).toHaveURL(/\/medici#specialista=urologo&condizione=cistite/);
+    await expect(page.getByText("Specialista di riferimento per «Cistite»:")).toBeVisible();
 
     expect(posts).toBe(0);
+    expect(sent.filter((s) => /cistite|condizione=|specialista=/.test(s.url))).toEqual([]);
     expect(sent.filter((s) => /brucia|pipì/i.test(decodeURIComponent(s.url) + s.body))).toEqual([]);
     const origin = new URL(page.url()).origin;
     const thirdParty = sent.map((s) => new URL(s.url)).filter((u) => u.protocol.startsWith("http") && u.origin !== origin);

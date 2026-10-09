@@ -40,7 +40,7 @@ function queryFromParams(params: URLSearchParams): CatalogQuery {
     q: (params.get("q") ?? "").slice(0, 80),
     ricetta: pick("ricetta", RECIPE_FILTERS),
     forma: pick("forma", FORM_FAMILIES),
-    atc: atc && atc in ATC_GROUPS ? atc : null,
+    atc: atc && Object.hasOwn(ATC_GROUPS, atc) ? atc : null,
     prezzo: pick("prezzo", PRICE_BANDS),
     ordine: pick("ordine", SORTS) ?? "nome",
   });

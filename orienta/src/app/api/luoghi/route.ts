@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { GeocodeError, geocodePlace } from "@/lib/doctors/geocode";
 import { placeRequestSchema } from "@/lib/doctors/schema";
-import { allowRequest, clientKey } from "@/lib/server/rate-limit";
+import { allowRequest, allowTotal, clientKey } from "@/lib/server/rate-limit";
 
 /** Città o CAP → coordinate, tramite Nominatim con cache e limite di una richiesta al secondo */
 const NO_STORE = { "Cache-Control": "no-store" };
@@ -11,7 +11,8 @@ function failure(status: number, message: string) {
 }
 
 export async function POST(request: Request) {
-  if (!allowRequest(`luoghi:${clientKey(request)}`, 20, 5 * 60 * 1000)) {
+  // Per indirizzo e in tutto: Nominatim chiede al massimo una richiesta al secondo
+  if (!allowRequest(`luoghi:${clientKey(request)}`, 20, 5 * 60 * 1000) || !allowTotal("luoghi", 150, 5 * 60 * 1000)) {
     return failure(429, "Hai fatto molte ricerche in poco tempo: aspetta qualche minuto e riprova.");
   }
   let body: unknown;

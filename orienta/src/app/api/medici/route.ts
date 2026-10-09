@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { doctorSearchRequestSchema } from "@/lib/doctors/schema";
 import { searchDoctors } from "@/lib/doctors/search";
-import { allowRequest, clientKey } from "@/lib/server/rate-limit";
+import { allowRequest, allowTotal, clientKey } from "@/lib/server/rate-limit";
 
 /**
  * Ricerca dei medici vicini. Arriva una posizione già arrotondata a circa 100 metri e una
@@ -15,7 +15,8 @@ function failure(status: number, message: string) {
 }
 
 export async function POST(request: Request) {
-  if (!allowRequest(`medici:${clientKey(request)}`, 30, 5 * 60 * 1000)) {
+  // Per indirizzo e in tutto: Overpass è gratuito e Google Places si paga
+  if (!allowRequest(`medici:${clientKey(request)}`, 30, 5 * 60 * 1000) || !allowTotal("medici", 150, 5 * 60 * 1000)) {
     return failure(429, "Hai fatto molte ricerche in poco tempo: aspetta qualche minuto e riprova.");
   }
   let body: unknown;

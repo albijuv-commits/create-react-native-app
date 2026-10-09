@@ -32,7 +32,7 @@ function EquivalentRow({ g, self, lowest, markLowest }: { g: MedicineSummary; se
             {g.name} <span className="text-small font-normal text-ink-muted">(questa confezione)</span>
           </p>
         ) : (
-          <Link href={`/mercato/${g.aic}`} className="font-bold text-primary underline-offset-2 hover:underline">
+          <Link href={`/mercato/${g.aic}`} prefetch={false} className="font-bold text-primary underline-offset-2 hover:underline">
             {g.name}
           </Link>
         )}

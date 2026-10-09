@@ -16,7 +16,8 @@ const atkinson = Atkinson_Hyperlegible({
 
 export const metadata: Metadata = {
   // Indirizzo pubblico dell'app, per i link assoluti delle anteprime di condivisione
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  // Vuota in .env.local (come in .env.example) vale come assente: new URL("") farebbe fallire ogni pagina
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000"),
   title: { default: "Orienta", template: "%s · Orienta" },
   description:
     "Orienta ti aiuta a capire i tuoi sintomi e a trovare il professionista giusto. Non sostituisce un medico.",

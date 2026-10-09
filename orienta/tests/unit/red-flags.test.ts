@@ -17,11 +17,29 @@ const CASES: Record<RedFlagId, { yes: string[]; no: string[] }> = {
     no: ["Bruciore dietro lo sterno dopo mangiato", "Mi fa male il petto quando tossisco", "Mi batte forte il cuore quando sono in ansia"],
   },
   respiro: {
-    yes: ["Faccio fatica a respirare anche da fermo", "Mi manca l'aria", "Non riesco a respirare bene", "Ha le labbra bluastre", "Respiro con fatica"],
-    no: ["Ho il naso chiuso e non respiro dal naso", "Ho un po' di fiato corto quando faccio le scale"],
+    yes: [
+      "Faccio fatica a respirare anche da fermo",
+      "Mi manca l'aria",
+      "Non riesco a respirare bene",
+      "Ha le labbra bluastre",
+      "Respiro con fatica",
+      "Mi manca il respiro",
+      "Mi manca il fiato anche a riposo",
+      "Ho il fiato corto anche a riposo",
+      "Ho difficoltà nel respirare",
+      "Non riesco a riprendere fiato",
+    ],
+    no: ["Ho il naso chiuso e non respiro dal naso", "Ho un po' di fiato corto quando faccio le scale", "Mi manca il fiato quando salgo le scale"],
   },
   ictus: {
-    yes: ["Ha la bocca storta all'improvviso", "Non riesco a muovere il braccio destro", "Fa fatica a parlare e confonde le parole", "Metà del corpo è debole"],
+    yes: [
+      "Ha la bocca storta all'improvviso",
+      "Non riesco a muovere il braccio destro",
+      "Fa fatica a parlare e confonde le parole",
+      "Metà del corpo è debole",
+      "Mi si è addormentato il lato destro del corpo",
+      "Ho un formicolio su metà corpo, solo a sinistra",
+    ],
     no: ["Ho formicolio a mani e piedi dopo la palestra", "Ho mal di testa e il collo teso"],
   },
   "gonfiore-gola": {
@@ -33,11 +51,17 @@ const CASES: Record<RedFlagId, { yes: string[]; no: string[] }> = {
       "Mal di testa improvviso e fortissimo",
       "È il peggior mal di testa della mia vita",
       "All'improvviso un dolore alla testa terribile, come un'esplosione",
+      "Non ho mai avuto un mal di testa così forte",
     ],
     no: ["Ho mal di testa da tre giorni", "Emicrania come al solito, pulsante a destra"],
   },
   "febbre-meningite": {
-    yes: ["Ho la febbre alta e il collo rigido", "Febbre e macchie che non scompaiono premendo il bicchiere", "Gli sono comparse delle petecchie"],
+    yes: [
+      "Ho la febbre alta e il collo rigido",
+      "Ho la febbre alta e rigidità nucale",
+      "Febbre e macchie che non scompaiono premendo il bicchiere",
+      "Gli sono comparse delle petecchie",
+    ],
     no: ["Ho il collo rigido dopo aver dormito storto", "Ho la febbre e mal di gola"],
   },
   "svenimento-convulsioni": {
@@ -49,8 +73,26 @@ const CASES: Record<RedFlagId, { yes: string[]; no: string[] }> = {
     no: ["Mi sanguinano un po' le gengive quando lavo i denti", "Ho un livido sulla gamba"],
   },
   autolesionismo: {
-    yes: ["Ho pensato di farmi del male", "Non voglio più vivere", "Penso al suicidio", "Vorrei farla finita"],
-    no: ["Mi fa male la pancia", "Mi sono fatto male alla caviglia giocando"],
+    yes: [
+      "Ho pensato di farmi del male",
+      "Non voglio più vivere",
+      "Penso al suicidio",
+      "Vorrei farla finita",
+      "Mi voglio uccidere",
+      "Mi voglio ammazzare",
+      "Mi voglio togliere la vita",
+      "Mi voglio fare del male",
+      "A volte mi faccio del male",
+      "Vorrei buttarmi giù dal ponte",
+      "La vita non ha più senso",
+    ],
+    no: [
+      "Mi fa male la pancia",
+      "Mi sono fatto male alla caviglia giocando",
+      "Questo mal di testa mi uccide",
+      "Mi ammazzo di lavoro e ho mal di schiena",
+      "Mi faccio male al ginocchio quando corro",
+    ],
   },
   monossido: {
     yes: [

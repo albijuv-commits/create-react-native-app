@@ -61,7 +61,8 @@ function BulletList({ items, marker = "bg-accent" }: { items: readonly string[];
 function medicLink(specialist: SpecialtyId, condition?: string) {
   const params = new URLSearchParams({ specialista: specialist });
   if (condition) params.set("condizione", condition);
-  return `/medici?${params.toString()}`;
+  // Specialista e condizione dopo «#»: non arrivano al server né ai suoi log
+  return `/medici#${params.toString()}`;
 }
 
 export function ConditionArticle({ condition: c }: { condition: Condition }) {

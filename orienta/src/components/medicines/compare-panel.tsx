@@ -119,7 +119,7 @@ export function ComparePanel() {
                         <span className="sr-only">Togli {m.name} dal confronto</span>
                       </button>
                     </div>
-                    <Link href={`/mercato/${m.aic}`} className="block font-bold text-primary underline-offset-2 hover:underline">
+                    <Link href={`/mercato/${m.aic}`} prefetch={false} className="block font-bold text-primary underline-offset-2 hover:underline">
                       {m.name}
                     </Link>
                   </div>

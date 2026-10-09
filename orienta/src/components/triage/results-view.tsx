@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, BookOpen, ChevronDown, Clock, House, Info, MapPin, Microscope, Phone, RotateCcw, Siren, Sparkles, Stethoscope, UsersRound } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronDown, Clock, House, ImageIcon, Info, MapPin, Microscope, Phone, RotateCcw, Siren, Sparkles, Stethoscope, UsersRound } from "lucide-react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useState, type ComponentType, type Ref, type SVGProps } from "react";
@@ -20,7 +20,6 @@ import { saveSummaryForDoctors } from "@/lib/doctors/handoff";
 import { cn } from "@/lib/cn";
 import { URGENCY, type UrgencyLevel } from "@/lib/design/urgency";
 import { CONDITION_ILLUSTRATIONS } from "@/lib/illustrations/conditions";
-import { SPECIALIST_ILLUSTRATIONS } from "@/lib/illustrations/specialists";
 import { URGENCY_ILLUSTRATIONS, URGENCY_MODELS } from "@/lib/illustrations/urgency";
 import type { Compatibility, ResultCondition, TriageResponse } from "@/lib/triage/schema";
 import type { HistoryEntry } from "@/lib/storage/history";
@@ -279,7 +278,7 @@ function NextSteps({ level, age }: { level: UrgencyLevel; age: number }) {
           Chiama il 112
         </ButtonAnchor>
         <p className="text-small">Se puoi muoverti in sicurezza, fatti accompagnare al pronto soccorso più vicino. Non guidare da solo.</p>
-        <ButtonLink href="/medici?specialista=pronto-soccorso" variant="secondary" className="w-full" icon={<MapPin aria-hidden className="size-5" />}>
+        <ButtonLink href="/medici#specialista=pronto-soccorso" variant="secondary" className="w-full" icon={<MapPin aria-hidden className="size-5" />}>
           Trova il pronto soccorso
         </ButtonLink>
       </div>
@@ -393,13 +392,14 @@ function ConditionCard({
       </AnimatePresence>
 
       <div className="grid gap-2">
-        <ButtonLink href={`/condizioni/${condition.id}`} variant="secondary" icon={<BookOpen aria-hidden className="size-5" />}>
+        {/* Niente precaricamento né immagini dello specialista: le richieste direbbero al server quale condizione è uscita */}
+        <ButtonLink href={`/condizioni/${condition.id}`} prefetch={false} variant="secondary" icon={<BookOpen aria-hidden className="size-5" />}>
           Scopri di più
         </ButtonLink>
-        <ButtonLink href={`/medici?${params.toString()}`} onClick={onFindSpecialist} variant="ghost" className="justify-start gap-3 py-2 text-left">
-          {SPECIALIST_ILLUSTRATIONS[specialist.id] && (
-            <Image src={SPECIALIST_ILLUSTRATIONS[specialist.id]!} alt="" sizes="48px" className="size-12 shrink-0" />
-          )}
+        <ButtonLink href={`/medici#${params.toString()}`} onClick={onFindSpecialist} variant="ghost" className="justify-start gap-3 py-2 text-left">
+          <span aria-hidden className="grid size-12 shrink-0 place-items-center rounded-full bg-surface-2 text-primary">
+            <MapPin className="size-6" />
+          </span>
           <span className="flex min-w-0 flex-1 flex-col">
             <span className="inline-flex items-center gap-1.5">
               Trova uno specialista
@@ -417,19 +417,24 @@ function ConditionCard({
 }
 
 /**
- * L'immagine della condizione: davanti l'illustrazione, dietro il vetrino animato.
- * Si gira toccandola; con meno movimento cambia e basta.
+ * L'immagine della condizione: davanti il vetrino animato, disegnato nel browser; dietro
+ * l'illustrazione, che si scarica solo quando giri la carta (il suo indirizzo direbbe al server
+ * quale condizione è uscita). Si gira toccandola; con meno movimento cambia e basta.
  */
 function FlipMedia({ condition, reduced }: { condition: InterviewCondition; reduced: boolean }) {
   const [back, setBack] = useState(false);
+  const [seen, setSeen] = useState(false);
   const art = CONDITION_ILLUSTRATIONS[condition.id];
   if (!art) return <SlidePreview spec={condition.animation} className="size-24 shrink-0" />;
   return (
     <button
       type="button"
-      onClick={() => setBack((b) => !b)}
+      onClick={() => {
+        setBack((b) => !b);
+        setSeen(true);
+      }}
       aria-pressed={back}
-      aria-label={back ? `Mostra l'illustrazione di ${condition.name}` : `Guarda ${condition.name} al microscopio`}
+      aria-label={`Mostra l'illustrazione di ${condition.name}`}
       className="relative size-24 shrink-0 [perspective:700px]"
     >
       <motion.span
@@ -438,15 +443,15 @@ function FlipMedia({ condition, reduced }: { condition: InterviewCondition; redu
         animate={{ rotateY: back ? 180 : 0 }}
         transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 24 }}
       >
-        <span className="absolute inset-0 grid place-items-center rounded-2xl bg-surface-2 [backface-visibility:hidden]">
-          <Image src={art} alt="" sizes="96px" className="size-20" />
-        </span>
-        <span className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+        <span className="absolute inset-0 [backface-visibility:hidden]">
           <SlidePreview spec={condition.animation} className="size-24" />
+        </span>
+        <span className="absolute inset-0 grid place-items-center rounded-2xl bg-surface-2 [backface-visibility:hidden] [transform:rotateY(180deg)]">
+          {seen && <Image src={art} alt="" sizes="96px" className="size-20" />}
         </span>
       </motion.span>
       <span aria-hidden className="absolute -bottom-1 -right-1 grid size-7 place-items-center rounded-full bg-primary text-on-primary shadow-sm">
-        <Microscope className="size-4" />
+        {back ? <Microscope className="size-4" /> : <ImageIcon className="size-4" />}
       </span>
     </button>
   );

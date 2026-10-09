@@ -8,7 +8,10 @@ export interface DoctorEmail {
   body: string;
 }
 
-/** Alcune app di posta troncano o rifiutano i link mailto troppo lunghi */
+/**
+ * Alcune app di posta troncano o rifiutano i link mailto troppo lunghi (circa 2000 caratteri in
+ * tutto): il limite vale per il testo come finisce nel link, cioè codificato.
+ */
 export const MAILTO_BODY_LIMIT = 1800;
 
 const SHORTENED_NOTE = "(Riepilogo abbreviato: il testo completo lo porto alla visita.)";
@@ -23,22 +26,24 @@ export function buildDoctorEmail({ specialtyLabel, summary }: { specialtyLabel: 
   return { subject: summary?.trim() ? "Richiesta di appuntamento, con riepilogo dei sintomi" : "Richiesta di appuntamento", body: lines.join("\n") };
 }
 
-/** Accorcia il riepilogo (a righe intere) finché il testo sta nel limite del link mailto */
+/** Quanto occupa il testo nel link: a capo CRLF e caratteri codificati (uno spazio vale 3, una lettera accentata 6) */
+export function encodedLength(text: string): number {
+  return encodeURIComponent(text.replace(/\r?\n/g, "\r\n")).length;
+}
+
+/** Accorcia il riepilogo (a righe intere) finché il testo codificato sta nel limite del link mailto */
 export function fitBody(body: string, limit = MAILTO_BODY_LIMIT): string {
-  if (body.length <= limit) return body;
+  if (encodedLength(body) <= limit) return body;
   const closingStart = body.lastIndexOf("\nGrazie, cordiali saluti");
   const closing = closingStart >= 0 ? body.slice(closingStart) : "";
   const head = closingStart >= 0 ? body.slice(0, closingStart) : body;
-  const room = limit - closing.length - SHORTENED_NOTE.length - 2;
-  const lines = head.split("\n");
+  const shortened = (lines: readonly string[]) => `${lines.join("\n").trimEnd()}\n\n${SHORTENED_NOTE}\n${closing}`;
   const kept: string[] = [];
-  let size = 0;
-  for (const line of lines) {
-    if (size + line.length + 1 > room) break;
+  for (const line of head.split("\n")) {
+    if (encodedLength(shortened([...kept, line])) > limit) break;
     kept.push(line);
-    size += line.length + 1;
   }
-  return `${kept.join("\n").trimEnd()}\n\n${SHORTENED_NOTE}\n${closing}`.slice(0, limit);
+  return shortened(kept);
 }
 
 /** RFC 6068: l'indirizzo resta in chiaro (è già validato), oggetto e testo sono codificati, a capo = CRLF */

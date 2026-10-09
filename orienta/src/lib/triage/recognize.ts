@@ -4,6 +4,28 @@ import { normalizeText } from "@/lib/text/normalize";
 /** Parole che, poco prima di un sintomo, lo negano: «non ho febbre», «niente nausea» */
 const NEGATIONS = new Set(["non", "niente", "senza", "nessun", "nessuna", "nessuno", "mai", "neanche", "nemmeno", "ne"]);
 const NEGATION_WINDOW = 3;
+/** Dopo «non» (e qualche pronome) questi verbi confermano il sintomo: «non riesco a deglutire», «non mi passa», «non solo» */
+const CONFIRMING_AFTER_NON = /^(riesc\w*|riusc\w*|posso|puo|potevo|ce|passa|passano|passava|smette|smettono|va|vanno|migliora|migliorano|finisce|diminuisce|cala|solo)$/;
+const CLITICS = new Set(["mi", "ti", "si", "ci", "vi", "me", "te", "se", "ne", "lo", "la", "li", "le"]);
+/** «Mai avuto un mal di testa così forte»: un confronto che conferma il sintomo */
+const COMPARISON = new Set(["cosi", "tanto", "simile", "genere", "uguale"]);
+
+/** Vero se la parola in posizione `i` nega davvero ciò che segue */
+function negates(words: readonly string[], i: number): boolean {
+  if (!NEGATIONS.has(words[i]!)) return false;
+  if (words[i] !== "non") return true;
+  let j = i + 1;
+  while (j < words.length && j <= i + 2 && CLITICS.has(words[j]!)) j++;
+  return !(j < words.length && CONFIRMING_AFTER_NON.test(words[j]!));
+}
+
+/** Vero se l'espressione tra `start` ed `end` è negata dalle parole che la precedono */
+function negatedBefore(words: readonly string[], start: number, end: number): boolean {
+  const from = Math.max(0, start - NEGATION_WINDOW);
+  const window = words.slice(from, start);
+  if (window.includes("mai") && words.slice(end, end + 3).some((w) => COMPARISON.has(w))) return false;
+  return window.some((_, k) => negates(words, from + k));
+}
 /** Parole che possono stare in mezzo a un'espressione: «brucia quando faccio pipì», «naso un po' chiuso» */
 const MAX_GAP = 2;
 
@@ -61,7 +83,7 @@ function matchAt(words: readonly string[], pattern: readonly string[], start: nu
       }
     }
     if (found < 0) return null;
-    for (let j = pos + 1; j < found; j++) if (NEGATIONS.has(words[j]!)) negatedInside = true;
+    for (let j = pos + 1; j < found; j++) if (negates(words, j)) negatedInside = true;
     pos = found;
   }
   return { start, end: pos + 1, negatedInside };
@@ -95,8 +117,7 @@ export function recognizeSymptoms(text: string): Recognition {
   const present: SymptomId[] = [];
   const negated: SymptomId[] = [];
   for (const m of taken) {
-    const before = words.slice(Math.max(0, m.start - NEGATION_WINDOW), m.start);
-    const isNegated = m.negatedInside || before.some((w) => NEGATIONS.has(w));
+    const isNegated = m.negatedInside || negatedBefore(words, m.start, m.end);
     const list = isNegated ? negated : present;
     if (!list.includes(m.id)) list.push(m.id);
   }
@@ -131,8 +152,7 @@ export function ambiguousTerms(text: string, known: readonly SymptomId[]): Ambig
     for (let i = 0; i < words.length; i++) {
       const m = matchAt(words, a.words, i);
       if (!m) continue;
-      const before = words.slice(Math.max(0, m.start - NEGATION_WINDOW), m.start);
-      if (m.negatedInside || before.some((w) => NEGATIONS.has(w))) continue;
+      if (m.negatedInside || negatedBefore(words, m.start, m.end)) continue;
       out.push({ term: words.slice(m.start, m.end).join(" "), question: a.question, options: a.options });
       break;
     }

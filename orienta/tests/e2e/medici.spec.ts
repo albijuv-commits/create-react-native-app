@@ -19,7 +19,7 @@ test.describe("Medici", () => {
     await completeCystitisInterview(page);
     await page.getByRole("link", { name: /Trova uno specialista/ }).first().click();
 
-    await expect(page).toHaveURL(/\/medici\?specialista=urologo&condizione=cistite/);
+    await expect(page).toHaveURL(/\/medici#specialista=urologo&condizione=cistite/);
     await expect(page.getByText("Specialista di riferimento per «Cistite»:")).toBeVisible();
     await expect(page.getByRole("radio", { name: /^Urologo/ })).toBeChecked();
     await expect(page.getByText("Primo passo: il medico di base")).toBeVisible();
@@ -73,7 +73,7 @@ test.describe("Medici", () => {
   });
 
   test("pronto soccorso: prima di tutto il 112", async ({ page }) => {
-    await page.goto("/medici?specialista=pronto-soccorso", { waitUntil: "networkidle" });
+    await page.goto("/medici#specialista=pronto-soccorso", { waitUntil: "networkidle" });
     await expect(page.getByText("In un'emergenza non cercare: chiama subito il 112.")).toBeVisible();
     await expect(page.getByRole("link", { name: "Chiama il 112" }).last()).toHaveAttribute("href", "tel:112");
   });

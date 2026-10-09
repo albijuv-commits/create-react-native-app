@@ -11,7 +11,7 @@ const AUGMENTIN = "026089019";
 const euro = (s: string) => new RegExp(s.replace(" ", "\\s"));
 
 async function openCatalog(page: Page, q = "") {
-  await page.goto(`/mercato${q ? `?q=${encodeURIComponent(q)}` : ""}`, { waitUntil: "networkidle" });
+  await page.goto(`/mercato${q ? `#q=${encodeURIComponent(q)}` : ""}`, { waitUntil: "networkidle" });
   await expect(page.getByRole("heading", { level: 1, name: "Mercato" })).toBeVisible();
 }
 
