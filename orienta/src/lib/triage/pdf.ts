@@ -3,12 +3,9 @@
  * jsPDF si carica solo quando la persona chiede il PDF.
  */
 
-const PAGE = { width: 210, height: 297, margin: 18 } as const;
+import { isSummaryHeading } from "./summary";
 
-/** Le righe che fanno da titolo di sezione nel testo del riepilogo */
-function isHeading(line: string, index: number): boolean {
-  return index === 0 || (index > 1 && !line.startsWith("- ") && !line.startsWith("Metodo:") && line.length <= 90);
-}
+const PAGE = { width: 210, height: 297, margin: 18 } as const;
 
 export async function downloadSummaryPdf(text: string, generatedAt: Date): Promise<void> {
   const { jsPDF } = await import("jspdf");
@@ -23,7 +20,7 @@ export async function downloadSummaryPdf(text: string, generatedAt: Date): Promi
       return;
     }
     const title = i === 0;
-    doc.setFont("helvetica", isHeading(line, i) ? "bold" : "normal");
+    doc.setFont("helvetica", isSummaryHeading(line, i) ? "bold" : "normal");
     doc.setFontSize(title ? 17 : 11);
     const lineHeight = title ? 8 : 5.4;
     for (const part of doc.splitTextToSize(line, width) as string[]) {

@@ -24,9 +24,9 @@ export function CallEmergency() {
 }
 
 /** Un numero di aiuto con orari, a chi si rivolge e il pulsante per chiamare */
-export function HelplineCard({ helpline: h }: { helpline: Helpline }) {
+export function HelplineCard({ helpline: h, tone = "surface2" }: { helpline: Helpline; tone?: "surface" | "surface2" }) {
   return (
-    <Card tone="surface2">
+    <Card tone={tone}>
       <View>
         <Txt bold>{h.name}</Txt>
         <Txt variant="title" tone="primary" style={styles.number}>

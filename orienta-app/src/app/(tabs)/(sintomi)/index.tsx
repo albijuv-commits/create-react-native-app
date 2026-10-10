@@ -49,10 +49,7 @@ export default function SintomiHome() {
         </Txt>
       </View>
       <View style={styles.start}>
-        <Button label="Inizia" icon={MessageCircleHeart} size="lg" disabled onPress={() => {}} hint="L'intervista arriva nella fase 3 dell'app" />
-        <Txt variant="small" tone="inkMuted" style={styles.center}>
-          L&apos;intervista arriva nella prossima versione dell&apos;app.
-        </Txt>
+        <Button label="Inizia" icon={MessageCircleHeart} size="lg" onPress={() => router.push("/sintomi/intervista")} />
       </View>
 
       <Card tone="calmSoft">

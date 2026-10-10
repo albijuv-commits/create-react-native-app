@@ -34,8 +34,8 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.bg },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: "Sintomi", tabBarIcon: tabIcon(HeartPulse) }} />
-      {/* Condizioni ha una sua pila di schermate (elenco e scheda), con le intestazioni in condizioni/_layout */}
+      {/* Sintomi e Condizioni hanno una loro pila di schermate, con le intestazioni nei rispettivi _layout */}
+      <Tabs.Screen name="(sintomi)" options={{ title: "Sintomi", headerShown: false, tabBarIcon: tabIcon(HeartPulse) }} />
       <Tabs.Screen name="condizioni" options={{ title: "Condizioni", headerShown: false, tabBarIcon: tabIcon(Microscope) }} />
       <Tabs.Screen name="medici" options={{ title: "Medici", tabBarIcon: tabIcon(Stethoscope) }} />
       <Tabs.Screen name="mercato" options={{ title: "Mercato", tabBarIcon: tabIcon(Pill) }} />

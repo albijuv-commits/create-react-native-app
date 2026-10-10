@@ -43,7 +43,8 @@
             "image": "./assets/images/splash-icon-dark.png"
           }
         }
-      ]
+      ],
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,
