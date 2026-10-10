@@ -1,9 +1,9 @@
-import { Check } from "lucide-react-native";
+import { Check, type LucideIcon } from "lucide-react-native";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useTheme } from "~/theme/theme";
 import { Txt } from "./text";
 
-/** Una scelta tra poche opzioni (tema, dimensione del testo): un gruppo di pulsanti di scelta */
+/** Una scelta tra poche opzioni (tema, dimensione del testo, distanza): un gruppo di pulsanti di scelta */
 export function Segmented<T extends string>({
   label,
   options,
@@ -11,7 +11,7 @@ export function Segmented<T extends string>({
   onChange,
 }: {
   label: string;
-  options: readonly { value: T; label: string }[];
+  options: readonly { value: T; label: string; icon?: LucideIcon; disabled?: boolean }[];
   value: T;
   onChange: (value: T) => void;
 }) {
@@ -22,20 +22,23 @@ export function Segmented<T extends string>({
       <View role="radiogroup" accessibilityLabel={label} style={[styles.track, { backgroundColor: colors.surface2 }]}>
         {options.map((o) => {
           const selected = o.value === value;
+          const Icon = o.icon;
           return (
             <Pressable
               key={o.value}
               role="radio"
-              accessibilityState={{ checked: selected }}
+              accessibilityState={{ checked: selected, disabled: o.disabled }}
               accessibilityLabel={o.label}
+              disabled={o.disabled}
               onPress={() => onChange(o.value)}
               style={({ pressed }) => [
                 styles.option,
                 selected && [styles.selected, { backgroundColor: colors.surface, shadowColor: colors.ink }],
-                { transform: [{ scale: pressed ? 0.97 : 1 }] },
+                { opacity: o.disabled ? 0.45 : 1, transform: [{ scale: pressed && !o.disabled ? 0.97 : 1 }] },
               ]}
             >
-              {selected && <Check color={colors.primary} size={16} strokeWidth={3} style={styles.check} />}
+              {selected && !Icon && <Check color={colors.primary} size={16} strokeWidth={3} style={styles.check} />}
+              {Icon && <Icon color={selected ? colors.primary : colors.inkMuted} size={18} strokeWidth={2.2} style={styles.check} />}
               <Txt variant="small" bold={selected} tone={selected ? "primary" : "inkMuted"} style={styles.optionLabel}>
                 {o.label}
               </Txt>

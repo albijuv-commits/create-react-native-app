@@ -27,7 +27,7 @@ Per l'intervista con l'intelligenza artificiale copia `.env.example` in `.env.lo
 ## Struttura
 
 - `src/app/`: le schermate (Expo Router). `(tabs)/` contiene le cinque schede (Sintomi, Condizioni, Medici, Mercato, Profilo); `(tabs)/(sintomi)/` ha la pagina Sintomi, l'intervista (`/sintomi/intervista`) e la scheda di una condizione aperta dai risultati (`/sintomi/condizione/[id]`) nella stessa pila, così «Indietro» riporta ai risultati; `(tabs)/condizioni/` ha elenco e scheda nella stessa pila, così la barra delle sezioni resta visibile; `emergenza.tsx` è sempre raggiungibile dal pulsante rosso in alto. `vetrino.tsx` è la galleria di tutte le scene per chi rivede i contenuti: non ha link nell'app, si apre con `orienta://vetrino` (o `/vetrino` nella versione web).
-- `src/components/`: componenti dell'app (`ui/` per testo, pulsanti, schede, selettori; `conditions/` per elenco e scheda; `slide/` per il vetrino; `triage/` per i passi dell'intervista; `body-map/` per la mappa del corpo; `emergency/` per il 112, i numeri di aiuto e la schermata Emergenza dell'intervista).
+- `src/components/`: componenti dell'app (`ui/` per testo, pulsanti, schede, selettori; `conditions/` per elenco e scheda; `slide/` per il vetrino; `triage/` per i passi dell'intervista; `body-map/` per la mappa del corpo; `emergency/` per il 112, i numeri di aiuto e la schermata Emergenza dell'intervista; `doctors/` per la sezione Medici).
 - `src/lib/illustrations.ts`: le illustrazioni della web app per condizioni, specialisti e aree del corpo. È generato: dopo aver aggiunto o tolto un'illustrazione in `../orienta/src/assets/illustrations` lancia `node scripts/gen-illustrations.mjs`.
 - `src/theme/`: colori della web app in chiaro e scuro, scala tipografica con Atkinson Hyperlegible, preferenze di tema e dimensione del testo (salvate sul telefono con lo stesso schema della web app).
 - Alias: `~/` è il codice dell'app, `@/` e `@data/` sono `../orienta/src` e `../orienta/data`. `metro.config.js` fa vedere a Metro i file condivisi e risolve i pacchetti che usano (per esempio `zod`) dai `node_modules` dell'app, così ogni pacchetto esiste in una sola copia. I moduli `server-only` della web app non si importano mai: la base di conoscenza sta in `lib/conditions/knowledge-base.ts`.
@@ -56,6 +56,17 @@ La stessa intervista della web app, passo per passo: consenso, età e sesso, des
 - **Riepilogo per il medico**: si legge, si copia, si condivide o diventa un PDF creato sul telefono (`expo-print`), condiviso con il sistema e poi cancellato. Toccando «Trova uno specialista» il riepilogo resta in memoria per sei ore, pronto per l'email al medico della sezione Medici.
 - Con «Riduci movimento» le carte si sostituiscono senza volare via, la mappa si gira senza animazione e l'attesa è un'immagine ferma.
 
+## Medici
+
+La sezione Medici della web app, con gli stessi testi e le stesse regole (`src/components/doctors/`):
+
+- **Chi cerchi**: i professionisti in una fila di riquadri illustrati, con il medico di base sempre per primo. Arrivando dai risultati dell'intervista o da una scheda lo specialista è già scelto e segnato come «Consigliato»; per gli specialisti c'è il richiamo al medico di base come primo passo, per il pronto soccorso prima di tutto il 112.
+- **Dove**: la posizione del telefono (`expo-location`), chiesta solo quando si tocca «Usa la mia posizione» e con il testo del permesso in italiano, oppure città o CAP. Prima di uscire dal telefono la posizione è arrotondata a circa 100 metri; le distanze si ricalcolano qui con le coordinate esatte. Se il permesso è negato, il pulsante porta alle impostazioni.
+- **Risultati**: in lista o su una mappa schematica, con lo stesso numero. La mappa è disegnata nell'app (il punto di ricerca al centro, i cerchi delle distanze, ogni risultato nella sua direzione): niente mappe scaricate da un servizio, quindi nessuna chiave (Google Maps su Android la vorrebbe nell'app) e nessuna richiesta che riveli dove si trova la persona. Per arrivare si usano le «Indicazioni», nell'app di mappe del telefono. Con i risultati di Google la mappa non c'è, come nella web app.
+- **Contatti**: chiama, email, sito e indicazioni compaiono solo se il dato esiste davvero. L'email si prepara in un foglio dove si vede a chi si scrive e cosa, si può togliere il riepilogo dei sintomi (se arriva dai risultati, solo in memoria) e poi si apre la propria app di posta: Orienta non invia nulla.
+- **Servizio**: la ricerca passa da `/api/medici` e `/api/luoghi` della web app (`EXPO_PUBLIC_API_URL`), che tengono le chiavi. Senza indirizzo l'app mostra solo DATI DI ESEMPIO, sempre etichettati, e la ricerca per città non compare.
+- **Come prenotare**: visita privata o con il Servizio sanitario nazionale (ricetta del medico di base, poi CUP), con la fonte del Ministero della Salute.
+
 ## Accessibilità
 
 Aree di tocco di almeno 44 pt, ruoli ed etichette per VoiceOver e TalkBack (intestazioni, pulsanti, scelte, sezioni che si aprono), colori con contrasto AA nei due temi, urgenza mai indicata dal solo colore. Il testo segue la dimensione scelta nelle impostazioni del telefono e, in più, quella del Profilo.
@@ -65,7 +76,7 @@ Aree di tocco di almeno 44 pt, ruoli ed etichette per VoiceOver e TalkBack (inte
 1. **Base** (fatta): progetto, navigazione a schede, design system, Emergenza con 112 e numeri di aiuto, preferenze.
 2. **Condizioni** (fatta): elenco con ricerca per nome o sintomo e filtro per area del corpo, anteprime animate, schede complete (storia, casi, cause, sintomi, cure, quando andare dal medico, prevenzione, specialista, fonti), vetrino animato.
 3. **Sintomi** (fatta): intervista con consenso, mappa del corpo, carte delle domande, segnali d'allarme deterministici, risultati con urgenza e condizioni compatibili, riepilogo per il medico (copia, condivisione, PDF); AI facoltativa tramite la web app.
-4. Medici: posizione, ricerca, mappa, contatti.
+4. **Medici** (fatta): specialisti illustrati con il consigliato, posizione o città, distanza, lista e mappa schematica, contatti, email con il riepilogo dei sintomi, come prenotare.
 5. Mercato: catalogo AIFA, schede dei farmaci, preferiti e confronto.
 6. Profilo e privacy, rifinitura, build installabili con EAS.
 

@@ -1,19 +1,17 @@
 import medici from "@/assets/illustrations/sezione-medici.webp";
-import { ComingSoon } from "~/components/coming-soon";
+import { conditionSpecialists } from "@/lib/conditions/knowledge-base";
+import { BookingInfo } from "~/components/doctors/booking-info";
+import { DoctorFinder } from "~/components/doctors/doctor-finder";
 import { PageHeader, Screen } from "~/components/ui/layout";
+
+const CONDITIONS = conditionSpecialists();
 
 export default function MediciScreen() {
   return (
     <Screen>
       <PageHeader title="Medici" lead="Trova professionisti vicino a te e contattali con un tocco." illustration={medici} />
-      <ComingSoon
-        phase={4}
-        items={[
-          "Ricerca con la tua posizione, con il tuo permesso, oppure per città o CAP",
-          "Lista e mappa, con la distanza da te",
-          "Chiama, scrivi un'email con il riepilogo dei sintomi, apri le indicazioni",
-        ]}
-      />
+      <DoctorFinder conditions={CONDITIONS} />
+      <BookingInfo />
     </Screen>
   );
 }

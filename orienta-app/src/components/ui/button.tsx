@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react-native";
-import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
 import { useTheme } from "~/theme/theme";
 import { Txt } from "./text";
 
@@ -16,6 +16,7 @@ export function Button({
   size = "md",
   icon: Icon,
   disabled = false,
+  busy = false,
   hint,
   style,
 }: {
@@ -25,6 +26,8 @@ export function Button({
   size?: "md" | "lg";
   icon?: LucideIcon;
   disabled?: boolean;
+  /** Operazione in corso: al posto dell'icona gira l'indicatore e il pulsante non risponde */
+  busy?: boolean;
   /** Cosa succede toccando, per VoiceOver e TalkBack (per esempio «Apre il telefono») */
   hint?: string;
   style?: StyleProp<ViewStyle>;
@@ -37,13 +40,14 @@ export function Button({
     danger: { bg: colors.red, fg: colors.onRed, border: colors.red },
   }[variant];
   const large = size === "lg";
+  const inactive = disabled || busy;
   return (
     <Pressable
       role="button"
       accessibilityLabel={label}
       accessibilityHint={hint}
-      accessibilityState={{ disabled }}
-      disabled={disabled}
+      accessibilityState={{ disabled: inactive, busy }}
+      disabled={inactive}
       onPress={onPress}
       style={({ pressed }) => [
         styles.base,
@@ -52,13 +56,13 @@ export function Button({
           backgroundColor: tone.bg,
           borderColor: tone.border,
           opacity: disabled ? 0.5 : 1,
-          transform: [{ scale: pressed && !disabled ? 0.97 : 1 }],
+          transform: [{ scale: pressed && !inactive ? 0.97 : 1 }],
         },
         variant === "ghost" && styles.ghost,
         style,
       ]}
     >
-      {Icon && <Icon color={tone.fg} size={large ? 30 : 22} strokeWidth={2.2} />}
+      {busy ? <ActivityIndicator color={tone.fg} /> : Icon && <Icon color={tone.fg} size={large ? 30 : 22} strokeWidth={2.2} />}
       <Txt variant={large ? "title" : "body"} bold style={{ color: tone.fg, textAlign: "center", flexShrink: 1 }}>
         {label}
       </Txt>

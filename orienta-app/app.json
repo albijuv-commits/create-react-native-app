@@ -44,7 +44,16 @@
           }
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Orienta usa la posizione solo quando tocchi «Usa la mia posizione», per trovare i medici vicini. Prima della ricerca la arrotondiamo a circa 100 metri e non la salviamo.",
+          "locationAlwaysAndWhenInUsePermission": false,
+          "locationAlwaysPermission": false,
+          "motionUsagePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

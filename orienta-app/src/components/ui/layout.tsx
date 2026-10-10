@@ -14,6 +14,7 @@ export function Screen({ children }: { children: ReactNode }) {
       contentContainerStyle={styles.screen}
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
+      automaticallyAdjustKeyboardInsets
     >
       {children}
     </ScrollView>
