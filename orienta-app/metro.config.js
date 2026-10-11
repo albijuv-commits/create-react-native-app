@@ -10,7 +10,8 @@ const webApp = path.resolve(projectRoot, "../orienta");
 const config = getDefaultConfig(projectRoot);
 
 // I file condivisi stanno fuori dalla cartella dell'app: Metro li deve vedere e seguire
-config.watchFolders = [...(config.watchFolders ?? []), path.join(webApp, "src"), path.join(webApp, "data")];
+// (più le poche foto con licenza libera del campione di esempio del Mercato, che viaggiano con l'app)
+config.watchFolders = [...(config.watchFolders ?? []), path.join(webApp, "src"), path.join(webApp, "data"), path.join(webApp, "public", "farmaci", "foto")];
 
 const appRootFile = path.join(projectRoot, "package.json");
 const isPackage = (name) => !/^(\.|\/|@\/|@data\/|~\/)/.test(name);

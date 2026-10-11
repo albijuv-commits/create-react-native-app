@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { fetchDoctors, fetchPlace } from "@/lib/doctors/client";
+import { CatalogRequestError, fetchCatalog, fetchMedicineDetail } from "@/lib/medicines/client";
 import { fetchAiAvailability, postTriageStep } from "@/lib/triage/client";
 
 /** I client delle route server: nel browser chiamano la stessa origine, nell'app nativa l'indirizzo della web app */
@@ -30,6 +31,18 @@ describe("client di Medici e luoghi", () => {
     const fetchMock = stubFetch({ place: { label: "Bologna, Emilia-Romagna", lat: 44.4938, lon: 11.3387 } });
     await expect(fetchPlace("Bologna", undefined, BASE)).resolves.toEqual({ label: "Bologna, Emilia-Romagna", lat: 44.4938, lon: 11.3387 });
     expect(fetchMock.mock.calls[0]![0]).toBe(`${BASE}/api/luoghi`);
+  });
+});
+
+describe("client del catalogo", () => {
+  it("ricerca e scheda vanno all'indirizzo indicato; gli errori del server arrivano con il loro messaggio", async () => {
+    const fetchMock = stubFetch({ info: { source: "esempio", count: 0, registryDate: null, classADate: null, transparencyDate: null }, page: { items: [], total: 0, page: 1, pageSize: 24 } });
+    await fetchCatalog({ q: "", ricetta: null, forma: null, atc: null, prezzo: null, ordine: "nome", pagina: 1 }, undefined, BASE);
+    expect(fetchMock.mock.calls[0]![0]).toBe(`${BASE}/api/farmaci`);
+    stubFetch({ message: "Questa confezione non è nel catalogo." }, 404);
+    const error = await fetchMedicineDetail("000000000", undefined, BASE).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(CatalogRequestError);
+    expect((error as Error).message).toBe("Questa confezione non è nel catalogo.");
   });
 });
 
