@@ -21,13 +21,12 @@ const MESSAGES: Record<Status, string> = {
 };
 
 /**
- * Il riepilogo da portare al medico: si legge qui, si copia, si condivide o si crea un PDF da salvare
- * o mandare. Il PDF si crea sul telefono e si cancella dopo la condivisione.
+ * Copia, PDF e Condividi per un riepilogo per il medico, con il messaggio che dice cosa è
+ * successo. Li usano i Risultati e lo storico del Profilo. Il PDF si crea sul telefono e si
+ * cancella dopo la condivisione.
  */
-export function DoctorSummary({ text }: { text: string }) {
-  const { colors } = useTheme();
+export function SummaryActions({ text, onCopyFailed }: { text: string; onCopyFailed?: () => void }) {
   const [status, setStatus] = useState<Status>("idle");
-  const [open, setOpen] = useState(false);
   const reset = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(
@@ -49,7 +48,7 @@ export function DoctorSummary({ text }: { text: string }) {
       if (!(await Clipboard.setStringAsync(text))) throw new Error("copia non riuscita");
       show("copiato", 2500);
     } catch {
-      setOpen(true);
+      onCopyFailed?.();
       show("copia-fallita");
     }
   };
@@ -75,6 +74,25 @@ export function DoctorSummary({ text }: { text: string }) {
   };
 
   return (
+    <>
+      <View style={styles.actions}>
+        <Action label={status === "copiato" ? "Copiato" : "Copia"} icon={status === "copiato" ? Check : ClipboardCopy} onPress={copy} />
+        <Action label="PDF" icon={status === "pdf-in-corso" ? LoaderCircle : FileDown} onPress={pdf} disabled={status === "pdf-in-corso"} hint="Crea un PDF da salvare o mandare" />
+        <Action label="Condividi" icon={Share2} onPress={share} />
+      </View>
+      <Txt variant="small" bold tone="primary" accessibilityLiveRegion="polite" style={styles.status}>
+        {MESSAGES[status]}
+      </Txt>
+    </>
+  );
+}
+
+/** Il riepilogo da portare al medico: si legge qui, si copia, si condivide o si crea un PDF da salvare o mandare */
+export function DoctorSummary({ text }: { text: string }) {
+  const { colors } = useTheme();
+  const [open, setOpen] = useState(false);
+
+  return (
     <View style={[styles.box, { backgroundColor: colors.surface, borderColor: colors.line }]}>
       <View style={styles.head}>
         <View style={styles.headText}>
@@ -88,15 +106,7 @@ export function DoctorSummary({ text }: { text: string }) {
         <Image source={riepilogo} style={styles.art} contentFit="contain" accessible={false} />
       </View>
 
-      <View style={styles.actions}>
-        <Action label={status === "copiato" ? "Copiato" : "Copia"} icon={status === "copiato" ? Check : ClipboardCopy} onPress={copy} />
-        <Action label="PDF" icon={status === "pdf-in-corso" ? LoaderCircle : FileDown} onPress={pdf} disabled={status === "pdf-in-corso"} hint="Crea un PDF da salvare o mandare" />
-        <Action label="Condividi" icon={Share2} onPress={share} />
-      </View>
-
-      <Txt variant="small" bold tone="primary" accessibilityLiveRegion="polite" style={styles.status}>
-        {MESSAGES[status]}
-      </Txt>
+      <SummaryActions text={text} onCopyFailed={() => setOpen(true)} />
 
       <View style={[styles.details, { backgroundColor: colors.surface2 }]}>
         <Pressable role="button" accessibilityState={{ expanded: open }} onPress={() => setOpen((o) => !o)} style={styles.detailsHead}>

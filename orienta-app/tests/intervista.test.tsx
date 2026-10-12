@@ -1,12 +1,15 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { act, screen, userEvent } from "@testing-library/react-native";
 import * as Clipboard from "expo-clipboard";
 import { Alert, Linking, Share } from "react-native";
 import { interviewConditions } from "@/lib/conditions/knowledge-base";
+import { historyEntrySchema } from "@/lib/storage/history";
 import { TriageRequestError } from "@/lib/triage/client";
 import { CORE_QUESTIONS } from "@/lib/triage/questions";
 import type { TriageResponse } from "@/lib/triage/schema";
 import { Interview } from "~/components/triage/interview";
 import { readSummaryForDoctors } from "~/lib/doctor-handoff";
+import { eraseAllMyData } from "~/lib/erase";
 import { renderWithTheme } from "./render";
 
 jest.mock("expo-router", () => ({ router: { push: jest.fn(), navigate: jest.fn() }, useNavigation: () => ({ dispatch: jest.fn() }) }));
@@ -145,6 +148,35 @@ describe("intervista con le regole fisse", () => {
     expect(await screen.findByRole("heading", { name: "Cosa senti?" })).toBeOnTheScreen();
     expect(screen.getByLabelText("Descrivi i tuoi disturbi")).toHaveDisplayValue("");
     expect(readSummaryForDoctors()).toBeNull();
+  });
+
+  it("dai risultati si salva la sessione nello storico solo se lo si chiede; «Elimina tutti i miei dati» azzera anche l'intervista", async () => {
+    const user = setup();
+    await start(user);
+    await describe_(user, "Ho mal di gola e la febbre");
+    await user.press(screen.getByRole("button", { name: "Continua con le domande" }));
+    await answerAll(user);
+    expect(await AsyncStorage.getItem("orienta:storico")).toBeNull();
+    // Risultati non salvati: uscire chiede conferma
+    expect(preventRemove).toHaveBeenLastCalledWith(true, expect.any(Function));
+
+    await user.press(screen.getByRole("button", { name: "Salva nello storico" }));
+    expect(await screen.findByText(/Salvata solo su questo telefono/)).toBeOnTheScreen();
+    const saved = JSON.parse((await AsyncStorage.getItem("orienta:storico")) ?? "[]") as unknown[];
+    expect(saved).toHaveLength(1);
+    const parsed = historyEntrySchema.parse(saved[0]);
+    expect(parsed.summary).toMatch(/mal di gola/i);
+    expect(parsed.symptoms).toEqual(expect.arrayContaining(["mal-di-gola", "febbre"]));
+    expect(parsed.age).toBe(34);
+    // Una volta salvati, i risultati si lasciano senza conferma
+    expect(preventRemove).toHaveBeenLastCalledWith(false, expect.any(Function));
+
+    await act(async () => {
+      await eraseAllMyData();
+    });
+    expect(await AsyncStorage.getItem("orienta:storico")).toBeNull();
+    expect(await screen.findByRole("checkbox", { name: /Ho capito che Orienta/ })).not.toBeChecked();
+    expect(screen.queryByText(DISCLAIMER)).not.toBeOnTheScreen();
   });
 
   it("chiede conferma prima di lasciare l'intervista a metà, mai sull'Emergenza", async () => {

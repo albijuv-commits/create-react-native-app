@@ -21,13 +21,14 @@ Serve anche la cartella `../orienta` con le sue dipendenze installate (`npm inst
 | `npm run typecheck` / `npm run lint` | Controlli statici |
 | `npm run export:web` | Esporta la versione web in `dist/` (utile per controllare le schermate) |
 | `npx expo-doctor` | Controlla configurazione e versioni dei pacchetti |
+| `npx expo export --platform ios --platform android` | Prepara i bundle nativi (Hermes) come in una build, senza account: utile per controllare che tutto compili |
 
 Per l'intervista con l'intelligenza artificiale, la ricerca dei medici e il catalogo completo dei farmaci copia `.env.example` in `.env.local` e scrivi in `EXPO_PUBLIC_API_URL` l'indirizzo della web app pubblicata. Senza, l'app funziona lo stesso: l'intervista usa le regole fisse sul telefono (e la casella dell'AI non compare), Medici e Mercato mostrano DATI DI ESEMPIO, sempre etichettati.
 
 ## Struttura
 
-- `src/app/`: le schermate (Expo Router). `(tabs)/` contiene le cinque schede (Sintomi, Condizioni, Medici, Mercato, Profilo); `(tabs)/(sintomi)/` ha la pagina Sintomi, l'intervista (`/sintomi/intervista`) e la scheda di una condizione aperta dai risultati (`/sintomi/condizione/[id]`) nella stessa pila, così «Indietro» riporta ai risultati; `(tabs)/condizioni/` ha elenco e scheda nella stessa pila, così la barra delle sezioni resta visibile; `(tabs)/mercato/` ha catalogo, scheda della confezione (`/mercato/[aic]`) e confronto (`/mercato/confronto`), anche loro in una pila; `emergenza.tsx` è sempre raggiungibile dal pulsante rosso in alto. `vetrino.tsx` è la galleria di tutte le scene per chi rivede i contenuti: non ha link nell'app, si apre con `orienta://vetrino` (o `/vetrino` nella versione web).
-- `src/components/`: componenti dell'app (`ui/` per testo, pulsanti, schede, selettori; `conditions/` per elenco e scheda; `slide/` per il vetrino; `triage/` per i passi dell'intervista; `body-map/` per la mappa del corpo; `emergency/` per il 112, i numeri di aiuto e la schermata Emergenza dell'intervista; `doctors/` per la sezione Medici; `medicines/` per il Mercato).
+- `src/app/`: le schermate (Expo Router). `(tabs)/` contiene le cinque schede (Sintomi, Condizioni, Medici, Mercato, Profilo); `(tabs)/(sintomi)/` ha la pagina Sintomi, l'intervista (`/sintomi/intervista`) e la scheda di una condizione aperta dai risultati (`/sintomi/condizione/[id]`) nella stessa pila, così «Indietro» riporta ai risultati; `(tabs)/condizioni/` ha elenco e scheda nella stessa pila, così la barra delle sezioni resta visibile; `(tabs)/mercato/` ha catalogo, scheda della confezione (`/mercato/[aic]`) e confronto (`/mercato/confronto`), anche loro in una pila; `(tabs)/profilo/` ha il Profilo, le pagine informative (`/profilo/privacy`, `/profilo/avvertenze`, `/profilo/fonti`) e le schede delle condizioni aperte dallo storico (`/profilo/condizione/[id]`); `emergenza.tsx` è sempre raggiungibile dal pulsante rosso in alto. `vetrino.tsx` è la galleria di tutte le scene per chi rivede i contenuti: non ha link nell'app, si apre con `orienta://vetrino` (o `/vetrino` nella versione web).
+- `src/components/`: componenti dell'app (`ui/` per testo, pulsanti, schede, selettori; `conditions/` per elenco e scheda; `slide/` per il vetrino; `triage/` per i passi dell'intervista; `body-map/` per la mappa del corpo; `emergency/` per il 112, i numeri di aiuto e la schermata Emergenza dell'intervista; `doctors/` per la sezione Medici; `medicines/` per il Mercato; `profile/` per storico, città predefinita, eliminazione dei dati e pagine informative). Se una schermata si blocca per un errore compare `error-screen.tsx`: nessun dettaglio tecnico, il 112 e «Riprova».
 - `src/lib/illustrations.ts`: le illustrazioni della web app per condizioni, specialisti e aree del corpo. È generato: dopo aver aggiunto o tolto un'illustrazione in `../orienta/src/assets/illustrations` lancia `node scripts/gen-illustrations.mjs`.
 - `src/theme/`: colori della web app in chiaro e scuro, scala tipografica con Atkinson Hyperlegible, preferenze di tema e dimensione del testo (salvate sul telefono con lo stesso schema della web app).
 - Alias: `~/` è il codice dell'app, `@/` e `@data/` sono `../orienta/src` e `../orienta/data`. `metro.config.js` fa vedere a Metro i file condivisi e risolve i pacchetti che usano (per esempio `zod`) dai `node_modules` dell'app, così ogni pacchetto esiste in una sola copia. I moduli `server-only` della web app non si importano mai: la base di conoscenza sta in `lib/conditions/knowledge-base.ts`.
@@ -51,7 +52,7 @@ La stessa intervista della web app, passo per passo: consenso, età e sesso, des
 - **Segnali d'allarme**: il controllo è deterministico, scritto in codice e mai affidato all'AI. Avviene mentre si scrive (con l'avviso e il pulsante per il 112 subito sotto il testo), dopo ogni risposta e alla prima domanda, che è sempre l'elenco dei segnali. Se ce n'è uno si va alla schermata Emergenza: prima il 112, poi cosa fare caso per caso; per i pensieri di farsi del male anche Telefono Amico e Telefono Azzurro, con per primo quello adatto all'età.
 - **Le domande** sono carte: le sì/no si possono anche trascinare (a destra sì, a sinistra no), la scala da 0 a 10 ha un quadrante che segue il numero; sì/no, scelte e scala hanno sempre «Non so» e si può tornare indietro ritrovando la risposta data. Dopo una risposta, per un attimo un secondo tocco viene ignorato.
 - **Motore**: senza consenso all'AI, o senza `EXPO_PUBLIC_API_URL`, le domande e il confronto con le schede si fanno sul telefono con le regole fisse, senza rete. Con il consenso esplicito i passi successivi alle domande fisse (segnali d'allarme, durata, intensità) vanno a `/api/triage` della web app: la chiave resta sul server, che non salva i dati e non li scrive nei log. Se il servizio non risponde si può riprovare o continuare con le regole fisse. Il modello sceglie solo tra le schede di Orienta e non indica farmaci.
-- **Dati**: tutto resta in memoria finché l'intervista è aperta e niente si salva sul telefono (lo storico arriverà con il Profilo, nella fase 6). Uscire a metà, o dai risultati, chiede conferma; dalla schermata Emergenza no.
+- **Dati**: tutto resta in memoria finché l'intervista è aperta. Sul telefono si salva solo se, nei risultati, la persona tocca «Salva nello storico». Uscire a metà, o da risultati non salvati, chiede conferma; dalla schermata Emergenza no.
 - **Risultati**: «Questa non è una diagnosi», il livello di urgenza con colore, icona e testo, cosa fare adesso (con il 116117 dove serve), i quattro livelli da esplorare, le condizioni compatibili con il perché, la scheda completa e lo specialista da cercare. Sotto i 14 anni il riferimento è il pediatra; sotto i 18 c'è l'invito a mostrare i risultati a un adulto.
 - **Riepilogo per il medico**: si legge, si copia, si condivide o diventa un PDF creato sul telefono (`expo-print`), condiviso con il sistema e poi cancellato. Toccando «Trova uno specialista» il riepilogo resta in memoria per sei ore, pronto per l'email al medico della sezione Medici.
 - Con «Riduci movimento» le carte si sostituiscono senza volare via, la mappa si gira senza animazione e l'attesa è un'immagine ferma.
@@ -77,6 +78,16 @@ Il catalogo informativo dei medicinali della web app, con gli stessi dati AIFA e
 - **Servizio**: con `EXPO_PUBLIC_API_URL` il catalogo completo arriva dalle route della web app (`/api/farmaci`, `/api/farmaci/elenco`, `/api/farmaci/marchi` e `/api/farmaci/scheda`), con i termini cercati e i codici nel corpo delle richieste, mai negli indirizzi. Senza, l'app cerca sul telefono il campione di 44 confezioni della web app, sempre etichettato come DATI DI ESEMPIO: `src/lib/catalog-sample.ts` applica le stesse regole delle query SQL (filtri, ordinamenti, equivalenti, marchi); i marchi europei stanno solo sul server. Le foto con licenza libera del campione viaggiano con l'app, le altre arrivano dalla web app; senza foto c'è l'illustrazione della forma.
 - **Linguaggio neutro**: niente offerte, classifiche o parole da pubblicità (i test del Mercato lo controllano). I risultati dell'intervista non portano mai a un farmaco: da lì si va alle schede delle condizioni e agli specialisti, non al Mercato.
 
+## Profilo e privacy
+
+Il Profilo della web app (`src/app/(tabs)/profilo/`, `src/components/profile/`), senza account:
+
+- **Preferenze**: tema e dimensione del testo; con il servizio di Orienta anche la città predefinita, che nei Medici diventa «Cerca a …».
+- **Storico delle sessioni**: una sessione si salva solo con «Salva nello storico» nei risultati, con lo stesso schema Zod della web app (`historyEntrySchema`), al massimo 50. Per ognuna: data, età, metodo, urgenza, condizioni (che si aprono nella pila del Profilo) e il riepilogo per il medico da leggere, copiare, condividere o trasformare in PDF. Si elimina una alla volta o tutto insieme, sempre con una conferma.
+- **«Elimina tutti i miei dati»**: dopo la conferma del sistema cancella tutte le chiavi `orienta:` di AsyncStorage (storico, preferenze, città, preferiti e confronto), il riepilogo in memoria per i Medici, un'intervista lasciata a metà e gli eventuali PDF rimasti nella cartella temporanea (`src/lib/erase.ts`).
+- **Pagine informative**: Informativa privacy, Avvertenze mediche e Fonti, con indice che porta alle sezioni. L'informativa descrive ciò che l'app fa davvero: dati solo sul telefono, posizione arrotondata, nessuna analisi. Titolare e contatto non si inventano: si mettono nella build con `EXPO_PUBLIC_PRIVACY_CONTROLLER` ed `EXPO_PUBLIC_PRIVACY_CONTACT`; finché mancano, la pagina lo dice.
+- **Sul telefono**: su Android i dati sono esclusi dal backup automatico su Google Drive (`android.allowBackup: false`); l'app chiede i permessi di internet e posizione, mentre quelli del modello di progetto che non servono (finestre sopra le altre app, vibrazione, memoria esterna) sono bloccati con `android.blockedPermissions`.
+
 ## Accessibilità
 
 Aree di tocco di almeno 44 pt, ruoli ed etichette per VoiceOver e TalkBack (intestazioni, pulsanti, scelte, sezioni che si aprono), colori con contrasto AA nei due temi, urgenza mai indicata dal solo colore. Il testo segue la dimensione scelta nelle impostazioni del telefono e, in più, quella del Profilo.
@@ -88,8 +99,28 @@ Aree di tocco di almeno 44 pt, ruoli ed etichette per VoiceOver e TalkBack (inte
 3. **Sintomi** (fatta): intervista con consenso, mappa del corpo, carte delle domande, segnali d'allarme deterministici, risultati con urgenza e condizioni compatibili, riepilogo per il medico (copia, condivisione, PDF); AI facoltativa tramite la web app.
 4. **Medici** (fatta): specialisti illustrati con il consigliato, posizione o città, distanza, lista e mappa schematica, contatti, email con il riepilogo dei sintomi, come prenotare.
 5. **Mercato** (fatta): catalogo AIFA con ricerca, forme illustrate e filtri, schede con equivalenti, marchi e principio attivo, preferiti e confronto salvati sul telefono, campione di esempio senza servizio.
-6. Profilo e privacy, rifinitura, build installabili con EAS.
+6. **Profilo e privacy** (fatta): storico delle sessioni sul telefono, città predefinita, «Elimina tutti i miei dati», Informativa privacy, Avvertenze mediche e Fonti, schermata d'errore con il 112, configurazione delle build con EAS.
 
-Le chiamate esterne (intervista con l'AI, ricerca dei medici, catalogo dei farmaci) passano dalle route server della web app, come chiede il progetto: nessuna chiave finisce nell'app. Per usarle sul telefono la web app andrà pubblicata e il suo indirizzo messo in `EXPO_PUBLIC_API_URL`; per le build da installare servirà un account Expo (EAS Build).
+Le chiamate esterne (intervista con l'AI, ricerca dei medici, catalogo dei farmaci) passano dalle route server della web app, come chiede il progetto: nessuna chiave finisce nell'app. Per usarle sul telefono la web app va pubblicata e il suo indirizzo messo in `EXPO_PUBLIC_API_URL`.
 
-Prima di pubblicare l'app negli store valgono le stesse verifiche della web app: [nota sul Regolamento UE sui dispositivi medici](../orienta/README.md#regolamento-ue-sui-dispositivi-medici-mdr), dati del titolare per l'informativa privacy, revisione medica delle schede.
+## Build da installare (EAS)
+
+`eas.json` ha due profili: `preview` (distribuzione interna: un APK da installare direttamente su Android, una build ad hoc per gli iPhone registrati) e `production` (AAB per Google Play e build per l'App Store, con il numero di build che EAS aumenta da solo: `appVersionSource: "remote"`). Servono un account Expo e, per gli store, gli account sviluppatore di Apple e Google; nessuna chiave va nel progetto.
+
+```bash
+npm install -g eas-cli         # versione 24.12 o successiva
+eas login
+eas init                       # collega il progetto: scrive owner e projectId in app.json (da salvare nel repository)
+# indirizzo della web app e dati del titolare: non sono segreti, finiscono nell'app
+eas env:set --name EXPO_PUBLIC_API_URL --value https://indirizzo-della-web-app --environment preview --environment production --visibility plaintext
+eas env:set --name EXPO_PUBLIC_PRIVACY_CONTROLLER --value "…" --environment production --visibility plaintext
+eas env:set --name EXPO_PUBLIC_PRIVACY_CONTACT --value "…" --environment production --visibility plaintext
+eas build --profile preview --platform android    # APK da installare
+eas device:create && eas build --profile preview --platform ios
+eas build --profile production --platform all
+eas submit --profile production --platform android   # e poi ios
+```
+
+Gli identificativi dell'app (`ios.bundleIdentifier` e `android.package` in `app.json`) sono `io.github.albijuvcommits.orienta`, presi dall'account GitHub del progetto: se l'app esce con un altro nome o un altro titolare vanno cambiati prima del primo caricamento negli store, perché dopo non si possono più modificare. L'app usa solo la crittografia standard di iOS (`usesNonExemptEncryption: false`).
+
+Prima di pubblicare l'app negli store valgono le stesse verifiche della web app: [nota sul Regolamento UE sui dispositivi medici](../orienta/README.md#regolamento-ue-sui-dispositivi-medici-mdr), dati del titolare per l'informativa privacy, revisione medica delle schede. In più vanno compilate, in modo coerente con l'informativa, la sezione privacy dell'App Store e quella sulla sicurezza dei dati di Google Play.

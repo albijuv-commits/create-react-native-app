@@ -11,6 +11,7 @@ import bussola from "@/assets/illustrations/passo-risultati.webp";
 import nessunRisultato from "@/assets/illustrations/stato-nessun-risultato.webp";
 import type { InterviewCondition } from "@/lib/conditions/knowledge-base";
 import { URGENCY, type UrgencyLevel } from "@/lib/design/urgency";
+import type { HistoryEntry } from "@/lib/storage/history";
 import type { Compatibility, ResultCondition, TriageResponse } from "@/lib/triage/schema";
 import { HelplineCard } from "~/components/emergency/emergency";
 import { SlidePreview } from "~/components/slide/slide-preview";
@@ -24,6 +25,7 @@ import { LEVEL_UI, LEVELS } from "~/lib/urgency";
 import { useTheme } from "~/theme/theme";
 import { DoctorSummary } from "./doctor-summary";
 import { StepHeader } from "./parts";
+import { SaveToHistory } from "./save-history";
 
 type Results = Extract<TriageResponse, { kind: "results" }>;
 
@@ -50,6 +52,7 @@ export function ResultsView({
   conditions,
   age,
   summary,
+  historyEntry,
   onRestart,
   reduced,
   headingRef,
@@ -58,6 +61,7 @@ export function ResultsView({
   conditions: readonly InterviewCondition[];
   age: number;
   summary: string;
+  historyEntry: HistoryEntry;
   onRestart: () => void;
   reduced: boolean;
   headingRef: Ref<Text>;
@@ -133,6 +137,7 @@ export function ResultsView({
       </View>
 
       <DoctorSummary text={summary} />
+      <SaveToHistory key={historyEntry.id} entry={historyEntry} />
 
       <Txt variant="small" tone="inkMuted">
         {result.source === "ai"

@@ -2,19 +2,21 @@ import { useNavigation } from "expo-router";
 import { useHeaderHeight, usePreventRemove } from "expo-router/react-navigation";
 import { ArrowLeft, RotateCw, Wrench } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, type Text } from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, View, type Text } from "react-native";
 import Animated, { Easing, FadeInLeft, FadeInRight } from "react-native-reanimated";
 import type { RedFlagId } from "@data/emergency/red-flags";
 import type { BodyZoneId } from "@data/vocab/body";
 import type { SymptomId } from "@data/vocab/symptoms";
 import offline from "@/assets/illustrations/stato-offline.webp";
 import type { InterviewCondition } from "@/lib/conditions/knowledge-base";
+import { newSessionId, type HistoryEntry } from "@/lib/storage/history";
 import { TriageRequestError } from "@/lib/triage/client";
 import { redFlagsFor, rulesResults, rulesStep } from "@/lib/triage/engine";
 import { CORE_QUESTIONS } from "@/lib/triage/questions";
 import { ambiguousTerms, recognizeSymptoms } from "@/lib/triage/recognize";
 import { detectRedFlags } from "@/lib/triage/red-flags";
 import { MAX_QUESTIONS, MIN_QUESTIONS, type Answer, type Question, type TriageRequest, type TriageResponse } from "@/lib/triage/schema";
+import { makeHistoryEntry } from "@/lib/triage/history-entry";
 import { buildDoctorSummary } from "@/lib/triage/summary";
 import { EmergencyPanel } from "~/components/emergency/emergency-panel";
 import { Button } from "~/components/ui/button";
@@ -22,6 +24,9 @@ import { Txt } from "~/components/ui/text";
 import { focusLater } from "~/lib/a11y";
 import { aiAvailable as checkAiAvailable, postStep } from "~/lib/api";
 import { clearSummaryForDoctors } from "~/lib/doctor-handoff";
+import { confirmAction } from "~/lib/confirm";
+import { onEraseAll } from "~/lib/erase";
+import { useHistory } from "~/lib/history";
 import { useReducedMotion } from "~/lib/use-reduced-motion";
 import { useTheme } from "~/theme/theme";
 import { ConsentStep, type ConsentState } from "./consent-step";
@@ -66,21 +71,18 @@ function batchOf(starts: readonly number[], index: number): number {
   return b;
 }
 
-/** Chiede conferma prima di lasciare l'intervista (finestra di sistema; sul web quella del browser) */
+/** Chiede conferma prima di lasciare l'intervista */
 function confirmLeave(title: string, message: string, leave: () => void) {
-  if (Platform.OS === "web") {
-    if (window.confirm(`${title}\n\n${message}`)) leave();
-    return;
-  }
-  Alert.alert(title, message, [
-    { text: "Resta", style: "cancel" },
-    { text: "Esci", style: "destructive", onPress: leave },
-  ]);
+  confirmAction({ title, message, confirm: "Esci", cancel: "Resta", onConfirm: leave });
 }
+
+const NO_CONSENT: ConsentState = { terms: false, health: false, ai: false };
+const NO_PROFILE: ProfileDraft = { age: null, sex: null, pregnancy: "non-applicabile", guardian: false };
 
 /**
  * L'intervista sui sintomi: consenso → dati di base → descrizione → domande → risultati, la stessa
- * logica della web app. Tutto resta in memoria sul telefono. Senza consenso all'AI (o senza il
+ * logica della web app. Tutto resta in memoria sul telefono, e nello storico solo se la persona lo
+ * sceglie nei risultati. Senza consenso all'AI (o senza il
  * servizio configurato) il motore a regole gira qui, senza rete; con il consenso i passi passano
  * da /api/triage della web app. Il controllo dei segnali d'allarme è deterministico e avviene qui a
  * ogni risposta, oltre che sul server.
@@ -97,8 +99,8 @@ export function Interview({ conditions }: { conditions: InterviewCondition[] }) 
   // Il primo passo compare con la schermata: si anima solo dopo un'azione della persona
   const [navigated, setNavigated] = useState(false);
   const [aiAvailable, setAiAvailable] = useState<boolean | null>(null);
-  const [consent, setConsent] = useState<ConsentState>({ terms: false, health: false, ai: false });
-  const [profile, setProfile] = useState<ProfileDraft>({ age: null, sex: null, pregnancy: "non-applicabile", guardian: false });
+  const [consent, setConsent] = useState<ConsentState>(NO_CONSENT);
+  const [profile, setProfile] = useState<ProfileDraft>(NO_PROFILE);
 
   const [text, setText] = useState("");
   const debouncedText = useDebounced(text, 300);
@@ -115,7 +117,7 @@ export function Interview({ conditions }: { conditions: InterviewCondition[] }) 
   const [rulesOnly, setRulesOnly] = useState(false);
   const [waitingFor, setWaitingFor] = useState<"passo" | "risultati">("passo");
 
-  const [result, setResult] = useState<{ data: Results; summary: string } | null>(null);
+  const [result, setResult] = useState<{ data: Results; summary: string; entry: HistoryEntry } | null>(null);
   const [flags, setFlags] = useState<RedFlagId[]>([]);
   const [emergencyFrom, setEmergencyFrom] = useState<"descrizione" | "domande">("descrizione");
   const [error, setError] = useState<string | null>(null);
@@ -124,6 +126,35 @@ export function Interview({ conditions }: { conditions: InterviewCondition[] }) 
   const focusTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const engine: Engine = aiAvailable === true && consent.ai && !rulesOnly ? "ai" : "regole";
+
+  // «Elimina tutti i miei dati» dal Profilo: anche un'intervista lasciata a metà sparisce, consenso compreso
+  useEffect(
+    () =>
+      onEraseAll(() => {
+        pending.current?.abort();
+        if (focusTimer.current !== null) clearTimeout(focusTimer.current);
+        setConsent(NO_CONSENT);
+        setProfile(NO_PROFILE);
+        setText("");
+        setExtra([]);
+        setDismissed([]);
+        setZones([]);
+        setDescribeError(null);
+        setBase(null);
+        setAsked([]);
+        setBatchStarts([]);
+        setAnswers([]);
+        setUndone(null);
+        setRulesOnly(false);
+        setResult(null);
+        setFlags([]);
+        setError(null);
+        setNavigated(false);
+        setDirection(1);
+        setStage("consenso");
+      }),
+    [],
+  );
 
   // Il servizio dice solo se l'AI è attiva: nessun dato della persona parte da qui
   useEffect(() => {
@@ -160,12 +191,15 @@ export function Interview({ conditions }: { conditions: InterviewCondition[] }) 
     if (stage === "domande") scrollRef.current?.scrollTo({ y: 0, animated: !reduced });
   }, [stage, answers.length, reduced]);
 
-  // Chi sta compilando non perde le risposte per sbaglio; mai però davanti all'Emergenza
-  const dirty = stage === "persona" || stage === "descrizione" || stage === "domande" || stage === "attesa" || stage === "errore" || stage === "risultati";
+  // Chi sta compilando non perde le risposte per sbaglio; mai però davanti all'Emergenza, né da risultati già salvati nello storico
+  const history = useHistory();
+  const savedInHistory = result !== null && history.status === "ready" && history.sessions.some((s) => s.id === result.entry.id);
+  const dirty =
+    stage === "persona" || stage === "descrizione" || stage === "domande" || stage === "attesa" || stage === "errore" || (stage === "risultati" && !savedInHistory);
   usePreventRemove(dirty, ({ data }) => {
     const leave = () => navigation.dispatch(data.action);
     if (stage === "risultati") {
-      confirmLeave("Uscire dai risultati?", "Non vengono salvati sul telefono: se ti serve, prima copia o condividi il riepilogo per il medico.", leave);
+      confirmLeave("Uscire dai risultati?", "Non sono salvati sul telefono: se ti servono, prima salvali nello storico o copia il riepilogo per il medico.", leave);
     } else {
       confirmLeave("Uscire dall'intervista?", "Le risposte date finora si perdono.", leave);
     }
@@ -212,7 +246,9 @@ export function Interview({ conditions }: { conditions: InterviewCondition[] }) 
     }
     const known = new Set(conditions.map((c) => c.id));
     const data: Results = { ...step, conditions: step.conditions.filter((c) => known.has(c.id)) };
-    setResult({ data, summary: buildDoctorSummary(req, data, conditions, new Date()) });
+    const at = new Date();
+    const summary = buildDoctorSummary(req, data, conditions, at);
+    setResult({ data, summary, entry: makeHistoryEntry(newSessionId(), req, data, conditions, summary, at) });
     if (reduced || via === "ai") {
       go("risultati");
       return;
@@ -390,7 +426,16 @@ export function Interview({ conditions }: { conditions: InterviewCondition[] }) 
     case "risultati":
       view =
         result && base ? (
-          <ResultsView result={result.data} conditions={conditions} age={base.profile.age} summary={result.summary} onRestart={restart} reduced={reduced} headingRef={headingRef} />
+          <ResultsView
+            result={result.data}
+            conditions={conditions}
+            age={base.profile.age}
+            summary={result.summary}
+            historyEntry={result.entry}
+            onRestart={restart}
+            reduced={reduced}
+            headingRef={headingRef}
+          />
         ) : null;
       break;
     case "emergenza":

@@ -5,10 +5,14 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo } from "react";
 import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ErrorScreen } from "~/components/error-screen";
 import { ThemeProvider, useTheme } from "~/theme/theme";
 import { FONTS } from "~/theme/type";
 
 SplashScreen.preventAutoHideAsync();
+
+/** Se una schermata si blocca per un errore compare questa, con il 112 e «Riprova» */
+export const ErrorBoundary = ErrorScreen;
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({ AtkinsonHyperlegible_400Regular, AtkinsonHyperlegible_700Bold });

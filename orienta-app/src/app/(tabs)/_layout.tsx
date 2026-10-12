@@ -34,12 +34,12 @@ export default function TabsLayout() {
         sceneStyle: { backgroundColor: colors.bg },
       }}
     >
-      {/* Sintomi, Condizioni e Mercato hanno una loro pila di schermate, con le intestazioni nei rispettivi _layout */}
+      {/* Sintomi, Condizioni, Mercato e Profilo hanno una loro pila di schermate, con le intestazioni nei rispettivi _layout */}
       <Tabs.Screen name="(sintomi)" options={{ title: "Sintomi", headerShown: false, tabBarIcon: tabIcon(HeartPulse) }} />
       <Tabs.Screen name="condizioni" options={{ title: "Condizioni", headerShown: false, tabBarIcon: tabIcon(Microscope) }} />
       <Tabs.Screen name="medici" options={{ title: "Medici", tabBarIcon: tabIcon(Stethoscope) }} />
       <Tabs.Screen name="mercato" options={{ title: "Mercato", headerShown: false, tabBarIcon: tabIcon(Pill) }} />
-      <Tabs.Screen name="profilo" options={{ title: "Profilo", tabBarIcon: tabIcon(UserRound) }} />
+      <Tabs.Screen name="profilo" options={{ title: "Profilo", headerShown: false, tabBarIcon: tabIcon(UserRound) }} />
     </Tabs>
   );
 }

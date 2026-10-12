@@ -79,9 +79,10 @@ export function useMedicineList(kind: MedicineListKind) {
   };
 }
 
-/** Svuota preferiti e confronto (per «Elimina tutti i miei dati» e per i test) */
+/** Svuota preferiti e confronto (per «Elimina tutti i miei dati» e per i test): le chiavi spariscono, non restano liste vuote */
 export async function clearMedicineLists(): Promise<void> {
   await load();
-  for (const kind of Object.keys(LISTS) as MedicineListKind[]) save(kind, EMPTY);
+  for (const kind of Object.keys(LISTS) as MedicineListKind[]) lists[kind] = EMPTY;
+  emit();
   await AsyncStorage.multiRemove(Object.values(LISTS).map((l) => l.key)).catch(() => {});
 }
