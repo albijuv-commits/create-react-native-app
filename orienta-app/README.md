@@ -32,6 +32,7 @@ Per l'intervista con l'intelligenza artificiale, la ricerca dei medici e il cata
 - `src/lib/illustrations.ts`: le illustrazioni della web app per condizioni, specialisti e aree del corpo. È generato: dopo aver aggiunto o tolto un'illustrazione in `../orienta/src/assets/illustrations` lancia `node scripts/gen-illustrations.mjs`.
 - `src/theme/`: colori della web app in chiaro e scuro, scala tipografica con Atkinson Hyperlegible, preferenze di tema e dimensione del testo (salvate sul telefono con lo stesso schema della web app).
 - Alias: `~/` è il codice dell'app, `@/` e `@data/` sono `../orienta/src` e `../orienta/data`. `metro.config.js` fa vedere a Metro i file condivisi e risolve i pacchetti che usano (per esempio `zod`) dai `node_modules` dell'app, così ogni pacchetto esiste in una sola copia. I moduli `server-only` della web app non si importano mai: la base di conoscenza sta in `lib/conditions/knowledge-base.ts`.
+- `patches/`: correzioni alle librerie, applicate da `patch-package` a ogni `npm install`. Per ora una sola: in react-native-svg 15.15.4 un gruppo con opacità animata usava su Android la tela del gruppo che lo contiene, e quando l'opacità tornava sotto 1 l'app si chiudeva («Underflow in restore»). Succedeva con le anteprime del vetrino nell'elenco delle Condizioni. Quando si aggiorna react-native-svg va ricontrollata: se la nuova versione corregge il problema il file si cancella, altrimenti si rifà con `npx patch-package react-native-svg`.
 
 ## Il vetrino animato
 
@@ -124,3 +125,22 @@ eas submit --profile production --platform android   # e poi ios
 Gli identificativi dell'app (`ios.bundleIdentifier` e `android.package` in `app.json`) sono `io.github.albijuvcommits.orienta`, presi dall'account GitHub del progetto: se l'app esce con un altro nome o un altro titolare vanno cambiati prima del primo caricamento negli store, perché dopo non si possono più modificare. L'app usa solo la crittografia standard di iOS (`usesNonExemptEncryption: false`).
 
 Prima di pubblicare l'app negli store valgono le stesse verifiche della web app: [nota sul Regolamento UE sui dispositivi medici](../orienta/README.md#regolamento-ue-sui-dispositivi-medici-mdr), dati del titolare per l'informativa privacy, revisione medica delle schede. In più vanno compilate, in modo coerente con l'informativa, la sezione privacy dell'App Store e quella sulla sicurezza dei dati di Google Play.
+
+### APK di prova, senza account
+
+Per provare l'app su un telefono Android senza un account Expo si può costruire l'APK sul proprio computer. Servono il JDK 17 o successivo e l'Android SDK con la piattaforma 36, i build-tools 36.0.0, l'NDK 27.1.12297006 e CMake 3.22.1, cioè le versioni che chiede React Native 0.86.
+
+```bash
+npx expo prebuild --platform android     # genera android/, che resta fuori dal repository
+cd android
+./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a \
+  -Pexpo.useLegacyPackaging=true \
+  -Pandroid.enableMinifyInReleaseBuilds=true \
+  -Pandroid.enableShrinkResourcesInReleaseBuilds=true
+# l'APK è in android/app/build/outputs/apk/release/app-release.apk
+```
+
+- `prebuild` cambia anche gli script `android` e `ios` di `package.json`: quella modifica non va salvata.
+- `arm64-v8a` limita l'APK ai telefoni a 64 bit, cioè quasi tutti quelli in uso. Le altre tre opzioni comprimono le librerie native e riducono il codice con R8: l'APK passa da circa 50 a meno di 30 MB.
+- L'APK è firmato con la chiave di prova del progetto generato: si installa sul telefono (consentendo l'installazione di app sconosciute), ma per Google Play serve la build `production` di EAS.
+- Senza `EXPO_PUBLIC_API_URL` l'app usa le regole fisse sul telefono e i DATI DI ESEMPIO.
