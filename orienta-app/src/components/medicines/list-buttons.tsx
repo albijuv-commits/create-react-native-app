@@ -32,7 +32,7 @@ function ToggleButton({
     <Pressable
       role="button"
       accessibilityLabel={label}
-      accessibilityState={{ selected: on, disabled }}
+      accessibilityState={{ selected: on }} aria-disabled={disabled}
       disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [

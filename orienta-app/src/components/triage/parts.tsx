@@ -80,7 +80,7 @@ export function CheckRow({
   return (
     <Pressable
       role="checkbox"
-      accessibilityState={{ checked }}
+      aria-checked={checked}
       accessibilityLabel={note ? `${label}. ${note}` : label}
       onPress={() => onChange(!checked)}
       style={({ pressed }) => [

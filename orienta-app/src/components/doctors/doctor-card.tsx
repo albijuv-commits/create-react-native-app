@@ -110,7 +110,7 @@ export function DoctorCard({
           )}
           {d.hours && (
             <View>
-              <Pressable role="button" accessibilityState={{ expanded: hoursOpen }} onPress={() => setHoursOpen((o) => !o)} style={styles.hoursToggle}>
+              <Pressable role="button" aria-expanded={hoursOpen} onPress={() => setHoursOpen((o) => !o)} style={styles.hoursToggle}>
                 <Txt variant="small" bold tone="primary">
                   Orari
                 </Txt>

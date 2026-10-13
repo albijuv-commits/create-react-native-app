@@ -70,7 +70,7 @@ export function EuBrands({
                 <Pressable
                   key={o.value ?? "diffusi"}
                   role="radio"
-                  accessibilityState={{ checked: on }}
+                  aria-checked={on}
                   onPress={() => setCountry(o.value)}
                   style={({ pressed }) => [
                     styles.chip,

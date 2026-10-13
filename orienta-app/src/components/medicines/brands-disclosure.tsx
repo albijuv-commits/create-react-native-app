@@ -48,7 +48,7 @@ export function BrandsDisclosure({ medicine: m }: { medicine: MedicineSummary })
     <View style={[styles.box, { backgroundColor: colors.surface2 }]}>
       <Pressable
         role="button"
-        accessibilityState={{ expanded: open }}
+        aria-expanded={open}
         onPress={() => {
           // Riaprendo dopo un errore si riprova
           if (!open && state?.error) setState(null);

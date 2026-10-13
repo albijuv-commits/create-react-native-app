@@ -27,7 +27,7 @@ export function Segmented<T extends string>({
             <Pressable
               key={o.value}
               role="radio"
-              accessibilityState={{ checked: selected, disabled: o.disabled }}
+              aria-checked={selected} aria-disabled={o.disabled}
               accessibilityLabel={o.label}
               disabled={o.disabled}
               onPress={() => onChange(o.value)}

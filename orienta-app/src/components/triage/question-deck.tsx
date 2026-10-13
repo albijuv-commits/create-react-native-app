@@ -523,7 +523,7 @@ function ScaleBody({
                   key={n}
                   role="radio"
                   accessibilityLabel={`${n}: ${intensityWord(n).toLowerCase()}`}
-                  accessibilityState={{ checked }}
+                  aria-checked={checked}
                   onPress={() => {
                     setValue(n);
                     setTried(false);

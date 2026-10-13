@@ -115,7 +115,7 @@ export function EmailSheet({
           )}
 
           <View style={[styles.details, { backgroundColor: colors.surface2 }]}>
-            <Pressable role="button" accessibilityState={{ expanded: textOpen }} onPress={() => setTextOpen((o) => !o)} style={styles.detailsHead}>
+            <Pressable role="button" aria-expanded={textOpen} onPress={() => setTextOpen((o) => !o)} style={styles.detailsHead}>
               <Txt bold tone="primary" style={styles.flex}>
                 Leggi il testo
               </Txt>

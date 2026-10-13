@@ -128,7 +128,7 @@ export function BodyMap({ selected, onToggle }: { selected: readonly BodyZoneId[
       ) : null}
 
       <View style={[styles.list, { borderColor: colors.line }]}>
-        <Pressable role="button" accessibilityState={{ expanded: listOpen }} onPress={() => setListOpen((o) => !o)} style={styles.listHead}>
+        <Pressable role="button" aria-expanded={listOpen} onPress={() => setListOpen((o) => !o)} style={styles.listHead}>
           <Txt bold tone="primary" style={styles.flex}>
             Scegli dall&apos;elenco delle zone
           </Txt>

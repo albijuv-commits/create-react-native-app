@@ -161,7 +161,7 @@ export function MedicineCatalog() {
               <Pressable
                 key={v}
                 role="tab"
-                accessibilityState={{ selected: on }}
+                aria-selected={on}
                 onPress={() => setView(v)}
                 style={[styles.tab, on && [styles.tabOn, { backgroundColor: colors.surface, shadowColor: colors.ink }]]}
               >
@@ -359,7 +359,7 @@ function FormPicker({ value, onChange }: { value: FormFamily | null; onChange: (
                 key={o.value ?? "tutte"}
                 role="radio"
                 accessibilityLabel={o.label}
-                accessibilityState={{ checked: on }}
+                aria-checked={on}
                 onPress={() => onChange(o.value)}
                 style={({ pressed }) => [
                   styles.formTile,
@@ -403,7 +403,7 @@ function ChipGroup<T extends string>({
             <Pressable
               key={o.value ?? "tutti"}
               role="radio"
-              accessibilityState={{ checked: on }}
+              aria-checked={on}
               accessibilityLabel={o.label}
               onPress={() => onChange(o.value)}
               style={({ pressed }) => [
@@ -449,7 +449,7 @@ function SelectList<T extends string>({
         role="button"
         accessibilityLabel={`${legend}: ${current}`}
         accessibilityHint={open ? "Chiude l'elenco" : "Apre l'elenco delle categorie"}
-        accessibilityState={{ expanded: open }}
+        aria-expanded={open}
         onPress={() => setOpen((o) => !o)}
         style={({ pressed }) => [styles.select, { borderColor: open ? colors.primary : colors.line, backgroundColor: colors.surface, transform: [{ scale: pressed ? 0.98 : 1 }] }]}
       >
@@ -467,7 +467,7 @@ function SelectList<T extends string>({
                 key={o.value ?? "tutte"}
                 role="radio"
                 accessibilityLabel={o.label}
-                accessibilityState={{ checked: on }}
+                aria-checked={on}
                 onPress={() => {
                   onChange(o.value);
                   setOpen(false);

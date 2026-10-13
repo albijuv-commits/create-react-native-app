@@ -109,7 +109,7 @@ export function DoctorSummary({ text }: { text: string }) {
       <SummaryActions text={text} onCopyFailed={() => setOpen(true)} />
 
       <View style={[styles.details, { backgroundColor: colors.surface2 }]}>
-        <Pressable role="button" accessibilityState={{ expanded: open }} onPress={() => setOpen((o) => !o)} style={styles.detailsHead}>
+        <Pressable role="button" aria-expanded={open} onPress={() => setOpen((o) => !o)} style={styles.detailsHead}>
           <Txt bold tone="primary" style={styles.flex}>
             Leggi il riepilogo
           </Txt>
@@ -133,7 +133,7 @@ function Action({ label, icon: Icon, onPress, disabled = false, hint }: { label:
       role="button"
       accessibilityLabel={label}
       accessibilityHint={hint}
-      accessibilityState={{ disabled, busy: disabled }}
+      aria-disabled={disabled} aria-busy={disabled}
       disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [

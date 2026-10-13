@@ -223,7 +223,7 @@ function Choices<T extends string>({
               key={o.id}
               role="radio"
               accessibilityLabel={o.label}
-              accessibilityState={{ checked }}
+              aria-checked={checked}
               onPress={() => onChange(o.id)}
               style={({ pressed }) => [
                 styles.choice,
@@ -280,7 +280,7 @@ function HoldButton({ icon: Icon, label, onStep, disabled = false }: { icon: Luc
     <Pressable
       role="button"
       accessibilityLabel={label}
-      accessibilityState={{ disabled }}
+      aria-disabled={disabled}
       disabled={disabled}
       onPressIn={() => {
         touched.current = true;

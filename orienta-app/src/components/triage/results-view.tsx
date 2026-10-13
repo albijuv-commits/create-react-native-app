@@ -351,7 +351,7 @@ function ConditionCard({
         </View>
       )}
 
-      <Pressable role="button" accessibilityState={{ expanded: open }} onPress={() => setOpen((o) => !o)} style={[styles.why, { backgroundColor: colors.surface2 }]}>
+      <Pressable role="button" aria-expanded={open} onPress={() => setOpen((o) => !o)} style={[styles.why, { backgroundColor: colors.surface2 }]}>
         <Txt bold tone="primary" style={styles.flex}>
           Perché?
         </Txt>

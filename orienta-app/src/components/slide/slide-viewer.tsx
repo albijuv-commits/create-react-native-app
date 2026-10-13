@@ -192,7 +192,7 @@ function ControlButton({ label, icon: Icon, onPress, disabled = false, primary =
     <Pressable
       role="button"
       accessibilityLabel={label}
-      accessibilityState={{ disabled }}
+      aria-disabled={disabled}
       disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [

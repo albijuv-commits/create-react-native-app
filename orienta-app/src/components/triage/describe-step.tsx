@@ -179,7 +179,7 @@ export function DescribeStep({
             ))}
           </View>
           {suggestions.length > SUGGESTIONS_SHOWN ? (
-            <Pressable role="button" accessibilityState={{ expanded: allSuggestions }} onPress={() => setAllSuggestions((v) => !v)} style={styles.more}>
+            <Pressable role="button" aria-expanded={allSuggestions} onPress={() => setAllSuggestions((v) => !v)} style={styles.more}>
               <Txt bold tone="primary">
                 {allSuggestions ? "Mostra meno" : `Mostra tutti (${suggestions.length})`}
               </Txt>

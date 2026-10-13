@@ -61,7 +61,7 @@ export function RedFlagItem({ id }: { id: RedFlagId }) {
   const flag = RED_FLAGS[id];
   return (
     <View style={[styles.flag, { backgroundColor: colors.surface, borderColor: open ? colors.red : colors.line }]}>
-      <Pressable role="button" accessibilityState={{ expanded: open }} onPress={() => setOpen((o) => !o)} style={styles.flagHead}>
+      <Pressable role="button" aria-expanded={open} onPress={() => setOpen((o) => !o)} style={styles.flagHead}>
         <Txt bold style={styles.flagTitle}>
           {flag.title}
         </Txt>

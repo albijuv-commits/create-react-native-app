@@ -77,7 +77,7 @@ export function SpecialtyPicker({
                 key={id}
                 role="radio"
                 accessibilityLabel={isRecommended ? `${label}, consigliato` : label}
-                accessibilityState={{ checked: on }}
+                aria-checked={on}
                 onPress={() => onChange(id)}
                 onLayout={(e) => {
                   tiles.current.set(id, { x: e.nativeEvent.layout.x + GUTTER, width: e.nativeEvent.layout.width });
