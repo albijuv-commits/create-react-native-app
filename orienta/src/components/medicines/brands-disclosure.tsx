@@ -38,7 +38,16 @@ export function BrandsDisclosure({ medicine: m }: { medicine: MedicineSummary })
   const range = stats.priceMin !== null && stats.priceMax !== null ? formatPriceRange(stats.priceMin, stats.priceMax) : null;
 
   return (
-    <details className="group rounded-2xl bg-surface-2" open={open} onToggle={(e) => setOpen(e.currentTarget.open)}>
+    <details
+      className="group rounded-2xl bg-surface-2"
+      open={open}
+      onToggle={(e) => {
+        const isOpen = e.currentTarget.open;
+        // Riaprendo dopo un errore si riprova
+        if (isOpen && state?.error) setState(null);
+        setOpen(isOpen);
+      }}
+    >
       <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-2xl px-3 py-2 [&::-webkit-details-marker]:hidden">
         <Building2 aria-hidden className="size-5 shrink-0 text-primary" />
         <span className="min-w-0 flex-1">

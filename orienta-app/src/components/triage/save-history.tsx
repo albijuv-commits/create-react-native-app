@@ -9,12 +9,13 @@ import { announceOnIOS } from "~/lib/a11y";
 import { deleteSession, saveSession } from "~/lib/history";
 import { useTheme } from "~/theme/theme";
 
-type Status = "idle" | "saving" | "saved" | "removed" | "failed";
+type Status = "idle" | "saving" | "saved" | "removed" | "save-failed" | "remove-failed";
 
 const ANNOUNCE: Partial<Record<Status, string>> = {
   saved: "Sessione salvata nello storico, solo su questo telefono.",
   removed: "Sessione eliminata dallo storico.",
-  failed: "Non riusciamo a salvare la sessione su questo telefono.",
+  "save-failed": "Non riusciamo a salvare la sessione su questo telefono.",
+  "remove-failed": "Non riusciamo a eliminare la sessione dallo storico.",
 };
 
 /**
@@ -37,7 +38,7 @@ export function SaveToHistory({ entry }: { entry: HistoryEntry }) {
       await saveSession(entry);
       show("saved");
     } catch {
-      show("failed");
+      show("save-failed");
     }
   };
 
@@ -46,7 +47,8 @@ export function SaveToHistory({ entry }: { entry: HistoryEntry }) {
       await deleteSession(entry.id);
       show("removed");
     } catch {
-      show("failed");
+      // La sessione è ancora salvata: si resta sul riquadro «salvata», con l'errore
+      show("remove-failed");
     }
   };
 
@@ -55,7 +57,7 @@ export function SaveToHistory({ entry }: { entry: HistoryEntry }) {
       <Txt variant="heading" header>
         Storico delle sessioni
       </Txt>
-      {status === "saved" ? (
+      {status === "saved" || status === "remove-failed" ? (
         <>
           <View style={styles.row} accessibilityLiveRegion="polite">
             <Check color={colors.primary} size={20} style={styles.icon} />
@@ -81,9 +83,14 @@ export function SaveToHistory({ entry }: { entry: HistoryEntry }) {
           )}
         </>
       )}
-      {status === "failed" && (
+      {status === "save-failed" && (
         <Txt variant="small" bold tone="red" accessibilityLiveRegion="polite">
           Non riusciamo a salvare su questo telefono. Riprova tra poco.
+        </Txt>
+      )}
+      {status === "remove-failed" && (
+        <Txt variant="small" bold tone="red" accessibilityLiveRegion="polite">
+          Non riusciamo a eliminarla: è ancora nello storico. Riprova tra poco.
         </Txt>
       )}
     </View>

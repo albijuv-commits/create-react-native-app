@@ -15,7 +15,7 @@ import { renderWithTheme } from "./render";
 jest.mock("expo-router", () => ({ router: { push: jest.fn(), navigate: jest.fn() }, useNavigation: () => ({ dispatch: jest.fn() }) }));
 jest.mock("expo-router/react-navigation", () => ({ useHeaderHeight: () => 0, usePreventRemove: jest.fn() }));
 jest.mock("expo-clipboard", () => ({ setStringAsync: jest.fn(() => Promise.resolve(true)) }));
-jest.mock("~/lib/summary-pdf", () => ({ shareSummaryPdf: jest.fn(() => Promise.resolve("condiviso")) }));
+jest.mock("~/lib/summary-pdf", () => ({ shareSummaryPdf: jest.fn(() => Promise.resolve("condiviso")), deleteSummaryPdfs: jest.fn() }));
 jest.mock("~/lib/api", () => ({ apiBaseUrl: jest.fn(() => null), aiAvailable: jest.fn(() => Promise.resolve(false)), postStep: jest.fn() }));
 
 const api = jest.requireMock<{ aiAvailable: jest.Mock; postStep: jest.Mock }>("~/lib/api");
@@ -80,6 +80,13 @@ afterEach(() => {
 const setup = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 describe("intervista con le regole fisse", () => {
+  it("dal consenso si legge l'informativa privacy dell'app, restando nella scheda Sintomi", async () => {
+    const user = setup();
+    await renderWithTheme(<Interview conditions={CONDITIONS} />);
+    await user.press(screen.getByRole("link", { name: "Leggi l'informativa privacy" }));
+    expect(mockRouter.push).toHaveBeenCalledWith("/sintomi/privacy");
+  });
+
   it("dalla descrizione ai risultati, senza mai chiamare l'AI", async () => {
     const user = setup();
     await start(user);
@@ -262,6 +269,31 @@ describe("intervista con l'AI", () => {
     expect(await screen.findByText(DISCLAIMER)).toBeOnTheScreen();
     expect(screen.getByRole("heading", { name: `1. ${throat.name}` })).toBeOnTheScreen();
     expect(screen.getByText(/preparati con l'intelligenza artificiale/)).toBeOnTheScreen();
+  });
+
+  it("se il servizio resta in silenzio, dopo un minuto si può riprovare o continuare con le regole", async () => {
+    const user = setup();
+    api.aiAvailable.mockResolvedValue(true);
+    // Una richiesta che non finisce mai, finché qualcuno non la interrompe
+    api.postStep.mockImplementation(
+      (_req: unknown, signal: AbortSignal) => new Promise((_resolve, reject) => signal.addEventListener("abort", () => reject(new Error("interrotta")))),
+    );
+    await start(user, { ai: true });
+    await describe_(user, "Ho mal di gola");
+    await user.press(screen.getByRole("button", { name: "Continua con le domande" }));
+    await screen.findByRole("heading", { name: CORE_QUESTIONS[0]!.text });
+    await user.press(screen.getByRole("button", { name: "Nessuno di questi" }));
+    await wait(400);
+    await user.press(await screen.findByRole("button", { name: "Non so" }));
+    await wait(400);
+    await user.press(await screen.findByRole("button", { name: "Non so" }));
+    await wait(400);
+    expect(api.postStep).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("heading", { name: "Non siamo riusciti a continuare" })).not.toBeOnTheScreen();
+    await wait(60_000);
+    expect(await screen.findByRole("heading", { name: "Non siamo riusciti a continuare" })).toBeOnTheScreen();
+    expect(screen.getByText(/Il servizio non risponde. Puoi riprovare oppure continuare con le regole fisse/)).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Continua con il metodo semplificato" })).toBeOnTheScreen();
   });
 
   it("se il servizio non risponde si può continuare con le regole fisse", async () => {

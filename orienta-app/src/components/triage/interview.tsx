@@ -76,6 +76,8 @@ function confirmLeave(title: string, message: string, leave: () => void) {
   confirmAction({ title, message, confirm: "Esci", cancel: "Resta", onConfirm: leave });
 }
 
+/** Oltre questo tempo senza risposta dal servizio dell'AI si va alla schermata di errore */
+const AI_TIMEOUT_MS = 60_000;
 const NO_CONSENT: ConsentState = { terms: false, health: false, ai: false };
 const NO_PROFILE: ProfileDraft = { age: null, sex: null, pregnancy: "non-applicabile", guardian: false };
 
@@ -278,15 +280,28 @@ export function Interview({ conditions }: { conditions: InterviewCondition[] }) 
     pending.current?.abort();
     const ac = new AbortController();
     pending.current = ac;
+    // Su Android le richieste di React Native non scadono mai da sole: dopo un minuto si lascia scegliere
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      ac.abort();
+    }, AI_TIMEOUT_MS);
     setWaitingFor(req.answers.length >= MIN_QUESTIONS ? "risultati" : "passo");
     go("attesa");
     try {
       const step = await postStep(req, ac.signal);
       if (!ac.signal.aborted) apply(step, req, "ai");
     } catch (e) {
+      if (timedOut) {
+        setError("Il servizio non risponde. Puoi riprovare oppure continuare con le regole fisse, qui sul telefono.");
+        go("errore");
+        return;
+      }
       if (ac.signal.aborted) return;
       setError(e instanceof TriageRequestError ? e.message : "Qualcosa è andato storto.");
       go("errore");
+    } finally {
+      clearTimeout(timer);
     }
   };
 

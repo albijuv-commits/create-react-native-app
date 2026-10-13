@@ -49,6 +49,18 @@ function save(kind: MedicineListKind, next: readonly string[]) {
   });
 }
 
+/**
+ * Ogni modifica parte dopo la prima lettura delle liste salvate: un tocco subito all'avvio non
+ * sovrascrive i preferiti già sul telefono con quelli, ancora pochi, in memoria.
+ */
+function update(kind: MedicineListKind, change: (current: readonly string[]) => readonly string[]) {
+  void load().then(() => {
+    const current = lists[kind];
+    const next = change(current);
+    if (next !== current) save(kind, next);
+  });
+}
+
 function subscribe(listener: () => void) {
   listeners.add(listener);
   void load();
@@ -69,13 +81,10 @@ export function useMedicineList(kind: MedicineListKind) {
     max,
     full: list.length >= max,
     has: (aic: string) => list.includes(aic),
-    toggle: (aic: string) => {
-      const current = lists[kind];
-      if (current.includes(aic)) save(kind, current.filter((a) => a !== aic));
-      else if (current.length < max) save(kind, [...current, aic]);
-    },
-    remove: (aic: string) => save(kind, lists[kind].filter((a) => a !== aic)),
-    clear: () => save(kind, EMPTY),
+    toggle: (aic: string) =>
+      update(kind, (current) => (current.includes(aic) ? current.filter((a) => a !== aic) : current.length < max ? [...current, aic] : current)),
+    remove: (aic: string) => update(kind, (current) => current.filter((a) => a !== aic)),
+    clear: () => update(kind, () => EMPTY),
   };
 }
 

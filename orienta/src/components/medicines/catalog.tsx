@@ -62,7 +62,8 @@ export function MedicineCatalog() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [fetched, setFetched] = useState<Fetched | null>(null);
   const [more, setMore] = useState<{ key: string; items: MedicineSummary[]; page: number; loading: boolean } | null>(null);
-  const [favItems, setFavItems] = useState<{ key: string; items: MedicineSummary[] } | null>(null);
+  const [favItems, setFavItems] = useState<{ key: string; items: MedicineSummary[]; error?: string } | null>(null);
+  const [favAttempt, setFavAttempt] = useState(0);
 
   // La ricerca parte quando si smette di scrivere
   const typed = text ?? query.q;
@@ -85,16 +86,20 @@ export function MedicineCatalog() {
   }, [query, key, view]);
 
   const favoriteList = favorites.list;
-  const favKey = favoriteList.join(",");
+  const favKey = `${favoriteList.join(",")}|${favAttempt}`;
   useEffect(() => {
     if (view !== "preferiti" || !favoriteList.length) return;
     const c = new AbortController();
+    const k = `${favoriteList.join(",")}|${favAttempt}`;
     fetchMedicines(favoriteList, c.signal).then(
-      (items) => setFavItems({ key: favoriteList.join(","), items }),
-      () => undefined,
+      (items) => setFavItems({ key: k, items }),
+      (e: unknown) => {
+        if (!c.signal.aborted) setFavItems({ key: k, items: [], error: e instanceof CatalogRequestError ? e.message : "Non riusciamo a caricare i preferiti." });
+      },
     );
     return () => c.abort();
-  }, [favoriteList, view]);
+  }, [favoriteList, view, favAttempt]);
+  const fav = favItems?.key === favKey ? favItems : null;
 
   const current = fetched?.key === key ? fetched : null;
   const loading = view === "catalogo" && !current;
@@ -288,9 +293,21 @@ export function MedicineCatalog() {
               <p className="font-bold">Non hai ancora preferiti.</p>
               <p className="text-small text-ink-muted">Tocca il cuore su una confezione per ritrovarla qui.</p>
             </div>
+          ) : fav?.error ? (
+            <div role="alert" className="space-y-3 rounded-3xl bg-red-soft p-4">
+              <p className="font-bold text-red">{fav.error}</p>
+              <Button variant="secondary" onClick={() => setFavAttempt((n) => n + 1)}>
+                Riprova
+              </Button>
+            </div>
+          ) : !fav ? (
+            <p aria-live="polite" className="flex items-center gap-2 font-bold">
+              <LoaderCircle aria-hidden className="size-5 animate-spin text-primary" />
+              Carico i preferiti…
+            </p>
           ) : (
             <ul className="space-y-3">
-              {(favItems?.key === favKey ? favItems.items : []).map((m) => (
+              {fav.items.map((m) => (
                 <li key={m.aic}>
                   <MedicineCard medicine={m} />
                 </li>

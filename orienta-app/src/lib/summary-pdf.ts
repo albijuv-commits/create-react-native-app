@@ -1,4 +1,4 @@
-import { File } from "expo-file-system";
+import { Directory, File, Paths } from "expo-file-system";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import { Platform } from "react-native";
@@ -44,23 +44,65 @@ ${body}
 }
 
 /**
+ * I PDF del riepilogo creati in precedenza: expo-print li mette nella cartella temporanea «Print»
+ * (su iOS e su Android), che ricrea quando serve.
+ */
+export function deleteSummaryPdfs(): void {
+  if (Platform.OS === "web") return;
+  const folder = new Directory(Paths.cache, "Print");
+  if (folder.exists) folder.delete();
+}
+
+/** Sul web (solo un aiuto per lo sviluppo) si stampa il riepilogo in una cornice nascosta, non la pagina */
+function printOnWeb(html: string) {
+  const frame = document.createElement("iframe");
+  frame.setAttribute("aria-hidden", "true");
+  Object.assign(frame.style, { position: "fixed", right: "0", bottom: "0", width: "0", height: "0", border: "0" });
+  document.body.appendChild(frame);
+  const win = frame.contentWindow;
+  if (!win) {
+    frame.remove();
+    throw new Error("Stampa non disponibile");
+  }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  win.print();
+  setTimeout(() => frame.remove(), 1000);
+}
+
+/**
  * Crea il PDF sul telefono e apre la condivisione (al medico, in una email, nei file): niente passa
- * da un server e, finita la condivisione, il file si cancella. Sul web apre la stampa del browser.
+ * da un server. Su iPhone il file si cancella appena la condivisione è finita; su Android alcune app
+ * (Drive, Bluetooth, Quick Share) lo leggono più tardi, quindi lì si cancella alla condivisione
+ * successiva o con «Elimina tutti i miei dati». Sul web apre la stampa del browser.
  */
 export async function shareSummaryPdf(text: string): Promise<"condiviso" | "stampa"> {
   const html = summaryHtml(text);
-  if (Platform.OS === "web" || !(await Sharing.isAvailableAsync())) {
+  if (Platform.OS === "web") {
+    printOnWeb(html);
+    return "stampa";
+  }
+  if (!(await Sharing.isAvailableAsync())) {
     await Print.printAsync({ html });
     return "stampa";
+  }
+  try {
+    deleteSummaryPdfs();
+  } catch {
+    // Il sistema svuota comunque la cartella temporanea
   }
   const { uri } = await Print.printToFileAsync({ html });
   try {
     await Sharing.shareAsync(uri, { mimeType: "application/pdf", UTI: "com.adobe.pdf", dialogTitle: "Riepilogo per il medico" });
   } finally {
-    try {
-      new File(uri).delete();
-    } catch {
-      // Il sistema svuota comunque la cartella temporanea
+    if (Platform.OS === "ios") {
+      try {
+        new File(uri).delete();
+      } catch {
+        // Il sistema svuota comunque la cartella temporanea
+      }
     }
   }
   return "condiviso";

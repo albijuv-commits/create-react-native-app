@@ -119,6 +119,7 @@ export function HistoryList() {
   const { colors } = useTheme();
   const history = useHistory();
   const [confirmAll, setConfirmAll] = useState(false);
+  const [clearFailed, setClearFailed] = useState(false);
 
   if (history.status === "loading") {
     return (
@@ -147,11 +148,13 @@ export function HistoryList() {
   }
 
   const clearAll = async () => {
+    setConfirmAll(false);
     try {
       await clearSessions();
+      setClearFailed(false);
       announceOnIOS("Storico svuotato.");
-    } finally {
-      setConfirmAll(false);
+    } catch {
+      setClearFailed(true);
     }
   };
 
@@ -169,6 +172,11 @@ export function HistoryList() {
         <Confirm question="Eliminare tutte le sessioni dello storico?" confirmLabel="Sì, svuota lo storico" onConfirm={() => void clearAll()} onCancel={() => setConfirmAll(false)} />
       ) : (
         <Button label="Svuota lo storico" icon={Trash2} variant="ghost" onPress={() => setConfirmAll(true)} />
+      )}
+      {clearFailed && (
+        <Txt variant="small" bold tone="red" accessibilityLiveRegion="polite">
+          Non riusciamo a svuotare lo storico. Riprova.
+        </Txt>
       )}
     </View>
   );

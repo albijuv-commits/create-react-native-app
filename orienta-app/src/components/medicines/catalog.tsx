@@ -65,7 +65,8 @@ export function MedicineCatalog() {
   const [fetched, setFetched] = useState<Fetched | null>(null);
   const [info, setInfo] = useState<CatalogInfo | null>(null);
   const [more, setMore] = useState<{ key: string; items: MedicineSummary[]; page: number; loading: boolean } | null>(null);
-  const [favItems, setFavItems] = useState<{ key: string; items: MedicineSummary[] } | null>(null);
+  const [favItems, setFavItems] = useState<{ key: string; items: MedicineSummary[]; error?: string } | null>(null);
+  const [favAttempt, setFavAttempt] = useState(0);
 
   // La ricerca parte quando si smette di scrivere
   useEffect(() => {
@@ -94,18 +95,22 @@ export function MedicineCatalog() {
   }, [query, key, view]);
 
   const favoriteList = favorites.list;
-  const favKey = favoriteList.join(",");
+  const favKey = `${favoriteList.join(",")}|${favAttempt}`;
   useEffect(() => {
     if (view !== "preferiti" || !favoriteList.length) return;
     const c = new AbortController();
+    const k = `${favoriteList.join(",")}|${favAttempt}`;
     medicinesByAic(favoriteList, c.signal).then(
       (items) => {
-        if (!c.signal.aborted) setFavItems({ key: favoriteList.join(","), items });
+        if (!c.signal.aborted) setFavItems({ key: k, items });
       },
-      () => undefined,
+      (e: unknown) => {
+        if (!c.signal.aborted) setFavItems({ key: k, items: [], error: e instanceof CatalogRequestError ? e.message : "Non riusciamo a caricare i preferiti." });
+      },
     );
     return () => c.abort();
-  }, [favoriteList, view]);
+  }, [favoriteList, view, favAttempt]);
+  const fav = favItems?.key === favKey ? favItems : null;
 
   const current = fetched?.key === key ? fetched : null;
   const loading = view === "catalogo" && !current;
@@ -293,9 +298,21 @@ export function MedicineCatalog() {
                   Tocca il cuore su una confezione per ritrovarla qui.
                 </Txt>
               </View>
+            ) : fav?.error ? (
+              <View accessibilityRole="alert" style={[styles.error, { backgroundColor: colors.redSoft }]}>
+                <Txt bold tone="red">
+                  {fav.error}
+                </Txt>
+                <Button label="Riprova" variant="secondary" onPress={() => setFavAttempt((n) => n + 1)} />
+              </View>
+            ) : !fav ? (
+              <View accessibilityLiveRegion="polite" style={styles.status}>
+                <ActivityIndicator color={colors.primary} />
+                <Txt bold>Carico i preferiti…</Txt>
+              </View>
             ) : (
               <View role="list" style={styles.list}>
-                {(favItems?.key === favKey ? favItems.items : []).map((m) => (
+                {fav.items.map((m) => (
                   <View key={m.aic} role="listitem">
                     <MedicineCard medicine={m} />
                   </View>
@@ -503,7 +520,7 @@ const styles = StyleSheet.create({
   radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: "center", justifyContent: "center" },
   radioDot: { width: 10, height: 10, borderRadius: 5 },
   status: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 24 },
-  error: { borderRadius: 24, padding: 16 },
+  error: { gap: 12, borderRadius: 24, padding: 16 },
   empty: { flexDirection: "row", alignItems: "center", gap: 16, borderRadius: 24, padding: 20 },
   emptyArt: { width: 88, height: 88 },
   emptyBox: { gap: 4, borderRadius: 24, padding: 20 },

@@ -6,7 +6,8 @@ import seed from "@data/medicines/seed.json";
 import MedicineScreen from "~/app/(tabs)/mercato/[aic]";
 import ConfrontoScreen from "~/app/(tabs)/mercato/confronto";
 import MercatoScreen from "~/app/(tabs)/mercato/index";
-import { sampleDetail, sampleInfo } from "~/lib/catalog-sample";
+import { catalogQuerySchema } from "@/lib/medicines/types";
+import { sampleBrands, sampleByAic, sampleDetail, sampleInfo, sampleSearch } from "~/lib/catalog-sample";
 import { clearMedicineLists, useMedicineList } from "~/lib/medicine-lists";
 import { renderWithTheme } from "./render";
 
@@ -178,6 +179,54 @@ describe("catalogo del Mercato", () => {
     expect(router.push).toHaveBeenCalledWith("/mercato/confronto");
     await fireEvent.press(screen.getByRole("button", { name: "Svuota" }));
     expect(screen.queryByText(/nel confronto$/)).toBeNull();
+  });
+});
+
+describe("Mercato con il servizio, quando la rete non risponde", () => {
+  const json = (body: unknown) => new Response(JSON.stringify(body), { status: 200, headers: { "Content-Type": "application/json" } });
+  /** Il catalogo risponde; elenco e marchi falliscono le prime volte, poi rispondono */
+  function network(failures: { elenco: number; marchi: number }) {
+    return jest.spyOn(globalThis, "fetch").mockImplementation(async (input, init) => {
+      const url = String(input);
+      const body = JSON.parse(String(init?.body ?? "{}")) as { aics?: string[]; aic?: string };
+      if (url.endsWith("/api/farmaci")) return json({ info: { ...sampleInfo(), source: "aifa" }, page: sampleSearch(catalogQuerySchema.parse({})) });
+      if (url.endsWith("/api/farmaci/elenco")) {
+        if (failures.elenco-- > 0) throw new TypeError("Network request failed");
+        return json({ items: sampleByAic(body.aics ?? []) });
+      }
+      if (url.endsWith("/api/farmaci/marchi")) {
+        if (failures.marchi-- > 0) throw new TypeError("Network request failed");
+        return json(sampleBrands(body.aic ?? ""));
+      }
+      throw new Error(`richiesta inattesa: ${url}`);
+    });
+  }
+
+  it("i preferiti che non arrivano lo dicono e si può riprovare", async () => {
+    api.apiBaseUrl.mockReturnValue("https://orienta.example");
+    network({ elenco: 1, marchi: 0 });
+    const lists = await renderHook(() => useMedicineList("preferiti"));
+    await act(async () => lists.result.current.toggle(TORVAST));
+    await renderWithTheme(<MercatoScreen />);
+    await screen.findByText("44 confezioni");
+    await fireEvent.press(screen.getByRole("tab", { name: "Preferiti (1)" }));
+    expect(await screen.findByText("Non riusciamo a raggiungere il catalogo. Controlla la connessione.")).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Riprova" }));
+    expect(await screen.findByRole("button", { name: "Togli dai preferiti: Torvast" })).toBeOnTheScreen();
+  });
+
+  it("il riquadro dei marchi riprova quando lo si riapre dopo un errore", async () => {
+    api.apiBaseUrl.mockReturnValue("https://orienta.example");
+    network({ elenco: 0, marchi: 1 });
+    await renderWithTheme(<MercatoScreen />);
+    await screen.findByText("44 confezioni");
+    const disclosure = () => screen.getAllByRole("button", { name: /^Marchi, aziende e prezzi/ })[0]!;
+    await fireEvent.press(disclosure());
+    expect(await screen.findByText("Non riusciamo a raggiungere il catalogo. Controlla la connessione.")).toBeOnTheScreen();
+    await fireEvent.press(disclosure());
+    await fireEvent.press(disclosure());
+    expect(await screen.findByText(/marchi? di \d+ aziend/)).toBeOnTheScreen();
+    expect(screen.queryByText("Non riusciamo a raggiungere il catalogo. Controlla la connessione.")).not.toBeOnTheScreen();
   });
 });
 

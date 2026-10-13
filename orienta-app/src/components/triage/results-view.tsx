@@ -20,7 +20,7 @@ import { Txt } from "~/components/ui/text";
 import { UrgencyIndicator } from "~/components/ui/urgency-indicator";
 import { saveSummaryForDoctors } from "~/lib/doctor-handoff";
 import { CONDITION_ILLUSTRATIONS } from "~/lib/illustrations";
-import { call } from "~/lib/links";
+import { callEmergency } from "~/lib/links";
 import { LEVEL_UI, LEVELS } from "~/lib/urgency";
 import { useTheme } from "~/theme/theme";
 import { DoctorSummary } from "./doctor-summary";
@@ -258,7 +258,7 @@ function NextSteps({ level, age }: { level: UrgencyLevel; age: number }) {
   if (level === "er") {
     return (
       <View style={styles.steps}>
-        <Button label="Chiama il 112" icon={Phone} variant="danger" size="lg" onPress={() => call("112")} hint="Apre il telefono con il 112 già composto" />
+        <Button label="Chiama il 112" icon={Phone} variant="danger" size="lg" onPress={callEmergency} hint="Apre il telefono con il 112 già composto" />
         <Txt variant="small">Se puoi muoverti in sicurezza, fatti accompagnare al pronto soccorso più vicino. Non guidare da solo.</Txt>
         <Button label="Trova il pronto soccorso" icon={MapPin} variant="secondary" onPress={() => findDoctors("pronto-soccorso")} />
       </View>

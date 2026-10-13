@@ -1,8 +1,8 @@
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { AlertTriangle, ExternalLink, MapPin, Phone, Siren, Stethoscope } from "lucide-react-native";
-import { useRef, type ReactNode } from "react";
-import { AccessibilityInfo, Platform, Pressable, ScrollView, StyleSheet, View, type Text } from "react-native";
+import type { ReactNode } from "react";
+import { Pressable, ScrollView, StyleSheet, View, type Text } from "react-native";
 import { bodyAreaLabel } from "@data/vocab/body";
 import { getSpecialty, type SpecialtyId } from "@data/vocab/specialties";
 import { SOURCES_CHECKED_AT, formatItalianDate } from "@/lib/conditions/knowledge-base";
@@ -13,8 +13,8 @@ import { Button } from "~/components/ui/button";
 import { Callout } from "~/components/ui/callout";
 import { Txt } from "~/components/ui/text";
 import { CONDITION_ILLUSTRATIONS, SPECIALIST_ILLUSTRATIONS } from "~/lib/illustrations";
-import { call, openSource } from "~/lib/links";
-import { useReducedMotion } from "~/lib/use-reduced-motion";
+import { callEmergency, openSource } from "~/lib/links";
+import { useSectionJump } from "~/lib/use-section-jump";
 import type { Palette } from "~/theme/colors";
 import { useTheme } from "~/theme/theme";
 
@@ -60,42 +60,23 @@ function SubHeading({ children }: { children: string }) {
 }
 
 /** Specialista e condizione passano alla sezione Medici come parametri della schermata */
-function findNearby(specialist: SpecialtyId, condition: string) {
-  router.navigate({ pathname: "/medici", params: { specialista: specialist, condizione: condition } });
+/** Apre i Medici con chi cercare; `recommended` resta lo specialista della condizione anche quando si cerca il medico di base */
+function findNearby(specialist: SpecialtyId, condition: string, recommended?: SpecialtyId) {
+  router.navigate({ pathname: "/medici", params: { specialista: specialist, condizione: condition, ...(recommended ? { consigliato: recommended } : {}) } });
 }
 
 /** La scheda completa di una condizione, con le stesse sezioni della web app */
 export function ConditionArticle({ condition: c }: { condition: Condition }) {
   const { colors } = useTheme();
-  const reduced = useReducedMotion();
-  const scroll = useRef<ScrollView>(null);
-  const offsets = useRef(new Map<SectionId, number>());
-  const headings = useRef(new Map<SectionId, Text>());
+  const { scroller, place, heading, jump } = useSectionJump<SectionId>(8);
   const specialist = getSpecialty(c.specialist.id);
   const emergency = c.specialist.id === "pronto-soccorso";
   const illustration = CONDITION_ILLUSTRATIONS[c.id];
   const specialistImage = SPECIALIST_ILLUSTRATIONS[c.specialist.id];
 
-  const jump = (id: SectionId) => {
-    const y = offsets.current.get(id);
-    if (y === undefined) return;
-    scroll.current?.scrollTo({ y: Math.max(0, y - 8), animated: !reduced });
-    // VoiceOver e TalkBack ripartono dal titolo della sezione (sul web non c'è questo comando)
-    const heading = headings.current.get(id);
-    if (heading && Platform.OS !== "web") AccessibilityInfo.sendAccessibilityEvent(heading, "focus");
-  };
-
   const section = (id: SectionId, title: string, children: ReactNode) => (
-    <View key={id} style={styles.section} onLayout={(e) => offsets.current.set(id, e.nativeEvent.layout.y)}>
-      <Txt
-        variant="title"
-        tone="primary"
-        header
-        ref={(el: Text | null) => {
-          if (el) headings.current.set(id, el);
-          else headings.current.delete(id);
-        }}
-      >
+    <View key={id} style={styles.section} onLayout={(e) => place(id, e.nativeEvent.layout.y)}>
+      <Txt variant="title" tone="primary" header ref={(el: Text | null) => heading(id, el)}>
         {title}
       </Txt>
       {children}
@@ -103,7 +84,7 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
   );
 
   return (
-    <ScrollView ref={scroll} style={{ backgroundColor: colors.bg }} contentContainerStyle={styles.page} contentInsetAdjustmentBehavior="automatic">
+    <ScrollView ref={scroller} style={{ backgroundColor: colors.bg }} contentContainerStyle={styles.page} contentInsetAdjustmentBehavior="automatic">
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <View style={styles.titleText}>
@@ -270,7 +251,7 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
               </Txt>
             </View>
             <BulletList items={c.whenToSeeDoctor.urgent} marker="red" />
-            <Button label="Chiama il 112" icon={Phone} variant="danger" onPress={() => call("112")} hint="Apre il telefono con il 112 già composto" />
+            <Button label="Chiama il 112" icon={Phone} variant="danger" onPress={callEmergency} hint="Apre il telefono con il 112 già composto" />
           </View>
         </>,
       )}
@@ -294,7 +275,7 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
             </Txt>
             {emergency ? (
               <View style={styles.tight}>
-                <Button label="Chiama il 112" icon={Phone} variant="danger" onPress={() => call("112")} hint="Apre il telefono con il 112 già composto" />
+                <Button label="Chiama il 112" icon={Phone} variant="danger" onPress={callEmergency} hint="Apre il telefono con il 112 già composto" />
                 <Button label="Trova il pronto soccorso vicino a me" icon={MapPin} variant="secondary" onPress={() => findNearby("pronto-soccorso", c.id)} />
               </View>
             ) : (
@@ -308,7 +289,7 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
                   ? "Per un adulto il primo passo è il medico di base."
                   : "Di solito il primo passo è il medico di base: ti visita e, se serve, ti indirizza dallo specialista."}
               </Txt>
-              <Button label="Trova il medico di base" icon={Stethoscope} variant="secondary" onPress={() => findNearby("medico-di-base", c.id)} />
+              <Button label="Trova il medico di base" icon={Stethoscope} variant="secondary" onPress={() => findNearby("medico-di-base", c.id, c.specialist.id)} />
             </View>
           )}
         </>,

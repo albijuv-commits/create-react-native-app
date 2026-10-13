@@ -16,6 +16,16 @@ beforeAll(async () => {
 });
 
 describe("preferiti e confronto sul telefono", () => {
+  it("un tocco prima che le liste siano lette non cancella quelle salvate", async () => {
+    const { result } = await renderHook(() => useMedicineList("preferiti"));
+    // Subito, mentre la lettura dal telefono è ancora in corso
+    await act(async () => result.current.toggle(ZIRTEC));
+    await waitFor(() => expect(result.current.list).toEqual([TORVAST, AUGMENTIN, ZIRTEC]));
+    expect(await saved("orienta:farmaci-preferiti")).toEqual([TORVAST, AUGMENTIN, ZIRTEC]);
+    await act(async () => result.current.toggle(ZIRTEC));
+    await waitFor(() => expect(result.current.list).toEqual([TORVAST, AUGMENTIN]));
+  });
+
   it("rilegge i preferiti salvati e scarta i valori non validi", async () => {
     const { result } = await renderHook(() => useMedicineList("preferiti"));
     await waitFor(() => expect(result.current.list).toEqual([TORVAST, AUGMENTIN]));

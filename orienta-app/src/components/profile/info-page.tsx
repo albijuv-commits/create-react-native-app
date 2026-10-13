@@ -1,9 +1,8 @@
-import { createContext, useCallback, useContext, useRef, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, View, type Text } from "react-native";
 import { Txt } from "~/components/ui/text";
-import { focusLater } from "~/lib/a11y";
 import { openSource } from "~/lib/links";
-import { useReducedMotion } from "~/lib/use-reduced-motion";
+import { useSectionJump } from "~/lib/use-section-jump";
 import { useTheme } from "~/theme/theme";
 
 type Register = { place: (id: string, y: number) => void; heading: (id: string, node: Text | null) => void };
@@ -17,25 +16,7 @@ const SectionsContext = createContext<Register | null>(null);
  */
 export function InfoPage({ title, lead, updated, sections, children }: { title: string; lead: string; updated: string; sections: readonly { id: string; title: string }[]; children: ReactNode }) {
   const { colors } = useTheme();
-  const reduced = useReducedMotion();
-  const scroller = useRef<ScrollView>(null);
-  const offsets = useRef(new Map<string, number>());
-  const headings = useRef(new Map<string, Text>());
-
-  const place = useCallback((id: string, y: number) => {
-    offsets.current.set(id, y);
-  }, []);
-  const heading = useCallback((id: string, node: Text | null) => {
-    if (node) headings.current.set(id, node);
-    else headings.current.delete(id);
-  }, []);
-
-  const jump = (id: string) => {
-    const y = offsets.current.get(id);
-    if (y === undefined) return;
-    scroller.current?.scrollTo({ y: Math.max(0, y - 12), animated: !reduced });
-    focusLater({ current: headings.current.get(id) ?? null }, reduced ? 100 : 450);
-  };
+  const { scroller, place, heading, jump } = useSectionJump();
 
   return (
     <SectionsContext.Provider value={{ place, heading }}>

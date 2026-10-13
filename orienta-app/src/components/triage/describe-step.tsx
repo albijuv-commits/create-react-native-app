@@ -10,7 +10,7 @@ import type { Ambiguity } from "@/lib/triage/recognize";
 import { BodyMap } from "~/components/body-map/body-map";
 import { Button } from "~/components/ui/button";
 import { Txt } from "~/components/ui/text";
-import { call } from "~/lib/links";
+import { callEmergency } from "~/lib/links";
 import { useTheme } from "~/theme/theme";
 import { textStyle } from "~/theme/type";
 import { Chip, FieldError, RemovableChip, StepHeader } from "./parts";
@@ -139,7 +139,7 @@ export function DescribeStep({
             ))}
           </View>
           <View style={styles.twoButtons}>
-            <Button label="Chiama il 112" icon={Phone} variant="danger" onPress={() => call("112")} hint="Apre il telefono con il 112 già composto" style={styles.flex} />
+            <Button label="Chiama il 112" icon={Phone} variant="danger" onPress={callEmergency} hint="Apre il telefono con il 112 già composto" style={styles.flex} />
             <Button label="Cosa fare" variant="secondary" onPress={onEmergency} style={styles.flex} />
           </View>
         </View>

@@ -36,6 +36,27 @@ describe("mazzo delle domande", () => {
     expect(onAnswer).toHaveBeenCalledWith({ kind: "yesno", question, value: "si" });
   });
 
+  it("«indietro» mentre la carta vola via annulla la risposta e ripropone la stessa domanda", async () => {
+    const user = setup();
+    const onAnswer = jest.fn();
+    const onBack = jest.fn();
+    const question = symptomQuestion("mal-di-gola");
+    await renderWithTheme(deck(question, { onAnswer, onBack }));
+    await user.press(screen.getByRole("button", { name: "No" }));
+    await user.press(screen.getByRole("button", { name: "Domanda precedente" }));
+    await wait(600);
+    expect(onAnswer).not.toHaveBeenCalled();
+    expect(onBack).not.toHaveBeenCalled();
+    // La carta è di nuovo lì e si può rispondere subito
+    await user.press(screen.getByRole("button", { name: "Sì" }));
+    await wait(400);
+    expect(onAnswer).toHaveBeenCalledTimes(1);
+    expect(onAnswer).toHaveBeenCalledWith({ kind: "yesno", question, value: "si" });
+    // Senza risposte in volo «indietro» torna alla domanda di prima
+    await user.press(screen.getByRole("button", { name: "Domanda precedente" }));
+    expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
   it("con «Riduci movimento» la risposta è immediata e non si parla di trascinare", async () => {
     const user = setup();
     const onAnswer = jest.fn();

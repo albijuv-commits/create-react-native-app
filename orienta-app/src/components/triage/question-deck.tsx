@@ -67,6 +67,8 @@ export function QuestionDeck({
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
   // La prima carta arriva insieme al passo; le altre entrano dopo una risposta o tornando indietro
   const [moved, setMoved] = useState(false);
+  // Cresce quando «indietro» annulla una risposta ancora in volo: la stessa carta torna
+  const [retake, setRetake] = useState(0);
   const prev = previous && previous.question.id === question.id ? previous : null;
 
   useEffect(() => {
@@ -93,6 +95,14 @@ export function QuestionDeck({
   };
   const back = () => {
     setMoved(true);
+    if (timers.current.size > 0) {
+      // La risposta non è ancora partita: «indietro» la annulla e la stessa domanda torna, da rifare
+      timers.current.forEach(clearTimeout);
+      timers.current.clear();
+      lockedUntil.current = 0;
+      setRetake((n) => n + 1);
+      return;
+    }
     onBack();
   };
 
@@ -124,7 +134,7 @@ export function QuestionDeck({
         {/* Le carte successive che si intravedono sotto */}
         <View aria-hidden style={[styles.under, styles.underFar, { backgroundColor: colors.surface2 }]} />
         <View aria-hidden style={[styles.under, styles.underNear, { backgroundColor: colors.surface, borderColor: colors.line }]} />
-        <QuestionCard key={question.id} question={question} previous={prev} tryLock={tryLock} later={later} onAnswer={answer} enter={moved && !reduced} reduced={reduced} />
+        <QuestionCard key={`${question.id}-${retake}`} question={question} previous={prev} tryLock={tryLock} later={later} onAnswer={answer} enter={moved && !reduced} reduced={reduced} />
       </View>
     </View>
   );

@@ -104,5 +104,11 @@ describe("scheda di una condizione", () => {
     await renderWithTheme(<ConditionArticle condition={condition} />);
     await user.press(screen.getByRole("button", { name: "Trova vicino a me" }));
     expect(mockRouter.navigate).toHaveBeenCalledWith({ pathname: "/medici", params: { specialista: condition.specialist.id, condizione: "acne" } });
+    // Cercando il medico di base lo specialista consigliato resta quello della scheda
+    await user.press(screen.getByRole("button", { name: "Trova il medico di base" }));
+    expect(mockRouter.navigate).toHaveBeenLastCalledWith({
+      pathname: "/medici",
+      params: { specialista: "medico-di-base", condizione: "acne", consigliato: condition.specialist.id },
+    });
   });
 });

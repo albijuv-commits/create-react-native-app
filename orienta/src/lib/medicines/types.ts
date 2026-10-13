@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { euBrandSchema } from "./eu-brands";
+import { euBrandSchema } from "./eu-brand";
 import { FORM_FAMILIES } from "./forms";
 import { SUPPLY_CODES } from "./regime";
 

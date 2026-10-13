@@ -1,11 +1,10 @@
+import { router } from "expo-router";
 import { ArrowRight, LockKeyhole, Siren, Sparkles, Stethoscope, type LucideIcon } from "lucide-react-native";
 import { useState, type ReactNode, type Ref } from "react";
 import { StyleSheet, View, type Text } from "react-native";
 import consenso from "@/assets/illustrations/passo-consenso.webp";
 import { Button } from "~/components/ui/button";
 import { Txt } from "~/components/ui/text";
-import { apiBaseUrl } from "~/lib/api";
-import { openSource } from "~/lib/links";
 import { useTheme } from "~/theme/theme";
 import { CheckRow, FieldError, StepHeader } from "./parts";
 
@@ -34,8 +33,6 @@ export function ConsentStep({
 }) {
   const [tried, setTried] = useState(false);
   const missing = !value.terms || !value.health;
-  // L'informativa completa sta nella web app; qui il link compare solo se la web app è configurata
-  const site = apiBaseUrl();
 
   const submit = () => {
     if (missing) {
@@ -72,15 +69,10 @@ export function ConsentStep({
           <Txt variant="small" bold>
             I tuoi dati restano tuoi.{" "}
           </Txt>
-          Non li salviamo e nell&apos;app non usiamo strumenti di analisi o di tracciamento.
-          {site ? (
-            <>
-              {" "}
-              <Txt variant="small" bold tone="primary" role="link" onPress={() => openSource(`${site}/profilo/privacy`)} style={styles.link}>
-                Leggi l&apos;informativa privacy
-              </Txt>
-            </>
-          ) : null}
+          Non li conserviamo sui nostri server e nell&apos;app non usiamo strumenti di analisi o di tracciamento.{" "}
+          <Txt variant="small" bold tone="primary" role="link" accessibilityHint="Apre l'informativa dell'app" onPress={() => router.push("/sintomi/privacy")} style={styles.link}>
+            Leggi l&apos;informativa privacy
+          </Txt>
         </Fact>
       </View>
 
@@ -99,7 +91,7 @@ export function ConsentStep({
           onChange={(health) => onChange({ ...value, health })}
           invalid={tried && !value.health}
           label="Acconsento all'uso dei dati sulla mia salute che inserirò, solo per questa intervista."
-          note="Sono dati particolari secondo l'articolo 9 del GDPR. Restano su questo telefono e si cancellano quando chiudi l'intervista."
+          note="Sono dati particolari secondo l'articolo 9 del GDPR. Restano su questo telefono e si cancellano quando chiudi l'intervista, a meno che tu non scelga di salvarla nello storico."
         />
         {aiAvailable ? (
           <CheckRow

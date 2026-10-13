@@ -1,12 +1,19 @@
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
+import { Platform } from "react-native";
 import { clearSummaryForDoctors, readSummaryForDoctors, saveSummaryForDoctors } from "~/lib/doctor-handoff";
 import { shareSummaryPdf, summaryHtml } from "~/lib/summary-pdf";
 
 jest.mock("expo-print", () => ({ printToFileAsync: jest.fn(), printAsync: jest.fn() }));
 jest.mock("expo-sharing", () => ({ isAvailableAsync: jest.fn(), shareAsync: jest.fn() }));
 const mockDelete = jest.fn();
-jest.mock("expo-file-system", () => ({ File: jest.fn().mockImplementation(() => ({ delete: mockDelete })) }));
+const mockDeleteFolder = jest.fn();
+jest.mock("expo-file-system", () => ({
+  File: jest.fn().mockImplementation(() => ({ delete: mockDelete })),
+  // La cartella «Print» dove expo-print mette i PDF
+  Directory: jest.fn().mockImplementation(() => ({ exists: true, delete: mockDeleteFolder })),
+  Paths: { cache: "file:///cache/" },
+}));
 
 const print = Print as jest.Mocked<typeof Print>;
 const sharing = Sharing as jest.Mocked<typeof Sharing>;
@@ -33,7 +40,7 @@ describe("PDF del riepilogo", () => {
     expect(html).toContain("Questa non è una diagnosi");
   });
 
-  it("crea il PDF sul telefono, lo condivide e poi lo cancella", async () => {
+  it("su iPhone crea il PDF sul telefono, lo condivide e poi lo cancella", async () => {
     sharing.isAvailableAsync.mockResolvedValue(true);
     print.printToFileAsync.mockResolvedValue({ uri: "file:///cache/riepilogo.pdf", numberOfPages: 1 });
     sharing.shareAsync.mockResolvedValue(undefined);
@@ -41,6 +48,21 @@ describe("PDF del riepilogo", () => {
     expect(print.printToFileAsync).toHaveBeenCalledWith({ html: summaryHtml(SUMMARY) });
     expect(sharing.shareAsync).toHaveBeenCalledWith("file:///cache/riepilogo.pdf", expect.objectContaining({ mimeType: "application/pdf" }));
     expect(mockDelete).toHaveBeenCalledTimes(1);
+    // Prima di crearne uno nuovo spariscono quelli delle volte precedenti
+    expect(mockDeleteFolder).toHaveBeenCalledTimes(1);
+  });
+
+  it("su Android lascia il PDF alle app che lo leggono dopo e lo cancella alla condivisione successiva", async () => {
+    const os = jest.replaceProperty(Platform, "OS", "android");
+    sharing.isAvailableAsync.mockResolvedValue(true);
+    print.printToFileAsync.mockResolvedValue({ uri: "file:///cache/Print/riepilogo.pdf", numberOfPages: 1 });
+    sharing.shareAsync.mockResolvedValue(undefined);
+    await expect(shareSummaryPdf(SUMMARY)).resolves.toBe("condiviso");
+    expect(mockDelete).not.toHaveBeenCalled();
+    expect(mockDeleteFolder).toHaveBeenCalledTimes(1);
+    await shareSummaryPdf(SUMMARY);
+    expect(mockDeleteFolder).toHaveBeenCalledTimes(2);
+    os.restore();
   });
 
   it("cancella il file anche se la condivisione non va a buon fine", async () => {

@@ -26,6 +26,7 @@ export default function SintomiLayout() {
       <Stack.Screen name="index" options={{ title: "Sintomi", headerTitle: () => <Brand />, headerTitleAlign: "left" }} />
       <Stack.Screen name="sintomi/intervista" options={{ title: "Intervista", headerBackTitle: "Sintomi" }} />
       <Stack.Screen name="sintomi/condizione/[id]" options={{ title: "Scheda", headerBackTitle: "Risultati" }} />
+      <Stack.Screen name="sintomi/privacy" options={{ title: "Informativa privacy" }} />
     </Stack>
   );
 }

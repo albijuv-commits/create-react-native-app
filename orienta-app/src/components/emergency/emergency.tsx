@@ -6,7 +6,7 @@ import { RED_FLAGS, type RedFlagId } from "@data/emergency/red-flags";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/layout";
 import { Txt } from "~/components/ui/text";
-import { call, openSource } from "~/lib/links";
+import { call, callEmergency, openSource } from "~/lib/links";
 import { useTheme } from "~/theme/theme";
 
 const sentence = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -15,7 +15,7 @@ const sentence = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 export function CallEmergency() {
   return (
     <View style={styles.call}>
-      <Button label="Chiama il 112" icon={Phone} variant="danger" size="lg" onPress={() => call("112")} hint="Apre il telefono con il 112 già composto" />
+      <Button label="Chiama il 112" icon={Phone} variant="danger" size="lg" onPress={callEmergency} hint="Apre il telefono con il 112 già composto" />
       <Txt variant="small" tone="inkMuted" style={styles.center}>
         Gratuito, sempre attivo, anche senza credito.
       </Txt>

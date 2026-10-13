@@ -1,9 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Directory, Paths } from "expo-file-system";
-import { Platform } from "react-native";
 import { clearSummaryForDoctors } from "./doctor-handoff";
 import { forgetSessions } from "./history";
 import { clearMedicineLists } from "./medicine-lists";
+import { deleteSummaryPdfs } from "./summary-pdf";
 
 /**
  * «Elimina tutti i miei dati»: tutto ciò che Orienta ha conservato su questo telefono.
@@ -29,12 +28,6 @@ export function onEraseAll(listener: () => void): () => void {
   };
 }
 
-function deleteLeftoverPdfs() {
-  if (Platform.OS === "web") return;
-  const folder = new Directory(Paths.cache, "Print");
-  if (folder.exists) folder.delete();
-}
-
 export async function eraseAllMyData(): Promise<{ failed: ErasePart[] }> {
   const failed: ErasePart[] = [];
   clearSummaryForDoctors();
@@ -47,7 +40,7 @@ export async function eraseAllMyData(): Promise<{ failed: ErasePart[] }> {
     failed.push("dati salvati sul telefono");
   }
   try {
-    deleteLeftoverPdfs();
+    deleteSummaryPdfs();
   } catch {
     failed.push("PDF temporanei");
   }

@@ -22,8 +22,8 @@ const MESSAGES: Record<Status, string> = {
 
 /**
  * Copia, PDF e Condividi per un riepilogo per il medico, con il messaggio che dice cosa è
- * successo. Li usano i Risultati e lo storico del Profilo. Il PDF si crea sul telefono e si
- * cancella dopo la condivisione.
+ * successo. Li usano i Risultati e lo storico del Profilo. Il PDF si crea sul telefono (vedi
+ * shareSummaryPdf per quando si cancella).
  */
 export function SummaryActions({ text, onCopyFailed }: { text: string; onCopyFailed?: () => void }) {
   const [status, setStatus] = useState<Status>("idle");

@@ -8,7 +8,7 @@ import { renderWithTheme } from "./render";
 
 jest.mock("expo-router", () => ({ router: { push: jest.fn(), navigate: jest.fn() } }));
 jest.mock("expo-clipboard", () => ({ setStringAsync: jest.fn(() => Promise.resolve(true)) }));
-jest.mock("~/lib/summary-pdf", () => ({ shareSummaryPdf: jest.fn(() => Promise.resolve("condiviso")) }));
+jest.mock("~/lib/summary-pdf", () => ({ shareSummaryPdf: jest.fn(() => Promise.resolve("condiviso")), deleteSummaryPdfs: jest.fn() }));
 
 const router = jest.requireMock<{ router: Record<"push" | "navigate", jest.Mock> }>("expo-router").router;
 
@@ -72,6 +72,40 @@ describe("«Salva nello storico» nei risultati", () => {
     await user.press(screen.getByRole("button", { name: "Elimina dallo storico" }));
     expect(await screen.findByText("Eliminata dallo storico: su questo telefono non resta.")).toBeOnTheScreen();
     expect(await AsyncStorage.getItem(HISTORY_KEY)).toBeNull();
+  });
+});
+
+describe("quando il telefono non riesce a scrivere", () => {
+  // Ogni prova parte dallo storico vuoto, anche eseguita da sola, e lo lascia vuoto
+  beforeEach(() => clearSessions());
+  afterEach(async () => {
+    jest.restoreAllMocks();
+    await act(() => clearSessions());
+  });
+
+  it("se eliminare dallo storico non riesce, la sessione risulta ancora salvata", async () => {
+    const user = userEvent.setup();
+    await renderWithTheme(<SaveToHistory entry={entry(8)} />);
+    await user.press(screen.getByRole("button", { name: "Salva nello storico" }));
+    await screen.findByText(/Salvata solo su questo telefono/);
+    jest.spyOn(AsyncStorage, "removeItem").mockRejectedValueOnce(new Error("disco pieno"));
+    await user.press(screen.getByRole("button", { name: "Elimina dallo storico" }));
+    expect(await screen.findByText("Non riusciamo a eliminarla: è ancora nello storico. Riprova tra poco.")).toBeOnTheScreen();
+    expect(screen.getByText(/Salvata solo su questo telefono/)).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Salva nello storico" })).not.toBeOnTheScreen();
+    expect((await saved())!.map((s) => s.id)).toEqual(["sessione-008"]);
+  });
+
+  it("se svuotare lo storico non riesce, lo dice e le sessioni restano", async () => {
+    const user = userEvent.setup();
+    await saveSession(entry(9));
+    await renderWithTheme(<HistoryList />);
+    await screen.findByText("1 sessione salvata su questo telefono.");
+    jest.spyOn(AsyncStorage, "removeItem").mockRejectedValueOnce(new Error("disco pieno"));
+    await user.press(screen.getByRole("button", { name: "Svuota lo storico" }));
+    await user.press(screen.getByRole("button", { name: "Sì, svuota lo storico" }));
+    expect(await screen.findByText("Non riusciamo a svuotare lo storico. Riprova.")).toBeOnTheScreen();
+    expect(screen.getByText("1 sessione salvata su questo telefono.")).toBeOnTheScreen();
   });
 });
 

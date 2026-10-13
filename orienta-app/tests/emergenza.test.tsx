@@ -1,5 +1,5 @@
-import { screen, userEvent } from "@testing-library/react-native";
-import { Linking } from "react-native";
+import { screen, userEvent, waitFor } from "@testing-library/react-native";
+import { Alert, Linking } from "react-native";
 import EmergenzaScreen from "~/app/emergenza";
 import { renderWithTheme } from "./render";
 
@@ -16,6 +16,16 @@ describe("schermata Emergenza", () => {
     expect(buttons[0]).toHaveAccessibleName("Chiama il 112");
     await user.press(screen.getByRole("button", { name: "Chiama il 112" }));
     expect(Linking.openURL).toHaveBeenCalledWith("tel:112");
+  });
+
+  it("se il dispositivo non sa telefonare, dice quale numero comporre", async () => {
+    // Un tablet senza SIM o un computer: il link tel: non si apre
+    jest.spyOn(Linking, "openURL").mockRejectedValue(new Error("nessuna app per telefonare"));
+    const alert = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+    const user = userEvent.setup();
+    await renderWithTheme(<EmergenzaScreen />);
+    await user.press(screen.getByRole("button", { name: "Chiama il 112" }));
+    await waitFor(() => expect(alert).toHaveBeenCalledWith("Non riusciamo ad aprire il telefono", "Componi 112 dal tastierino di un telefono."));
   });
 
   it("un segnale d'allarme si apre e mostra cosa fare", async () => {

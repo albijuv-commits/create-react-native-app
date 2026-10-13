@@ -1,7 +1,11 @@
 import { z } from "zod";
-import { emaSubstanceKey } from "./ingredient-key";
+import { euBrandSchema, type EuBrand } from "./eu-brand";
 import type { FormFamily } from "./forms";
+import { emaSubstanceKey } from "./ingredient-key";
 import type { IngredientInfo } from "./ingredients";
+
+// Schema e pagina dell'elenco stanno in eu-brand.ts, senza dipendenze, per chi mostra solo i dati
+export { EMA_ARTICLE57_PAGE, euBrandSchema, type EuBrand } from "./eu-brand";
 
 /**
  * I marchi con cui lo stesso principio attivo è autorizzato negli altri Paesi europei, dall'elenco
@@ -10,8 +14,6 @@ import type { IngredientInfo } from "./ingredients";
  * somministrazione e titolari. Le colonne con email e telefoni di farmacovigilanza non si leggono.
  */
 export const EMA_ARTICLE57_URL = "https://www.ema.europa.eu/en/documents/other/article-57-product-data_en.xlsx";
-export const EMA_ARTICLE57_PAGE =
-  "https://www.ema.europa.eu/en/human-regulatory-overview/post-authorisation/data-medicines-iso-idmp-standards-post-authorisation/public-data-article-57-database";
 
 export const COUNTRY_LABEL: Record<string, string> = {
   Austria: "Austria",
@@ -78,14 +80,6 @@ export const ROUTES_FOR_FORM: Record<FormFamily, readonly string[] | null> = {
   crema: ["sulla pelle"],
   altro: null,
 };
-
-export const euBrandSchema = z.object({
-  name: z.string().min(1),
-  countries: z.array(z.string().min(1)).min(1),
-  routes: z.array(z.string().min(1)).min(1),
-  holders: z.array(z.string().min(1)).max(3),
-});
-export type EuBrand = z.infer<typeof euBrandSchema>;
 
 export const euBrandsFileSchema = z.object({
   source: z.string(),

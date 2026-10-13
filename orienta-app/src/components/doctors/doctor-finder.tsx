@@ -14,7 +14,7 @@ import { Txt } from "~/components/ui/text";
 import { searchDoctors } from "~/lib/api";
 import { clearSummaryForDoctors, useSummaryForDoctors } from "~/lib/doctor-handoff";
 import { SPECIALIST_ILLUSTRATIONS } from "~/lib/illustrations";
-import { call } from "~/lib/links";
+import { callEmergency } from "~/lib/links";
 import { useReducedMotion } from "~/lib/use-reduced-motion";
 import { useTheme } from "~/theme/theme";
 import { GoogleMapsAttribution, OsmCredit } from "./credits";
@@ -138,7 +138,7 @@ export function DoctorFinder({ conditions }: { conditions: Record<string, Condit
             <Txt bold tone="red">
               In un&apos;emergenza non cercare: chiama subito il 112.
             </Txt>
-            <Button label="Chiama il 112" icon={Phone} variant="danger" onPress={() => call("112")} hint="Apre il telefono con il 112 già composto" />
+            <Button label="Chiama il 112" icon={Phone} variant="danger" onPress={callEmergency} hint="Apre il telefono con il 112 già composto" />
           </View>
         ) : (
           !NON_SPECIALIST.has(specialty) && (

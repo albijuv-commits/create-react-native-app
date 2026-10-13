@@ -46,7 +46,16 @@ export function BrandsDisclosure({ medicine: m }: { medicine: MedicineSummary })
 
   return (
     <View style={[styles.box, { backgroundColor: colors.surface2 }]}>
-      <Pressable role="button" accessibilityState={{ expanded: open }} onPress={() => setOpen((o) => !o)} style={styles.head}>
+      <Pressable
+        role="button"
+        accessibilityState={{ expanded: open }}
+        onPress={() => {
+          // Riaprendo dopo un errore si riprova
+          if (!open && state?.error) setState(null);
+          setOpen((o) => !o);
+        }}
+        style={styles.head}
+      >
         <Building2 color={colors.primary} size={20} />
         <View style={styles.flex}>
           <Txt variant="small" bold>

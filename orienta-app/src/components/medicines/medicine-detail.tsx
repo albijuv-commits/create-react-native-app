@@ -1,5 +1,5 @@
 import { FileDown, Info } from "lucide-react-native";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View, type Text } from "react-native";
 import { atcGroupLabel } from "@/lib/medicines/atc";
 import { FORM_FAMILY_LABEL } from "@/lib/medicines/forms";
@@ -8,10 +8,9 @@ import { supplyBadge, SUPPLY_BADGE_LABEL, SUPPLY_CODE_DESCRIPTION, type SupplyCo
 import { displayCompany, formatEuro, formatItalianDay, sentenceCase } from "@/lib/medicines/text";
 import type { MedicineDetailResponse, MedicineSummary } from "@/lib/medicines/types";
 import { Txt } from "~/components/ui/text";
-import { focusLater } from "~/lib/a11y";
 import { openSource } from "~/lib/links";
 import { medicinePhoto } from "~/lib/medicine-photo";
-import { useReducedMotion } from "~/lib/use-reduced-motion";
+import { useSectionJump } from "~/lib/use-section-jump";
 import { useTheme } from "~/theme/theme";
 import { ReimbursableBadge, SupplyBadge } from "./badges";
 import { openMedicine } from "./brands-disclosure";
@@ -93,16 +92,9 @@ function EquivalentRow({ g, self, lowest, markLowest, first }: { g: MedicineSumm
  */
 export function MedicineDetail({ data }: { data: MedicineDetailResponse }) {
   const { colors } = useTheme();
-  const reduced = useReducedMotion();
   const { medicine: m, equivalents, info, brands, europe } = data;
   const [allEquivalents, setAllEquivalents] = useState(false);
-  const scroller = useRef<ScrollView>(null);
-  const offsets = useRef(new Map<SectionId, number>());
-  const prezzoHeading = useRef<Text>(null);
-  const ingredientHeading = useRef<Text>(null);
-  const equivalentsHeading = useRef<Text>(null);
-  const brandsHeading = useRef<Text>(null);
-  const europeHeading = useRef<Text>(null);
+  const { scroller, place, heading, jump } = useSectionJump<SectionId>();
 
   const ingredient = ingredientInfo(m.ingredientKey);
   const code = m.supplyCode;
@@ -135,13 +127,6 @@ export function MedicineDetail({ data }: { data: MedicineDetailResponse }) {
     .map(([id, label]) => ({ id, label }));
   const leaflet = m.leafletUrl;
 
-  const jump = (id: SectionId) => {
-    const y = offsets.current.get(id);
-    if (y === undefined) return;
-    scroller.current?.scrollTo({ y: Math.max(0, y - 12), animated: !reduced });
-    const heading = { prezzo: prezzoHeading, "principio-attivo": ingredientHeading, equivalenti: equivalentsHeading, marchi: brandsHeading, "in-europa": europeHeading }[id];
-    focusLater(heading, reduced ? 100 : 450);
-  };
 
   const facts: [string, string][] = [
     ["Principio attivo", m.activeIngredient],
@@ -214,8 +199,8 @@ export function MedicineDetail({ data }: { data: MedicineDetailResponse }) {
         </ScrollView>
       )}
 
-      <View onLayout={(e) => offsets.current.set("prezzo", e.nativeEvent.layout.y)} style={[styles.box, { backgroundColor: colors.surface, borderColor: colors.line }]}>
-        <Txt ref={prezzoHeading} bold header>
+      <View onLayout={(e) => place("prezzo", e.nativeEvent.layout.y)} style={[styles.box, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+        <Txt ref={(node: Text | null) => heading("prezzo", node)} bold header>
           Prezzo
         </Txt>
         <Price medicine={m} size="lg" />
@@ -292,14 +277,14 @@ export function MedicineDetail({ data }: { data: MedicineDetailResponse }) {
       </View>
 
       {ingredient && (
-        <View onLayout={(e) => offsets.current.set("principio-attivo", e.nativeEvent.layout.y)}>
-          <IngredientSection info={ingredient} headingRef={ingredientHeading} />
+        <View onLayout={(e) => place("principio-attivo", e.nativeEvent.layout.y)}>
+          <IngredientSection info={ingredient} headingRef={(node: Text | null) => heading("principio-attivo", node)} />
         </View>
       )}
 
-      <View onLayout={(e) => offsets.current.set("equivalenti", e.nativeEvent.layout.y)} style={styles.section}>
+      <View onLayout={(e) => place("equivalenti", e.nativeEvent.layout.y)} style={styles.section}>
         <View style={styles.head}>
-          <Txt ref={equivalentsHeading} variant="heading" header>
+          <Txt ref={(node: Text | null) => heading("equivalenti", node)} variant="heading" header>
             Farmaci equivalenti
           </Txt>
           <Txt variant="small" tone="inkMuted">
@@ -341,13 +326,13 @@ export function MedicineDetail({ data }: { data: MedicineDetailResponse }) {
       </View>
 
       {showBrands && (
-        <View onLayout={(e) => offsets.current.set("marchi", e.nativeEvent.layout.y)}>
-          <BrandsSection brands={brands} selfName={m.name} otc={otc} headingRef={brandsHeading} />
+        <View onLayout={(e) => place("marchi", e.nativeEvent.layout.y)}>
+          <BrandsSection brands={brands} selfName={m.name} otc={otc} headingRef={(node: Text | null) => heading("marchi", node)} />
         </View>
       )}
 
       {europe && (
-        <View onLayout={(e) => offsets.current.set("in-europa", e.nativeEvent.layout.y)}>
+        <View onLayout={(e) => place("in-europa", e.nativeEvent.layout.y)}>
           <EuBrands
             ingredient={ingredient?.name ?? m.activeIngredient}
             brands={europe.brands}
@@ -356,7 +341,7 @@ export function MedicineDetail({ data }: { data: MedicineDetailResponse }) {
             routeLabel={routeLabel}
             updated={europe.updated}
             sourceUrl={europe.url}
-            headingRef={europeHeading}
+            headingRef={(node: Text | null) => heading("in-europa", node)}
           />
         </View>
       )}

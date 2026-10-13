@@ -114,7 +114,8 @@ export default function PrivacyScreen() {
             l&apos;app resta aperta e al massimo per sei ore. L&apos;email al medico la invii tu, dalla tua app di posta.
           </Item>
           <Item>
-            <Strong>PDF del riepilogo</Strong>: si crea sul telefono quando lo chiedi e si cancella dopo la condivisione. Il testo copiato resta negli appunti del
+            <Strong>PDF del riepilogo</Strong>: si crea sul telefono quando lo chiedi, in una cartella temporanea dell&apos;app. Su iPhone si cancella dopo la
+            condivisione; su Android, dove alcune app lo leggono più tardi, alla condivisione successiva o con «Elimina tutti i miei dati». Il testo copiato resta negli appunti del
             telefono finché non copi altro.
           </Item>
         </Items>

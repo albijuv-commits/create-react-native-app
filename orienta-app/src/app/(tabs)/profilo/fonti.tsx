@@ -4,7 +4,7 @@ import photos from "@data/medicines/photos.json";
 import { formatItalianDate, SOURCES_CHECKED_AT } from "@/lib/conditions/knowledge-base";
 import type { Source } from "@/lib/conditions/schema";
 import { BOOKING_SOURCE } from "@/lib/doctors/booking";
-import { EMA_ARTICLE57_PAGE } from "@/lib/medicines/eu-brands";
+import { EMA_ARTICLE57_PAGE } from "@/lib/medicines/eu-brand";
 import { INGREDIENTS, INGREDIENTS_CHECKED_ON } from "@/lib/medicines/ingredients";
 import { photosFileSchema } from "@/lib/medicines/photos";
 import { External, InfoPage, InfoSection, Item, Items } from "~/components/profile/info-page";
