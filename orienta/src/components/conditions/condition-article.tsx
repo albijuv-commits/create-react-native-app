@@ -58,9 +58,11 @@ function BulletList({ items, marker = "bg-accent" }: { items: readonly string[];
   );
 }
 
-function medicLink(specialist: SpecialtyId, condition?: string) {
+/** `recommended` resta lo specialista della condizione anche quando si cerca il medico di base */
+function medicLink(specialist: SpecialtyId, condition?: string, recommended?: SpecialtyId) {
   const params = new URLSearchParams({ specialista: specialist });
   if (condition) params.set("condizione", condition);
+  if (recommended) params.set("consigliato", recommended);
   // Specialista e condizione dopo «#»: non arrivano al server né ai suoi log
   return `/medici#${params.toString()}`;
 }
@@ -261,7 +263,7 @@ export function ConditionArticle({ condition: c }: { condition: Condition }) {
                 ? "Per un adulto il primo passo è il medico di base."
                 : "Di solito il primo passo è il medico di base: ti visita e, se serve, ti indirizza dallo specialista."}
             </p>
-            <ButtonLink href={medicLink("medico-di-base", c.id)} variant="secondary" icon={<Stethoscope aria-hidden className="size-5" />}>
+            <ButtonLink href={medicLink("medico-di-base", c.id, c.specialist.id)} variant="secondary" icon={<Stethoscope aria-hidden className="size-5" />}>
               Trova il medico di base
             </ButtonLink>
           </div>

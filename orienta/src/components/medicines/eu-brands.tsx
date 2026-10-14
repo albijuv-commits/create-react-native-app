@@ -2,7 +2,7 @@
 
 import { ExternalLink, Globe2 } from "lucide-react";
 import { useId, useState } from "react";
-import type { EuBrand } from "@/lib/medicines/eu-brands";
+import type { EuBrand } from "@/lib/medicines/eu-brand";
 import { formatItalianDay } from "@/lib/medicines/text";
 
 const TOP = 15;

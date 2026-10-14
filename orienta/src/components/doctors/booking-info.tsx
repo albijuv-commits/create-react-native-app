@@ -1,9 +1,6 @@
 import prenota from "@/assets/illustrations/stato-prenota.webp";
 import { TiltIllustration } from "@/components/ui/tilt-illustration";
-
-/** Fonte verificata il 7 ottobre 2026: le prestazioni specialistiche si prescrivono sulla ricetta del SSN e si prenotano al CUP */
-export const BOOKING_SOURCE = "https://www.salute.gov.it/new/it/tema/ricetta-elettronica-e-cup/";
-const SOURCE = BOOKING_SOURCE;
+import { BOOKING_SOURCE, BOOKING_SOURCE_TITLE } from "@/lib/doctors/booking";
 
 export function BookingInfo() {
   return (
@@ -45,8 +42,8 @@ export function BookingInfo() {
       </div>
       <p className="text-small text-ink-muted">
         Fonte:{" "}
-        <a href={SOURCE} target="_blank" rel="noopener noreferrer" className="font-bold text-primary underline underline-offset-2">
-          Ministero della Salute, Ricetta elettronica e CUP
+        <a href={BOOKING_SOURCE} target="_blank" rel="noopener noreferrer" className="font-bold text-primary underline underline-offset-2">
+          {BOOKING_SOURCE_TITLE}
           <span className="sr-only"> (si apre in una nuova scheda)</span>
         </a>
       </p>

@@ -46,8 +46,11 @@ export function Reflusso() {
         transition={slow}
       />
       <motion.g initial={false} animate={{ opacity: step === 2 ? 1 : 0 }} transition={t}>
-        <g transform="translate(98 92)" className="idle-pulse">
-          <ellipse rx="20" ry="30" fill={C.highlightSoft} opacity="0.45" />
+        {/* La classe idle-* sta su un gruppo interno: l'animazione CSS sostituirebbe il translate */}
+        <g transform="translate(98 92)">
+          <g className="idle-pulse">
+            <ellipse rx="20" ry="30" fill={C.highlightSoft} opacity="0.45" />
+          </g>
         </g>
       </motion.g>
 

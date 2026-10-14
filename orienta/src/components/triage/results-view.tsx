@@ -7,7 +7,7 @@ import { useState, type ComponentType, type Ref, type SVGProps } from "react";
 import bussola from "@/assets/illustrations/passo-risultati.webp";
 import nessunRisultato from "@/assets/illustrations/stato-nessun-risultato.webp";
 import { CURE_NON_URGENTI } from "@data/emergency/helplines";
-import { getSpecialty, type SpecialtyId } from "@data/vocab/specialties";
+import { getSpecialty } from "@data/vocab/specialties";
 import { symptomLabel } from "@data/vocab/symptoms";
 import { HelplineCard } from "@/components/emergency/emergency-panel";
 import { SlidePreview } from "@/components/slide/slide-preview";
@@ -22,6 +22,7 @@ import { URGENCY, type UrgencyLevel } from "@/lib/design/urgency";
 import { CONDITION_ILLUSTRATIONS } from "@/lib/illustrations/conditions";
 import { URGENCY_ILLUSTRATIONS, URGENCY_MODELS } from "@/lib/illustrations/urgency";
 import type { Compatibility, ResultCondition, TriageResponse } from "@/lib/triage/schema";
+import { specialistForAge } from "@/lib/triage/referral";
 import type { HistoryEntry } from "@/lib/storage/history";
 import { DoctorSummary } from "./doctor-summary";
 import { SaveToHistory } from "./save-history";
@@ -39,11 +40,6 @@ const COMPATIBILITY: Record<Compatibility, { label: string; bars: number }> = {
   media: { label: "Compatibilità media", bars: 2 },
   bassa: { label: "Compatibilità bassa", bars: 1 },
 };
-
-/** Sotto i 14 anni il riferimento per tutto ciò che è «medico di base» è il pediatra */
-function specialistFor(id: SpecialtyId, age: number): SpecialtyId {
-  return age < 14 && id === "medico-di-base" ? "pediatra" : id;
-}
 
 export function ResultsView({
   result,
@@ -333,7 +329,7 @@ function ConditionCard({
   const [open, setOpen] = useState(false);
   const titleId = `risultato-${condition.id}`;
   const detailsId = `perche-${condition.id}`;
-  const specialist = getSpecialty(specialistFor(condition.specialistId, age));
+  const specialist = getSpecialty(specialistForAge(condition.specialistId, age));
   const params = new URLSearchParams({ specialista: specialist.id, condizione: condition.id });
 
   return (

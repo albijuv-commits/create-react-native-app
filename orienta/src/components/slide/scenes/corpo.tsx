@@ -85,8 +85,11 @@ export function Corpo({ params }: { params: SceneParams<"corpo"> }) {
 
       {/* Cause: movimento brusco, sollevamento sbagliato, postura mantenuta a lungo */}
       <motion.g initial={false} animate={{ opacity: step === 1 ? 1 : 0 }} transition={t}>
-        <g transform={`translate(${cx} ${cy})`} className="idle-pulse">
-          <path d="M0 -9 L2.4 -2.4 L9 0 L2.4 2.4 L0 9 L-2.4 2.4 L-9 0 L-2.4 -2.4 Z" fill={C.pollen} stroke={C.pollenDark} strokeWidth="0.8" />
+        {/* La classe idle-* sta su un gruppo interno: l'animazione CSS sostituirebbe il translate */}
+        <g transform={`translate(${cx} ${cy})`}>
+          <g className="idle-pulse">
+            <path d="M0 -9 L2.4 -2.4 L9 0 L2.4 2.4 L0 9 L-2.4 2.4 L-9 0 L-2.4 -2.4 Z" fill={C.pollen} stroke={C.pollenDark} strokeWidth="0.8" />
+          </g>
         </g>
         {back && (
           <>

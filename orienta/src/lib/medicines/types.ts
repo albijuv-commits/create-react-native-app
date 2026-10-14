@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { euBrandSchema } from "./eu-brand";
 import { FORM_FAMILIES } from "./forms";
 import { SUPPLY_CODES } from "./regime";
 
@@ -140,6 +141,42 @@ export type CatalogPage = z.infer<typeof catalogPageSchema>;
 
 export const listRequestSchema = z.object({ aics: z.array(aic).min(1).max(60) });
 export const listResponseSchema = z.object({ items: z.array(medicineSummarySchema) });
+
+/* ------------------------------------------------------- Scheda (app nativa) */
+
+/** La confezione con i dati che servono alla scheda oltre al riepilogo: ATC, prezzo di riferimento, foglietto */
+export const medicineDetailSchema = medicineSummarySchema.extend({
+  atc: z.string().nullable(),
+  atcGroup: z.string().nullable(),
+  atcClass: z.string().nullable(),
+  referencePrice: z.number().nonnegative().nullable(),
+  leafletUrl: z.url({ protocol: /^https$/ }).nullable(),
+});
+export type MedicineDetailData = z.infer<typeof medicineDetailSchema>;
+
+/** Lo stesso principio attivo negli altri Paesi europei (elenco EMA), già filtrato per via di somministrazione */
+export const euBrandsViewSchema = z.object({
+  source: z.string(),
+  url: z.url(),
+  updated: z.string().nullable(),
+  products: z.number().int().min(0),
+  countries: z.array(z.string()),
+  brands: z.array(euBrandSchema),
+  sameRoute: z.boolean(),
+});
+export type EuBrandsViewData = z.infer<typeof euBrandsViewSchema>;
+
+export const detailRequestSchema = z.object({ aic });
+
+/** Tutta la scheda di una confezione in una risposta: equivalenti, catalogo, marchi e aziende, Europa */
+export const medicineDetailResponseSchema = z.object({
+  medicine: medicineDetailSchema,
+  equivalents: z.array(medicineSummarySchema),
+  info: catalogInfoSchema,
+  brands: brandsInfoSchema.nullable(),
+  europe: euBrandsViewSchema.nullable(),
+});
+export type MedicineDetailResponse = z.infer<typeof medicineDetailResponseSchema>;
 
 /** Il prezzo dei farmaci senza ricetta può cambiare da farmacia a farmacia */
 export function isIndicativePrice(m: Pick<MedicineSummary, "supplyCode" | "price">): boolean {

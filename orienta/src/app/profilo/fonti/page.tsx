@@ -4,7 +4,7 @@ import { CURE_NON_URGENTI, EMERGENCY_NUMBER, TELEFONO_AMICO, TELEFONO_AZZURRO } 
 import { CONDITIONS } from "@data/conditions";
 import euBrands from "@data/medicines/eu-brands.json";
 import photos from "@data/medicines/photos.json";
-import { BOOKING_SOURCE } from "@/components/doctors/booking-info";
+import { BOOKING_SOURCE } from "@/lib/doctors/booking";
 import { CatalogDates } from "@/components/medicines/catalog-info";
 import { External, InfoPage, InfoSection } from "@/components/profile/info-page";
 import { formatItalianDate, SOURCES_CHECKED_AT } from "@/lib/conditions/catalog";

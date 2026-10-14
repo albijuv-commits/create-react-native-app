@@ -31,6 +31,11 @@ function answerText(a: Answer): string {
   }
 }
 
+/** Le righe che fanno da titolo di sezione nel testo del riepilogo (per il PDF della web app e dell'app nativa) */
+export function isSummaryHeading(line: string, index: number): boolean {
+  return index === 0 || (index > 1 && !line.startsWith("- ") && !line.startsWith("Metodo:") && line.length <= 90);
+}
+
 /**
  * Il riepilogo da mostrare o consegnare al medico: dati di base, cosa ha riferito la persona,
  * le risposte e le possibilità emerse. In testo semplice, da copiare o da mettere in un PDF.

@@ -1,0 +1,72 @@
+diff --git a/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/GroupView.java b/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/GroupView.java
+index 1c90e0a..ad74622 100644
+--- a/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/GroupView.java
++++ b/node_modules/react-native-svg/android/src/main/java/com/horcrux/svg/GroupView.java
+@@ -95,22 +95,28 @@ class GroupView extends RenderableView {
+     final GroupView self = this;
+     final RectF groupRect = new RectF();
+ 
+-    if (mOpacity != 1) {
+-      if (mLayerBitmap == null) {
+-        mLayerBitmap =
+-            Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
++    // The layer canvas belongs to this group only. It used to point to the parent's canvas
++    // while the opacity was 1: when the opacity dropped again, setBitmap reset the parent's
++    // save stack and the parent's restore() threw "Underflow in restore".
++    final boolean useLayer = mOpacity != 1;
++    final Canvas drawCanvas;
++    if (useLayer) {
++      if (mLayerBitmap != null) {
++        mLayerBitmap.recycle();
++      }
++      mLayerBitmap =
++          Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
++      if (mLayerCanvas == null) {
+         mLayerCanvas = new Canvas(mLayerBitmap);
+       } else {
+-        mLayerBitmap.recycle();
+-        mLayerBitmap =
+-            Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.ARGB_8888);
+         mLayerCanvas.setBitmap(mLayerBitmap);
+       }
+       // Copy current matrix from original canvas
+       mLayerCanvas.save();
+       mLayerCanvas.setMatrix(canvas.getMatrix());
++      drawCanvas = mLayerCanvas;
+     } else {
+-      mLayerCanvas = canvas;
++      drawCanvas = canvas;
+     }
+ 
+     elements = new ArrayList<>();
+@@ -129,15 +135,15 @@ class GroupView extends RenderableView {
+           ((RenderableView) node).mergeProperties(self);
+         }
+ 
+-        int count = node.saveAndSetupCanvas(mLayerCanvas, mCTM);
+-        node.render(mLayerCanvas, paint, opacity);
++        int count = node.saveAndSetupCanvas(drawCanvas, mCTM);
++        node.render(drawCanvas, paint, opacity);
+         RectF r = node.getClientRect();
+ 
+         if (r != null) {
+           groupRect.union(r);
+         }
+ 
+-        node.restoreCanvas(mLayerCanvas, count);
++        node.restoreCanvas(drawCanvas, count);
+ 
+         if (node instanceof RenderableView) {
+           ((RenderableView) node).resetProperties();
+@@ -167,9 +173,9 @@ class GroupView extends RenderableView {
+       }
+     }
+ 
+-    if (mOpacity != 1) {
++    if (useLayer) {
+       // Restore copied canvas and temporary reset original canvas matrix to draw bitmap 1:1
+-      mLayerCanvas.restore();
++      drawCanvas.restore();
+       int saveCount = canvas.save();
+       canvas.setMatrix(null);
+       mLayerPaint.setAlpha((int) (mOpacity * 255));
