@@ -8,7 +8,7 @@ import { FieldError } from "~/components/triage/parts";
 import { Button } from "~/components/ui/button";
 import { Txt } from "~/components/ui/text";
 import { apiBaseUrl, findPlace } from "~/lib/api";
-import { currentPosition, LocationError } from "~/lib/location";
+import { currentPosition, LocationError, locationMessages } from "~/lib/location";
 import { useTheme } from "~/theme/theme";
 import { textStyle } from "~/theme/type";
 import { OsmCredit } from "./credits";
@@ -47,13 +47,13 @@ export function LocationPicker({ origin, onOrigin }: { origin: Origin | null; on
     setBusy("posizione");
     setError(null);
     try {
-      const point = await currentPosition();
+      const point = await currentPosition({ placeSearch: canSearchPlaces });
       choose({ kind: "gps", label: "La tua posizione", ...point });
     } catch (e) {
       setError(
         e instanceof LocationError
           ? { message: e.message, settings: e.settings }
-          : { message: "Non riusciamo a trovare la tua posizione in questo momento. Scrivi la città o il CAP.", settings: false },
+          : { message: locationMessages(canSearchPlaces).unavailable, settings: false },
       );
     } finally {
       setBusy(null);

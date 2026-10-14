@@ -5,7 +5,7 @@ import { useEffect, useState, type Ref } from "react";
 import { Pressable, StyleSheet, View, type Text } from "react-native";
 import Animated, { Easing, FadeIn, FadeInDown, useAnimatedStyle, useSharedValue, withDelay, withSpring, withTiming } from "react-native-reanimated";
 import { CURE_NON_URGENTI } from "@data/emergency/helplines";
-import { getSpecialty, type SpecialtyId } from "@data/vocab/specialties";
+import { getSpecialty } from "@data/vocab/specialties";
 import { symptomLabel } from "@data/vocab/symptoms";
 import bussola from "@/assets/illustrations/passo-risultati.webp";
 import nessunRisultato from "@/assets/illustrations/stato-nessun-risultato.webp";
@@ -13,6 +13,7 @@ import type { InterviewCondition } from "@/lib/conditions/knowledge-base";
 import { URGENCY, type UrgencyLevel } from "@/lib/design/urgency";
 import type { HistoryEntry } from "@/lib/storage/history";
 import type { Compatibility, ResultCondition, TriageResponse } from "@/lib/triage/schema";
+import { specialistForAge } from "@/lib/triage/referral";
 import { HelplineCard } from "~/components/emergency/emergency";
 import { SlidePreview } from "~/components/slide/slide-preview";
 import { Button } from "~/components/ui/button";
@@ -36,11 +37,6 @@ const COMPATIBILITY: Record<Compatibility, { label: string; bars: number }> = {
   media: { label: "Compatibilità media", bars: 2 },
   bassa: { label: "Compatibilità bassa", bars: 1 },
 };
-
-/** Sotto i 14 anni il riferimento per tutto ciò che è «medico di base» è il pediatra */
-function specialistFor(id: SpecialtyId, age: number): SpecialtyId {
-  return age < 14 && id === "medico-di-base" ? "pediatra" : id;
-}
 
 /** Va alla sezione Medici con lo specialista già scelto (i parametri restano nell'app) */
 function findDoctors(specialista: string, condizione?: string) {
@@ -317,7 +313,7 @@ function ConditionCard({
 }) {
   const { colors } = useTheme();
   const [open, setOpen] = useState(false);
-  const specialist = getSpecialty(specialistFor(condition.specialistId, age));
+  const specialist = getSpecialty(specialistForAge(condition.specialistId, age));
 
   return (
     <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
