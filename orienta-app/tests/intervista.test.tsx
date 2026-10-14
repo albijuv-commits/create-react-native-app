@@ -271,6 +271,22 @@ describe("intervista con l'AI", () => {
     expect(screen.getByText(/preparati con l'intelligenza artificiale/)).toBeOnTheScreen();
   });
 
+  it("a un adulto una condizione affidata al pediatra indica il medico di base", async () => {
+    const user = setup();
+    const varicella = CONDITIONS.find((c) => c.id === "varicella")!;
+    expect(varicella.specialistId).toBe("pediatra");
+    api.aiAvailable.mockResolvedValue(true);
+    api.postStep.mockResolvedValue(results(varicella.id));
+    await start(user, { ai: true });
+    await describe_(user, "Ho mal di gola");
+    await user.press(screen.getByRole("button", { name: "Continua con le domande" }));
+    await screen.findByRole("heading", { name: CORE_QUESTIONS[0]!.text });
+    await answerAll(user);
+    expect(screen.getByRole("heading", { name: `1. ${varicella.name}` })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Trova uno specialista: Medico di base" })).toBeOnTheScreen();
+    expect(screen.queryByText("Pediatra")).not.toBeOnTheScreen();
+  });
+
   it("se il servizio resta in silenzio, dopo un minuto si può riprovare o continuare con le regole", async () => {
     const user = setup();
     api.aiAvailable.mockResolvedValue(true);
