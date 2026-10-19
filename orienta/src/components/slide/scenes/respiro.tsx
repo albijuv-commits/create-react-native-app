@@ -157,8 +157,11 @@ export function VieAereeSonno() {
       </g>
       {/* Micro-risveglio del cervello */}
       <motion.g initial={false} animate={{ opacity: step === 3 ? 1 : 0 }} transition={t}>
-        <g transform="translate(112 32)" className="idle-pulse">
-          <path d="M0 -8 L2 -2 L8 0 L2 2 L0 8 L-2 2 L-8 0 L-2 -2 Z" fill={C.pollen} stroke={C.pollenDark} strokeWidth="0.8" />
+        {/* La classe idle-* sta su un gruppo interno: l'animazione CSS sostituirebbe il translate */}
+        <g transform="translate(112 32)">
+          <g className="idle-pulse">
+            <path d="M0 -8 L2 -2 L8 0 L2 2 L0 8 L-2 2 L-8 0 L-2 -2 Z" fill={C.pollen} stroke={C.pollenDark} strokeWidth="0.8" />
+          </g>
         </g>
       </motion.g>
       <SceneLabel x={100} y={164}>gola</SceneLabel>

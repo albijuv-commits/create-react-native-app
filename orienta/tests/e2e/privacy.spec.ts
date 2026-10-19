@@ -20,6 +20,8 @@ async function aiAvailable(page: Page, onPost: Parameters<Page["route"]>[1]) {
 
 test.describe("Privacy delle pagine dei sintomi", () => {
   test("senza il consenso all'AI i sintomi restano sul dispositivo: niente terze parti, niente cookie", async ({ page, context }) => {
+    // Tre pagine e poi un'intervista completa: da solo dura circa 25 secondi, con tutti i test in parallelo di più
+    test.slow();
     const sent = recordRequests(page);
     let posts = 0;
     await aiAvailable(page, (route) => {

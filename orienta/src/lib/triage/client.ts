@@ -3,16 +3,17 @@ import { triageResponseSchema, type TriageRequest, type TriageResponse } from ".
 
 /**
  * Chiamate del browser alla route /api/triage. La chiave dell'AI resta sul server; anche qui
- * ogni risposta passa da Zod prima di arrivare all'interfaccia.
+ * ogni risposta passa da Zod prima di arrivare all'interfaccia. `base` è l'indirizzo della web app:
+ * vuoto nel browser (stessa origine), quello pubblicato nell'app nativa.
  */
 
 const availabilitySchema = z.object({ ai: z.boolean() });
 const errorSchema = z.object({ kind: z.literal("error"), message: z.string().max(300) });
 
 /** true se il server può usare l'AI. In caso di dubbio no: si usa il metodo semplificato. */
-export async function fetchAiAvailability(signal?: AbortSignal): Promise<boolean> {
+export async function fetchAiAvailability(signal?: AbortSignal, base = ""): Promise<boolean> {
   try {
-    const res = await fetch("/api/triage", { cache: "no-store", signal });
+    const res = await fetch(`${base}/api/triage`, { cache: "no-store", signal });
     if (!res.ok) return false;
     const parsed = availabilitySchema.safeParse(await res.json());
     return parsed.success && parsed.data.ai;
@@ -24,10 +25,10 @@ export async function fetchAiAvailability(signal?: AbortSignal): Promise<boolean
 export class TriageRequestError extends Error {}
 
 /** Un passo dell'intervista con l'AI: da chiamare solo dopo il consenso esplicito della persona. */
-export async function postTriageStep(req: TriageRequest, signal?: AbortSignal): Promise<TriageResponse> {
+export async function postTriageStep(req: TriageRequest, signal?: AbortSignal, base = ""): Promise<TriageResponse> {
   let res: Response;
   try {
-    res = await fetch("/api/triage", {
+    res = await fetch(`${base}/api/triage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...req, consent: true }),

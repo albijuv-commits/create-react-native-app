@@ -3,16 +3,17 @@
  * (scene "corpo" e, nella fase 3, la mappa interattiva fronte/retro).
  */
 
+/** `short`: l'etichetta breve dei riquadri del filtro */
 export const BODY_AREAS = [
-  { id: "testa", label: "Testa" },
-  { id: "orl", label: "Occhi, naso, orecchie e gola" },
-  { id: "respiro", label: "Petto e respiro" },
-  { id: "digestione", label: "Pancia e digestione" },
-  { id: "urinario", label: "Vie urinarie" },
-  { id: "pelle", label: "Pelle" },
-  { id: "muscoli", label: "Ossa, muscoli e articolazioni" },
-  { id: "mente", label: "Mente e sonno" },
-  { id: "corpo", label: "Tutto il corpo" },
+  { id: "testa", label: "Testa", short: "Testa" },
+  { id: "orl", label: "Occhi, naso, orecchie e gola", short: "Occhi, naso, gola" },
+  { id: "respiro", label: "Petto e respiro", short: "Petto e respiro" },
+  { id: "digestione", label: "Pancia e digestione", short: "Pancia" },
+  { id: "urinario", label: "Vie urinarie", short: "Vie urinarie" },
+  { id: "pelle", label: "Pelle", short: "Pelle" },
+  { id: "muscoli", label: "Ossa, muscoli e articolazioni", short: "Ossa e muscoli" },
+  { id: "mente", label: "Mente e sonno", short: "Mente e sonno" },
+  { id: "corpo", label: "Tutto il corpo", short: "Tutto il corpo" },
 ] as const;
 
 export type BodyAreaId = (typeof BODY_AREAS)[number]["id"];

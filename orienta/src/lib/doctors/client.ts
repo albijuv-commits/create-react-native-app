@@ -10,7 +10,8 @@ import {
 
 /**
  * Chiamate del browser alle route /api/medici e /api/luoghi. La posizione parte già arrotondata
- * a circa 100 metri; ogni risposta passa da Zod prima di arrivare all'interfaccia.
+ * a circa 100 metri; ogni risposta passa da Zod prima di arrivare all'interfaccia. `base` è
+ * l'indirizzo della web app: vuoto nel browser (stessa origine), quello pubblicato nell'app nativa.
  */
 export class DoctorsRequestError extends Error {}
 
@@ -35,15 +36,15 @@ async function post(url: string, body: unknown, signal?: AbortSignal): Promise<u
   return json;
 }
 
-export async function fetchDoctors(req: DoctorSearchRequest, signal?: AbortSignal): Promise<DoctorSearchResponse> {
-  const json = await post("/api/medici", { ...req, ...roundPoint(req) }, signal);
+export async function fetchDoctors(req: DoctorSearchRequest, signal?: AbortSignal, base = ""): Promise<DoctorSearchResponse> {
+  const json = await post(`${base}/api/medici`, { ...req, ...roundPoint(req) }, signal);
   const parsed = doctorSearchResponseSchema.safeParse(json);
   if (!parsed.success) throw new DoctorsRequestError("La risposta del servizio non è valida.");
   return parsed.data;
 }
 
-export async function fetchPlace(q: string, signal?: AbortSignal): Promise<Place | null> {
-  const json = await post("/api/luoghi", { q }, signal);
+export async function fetchPlace(q: string, signal?: AbortSignal, base = ""): Promise<Place | null> {
+  const json = await post(`${base}/api/luoghi`, { q }, signal);
   const parsed = placeResponseSchema.safeParse(json);
   if (!parsed.success) throw new DoctorsRequestError("La risposta del servizio non è valida.");
   return parsed.data.place;

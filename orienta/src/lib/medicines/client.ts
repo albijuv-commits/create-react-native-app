@@ -4,14 +4,19 @@ import {
   catalogInfoSchema,
   catalogPageSchema,
   listResponseSchema,
+  medicineDetailResponseSchema,
   type BrandsResponse,
   type CatalogInfo,
   type CatalogPage,
   type CatalogQuery,
+  type MedicineDetailResponse,
   type MedicineSummary,
 } from "./types";
 
-/** Chiamate del browser alle route del catalogo; ogni risposta passa da Zod. */
+/**
+ * Chiamate alle route del catalogo; ogni risposta passa da Zod. `base` è l'indirizzo della web app:
+ * vuoto nel browser (stessa origine), quello pubblicato nell'app nativa.
+ */
 export class CatalogRequestError extends Error {}
 
 const errorSchema = z.object({ message: z.string().max(300) });
@@ -38,21 +43,28 @@ async function post(url: string, body: unknown, signal?: AbortSignal): Promise<u
   return json;
 }
 
-export async function fetchCatalog(query: CatalogQuery, signal?: AbortSignal): Promise<{ info: CatalogInfo; page: CatalogPage }> {
-  const parsed = searchResponseSchema.safeParse(await post("/api/farmaci", query, signal));
+export async function fetchCatalog(query: CatalogQuery, signal?: AbortSignal, base = ""): Promise<{ info: CatalogInfo; page: CatalogPage }> {
+  const parsed = searchResponseSchema.safeParse(await post(`${base}/api/farmaci`, query, signal));
   if (!parsed.success) throw new CatalogRequestError("La risposta del catalogo non è valida.");
   return parsed.data;
 }
 
-export async function fetchMedicines(aics: readonly string[], signal?: AbortSignal): Promise<MedicineSummary[]> {
+export async function fetchMedicines(aics: readonly string[], signal?: AbortSignal, base = ""): Promise<MedicineSummary[]> {
   if (!aics.length) return [];
-  const parsed = listResponseSchema.safeParse(await post("/api/farmaci/elenco", { aics }, signal));
+  const parsed = listResponseSchema.safeParse(await post(`${base}/api/farmaci/elenco`, { aics }, signal));
   if (!parsed.success) throw new CatalogRequestError("La risposta del catalogo non è valida.");
   return parsed.data.items;
 }
 
-export async function fetchBrands(aic: string, signal?: AbortSignal): Promise<BrandsResponse> {
-  const parsed = brandsResponseSchema.safeParse(await post("/api/farmaci/marchi", { aic }, signal));
+export async function fetchBrands(aic: string, signal?: AbortSignal, base = ""): Promise<BrandsResponse> {
+  const parsed = brandsResponseSchema.safeParse(await post(`${base}/api/farmaci/marchi`, { aic }, signal));
+  if (!parsed.success) throw new CatalogRequestError("La risposta del catalogo non è valida.");
+  return parsed.data;
+}
+
+/** La scheda completa di una confezione (per l'app nativa: la web app la disegna sul server) */
+export async function fetchMedicineDetail(aic: string, signal?: AbortSignal, base = ""): Promise<MedicineDetailResponse> {
+  const parsed = medicineDetailResponseSchema.safeParse(await post(`${base}/api/farmaci/scheda`, { aic }, signal));
   if (!parsed.success) throw new CatalogRequestError("La risposta del catalogo non è valida.");
   return parsed.data;
 }
