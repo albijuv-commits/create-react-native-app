@@ -1,5 +1,6 @@
 import "server-only";
 import { TtlCache } from "@/lib/server/ttl-cache";
+import { siteUrl } from "@/lib/site-url";
 import { roundPoint } from "./geo";
 import { ExampleProvider, GooglePlacesProvider, OsmProvider, type DoctorProvider } from "./providers";
 import { DOCTOR_SOURCES, MAX_DOCTORS, type Doctor, type DoctorSearchRequest, type DoctorSearchResponse, type DoctorSource } from "./schema";
@@ -16,7 +17,7 @@ export interface SearchEnv {
 
 /** User-Agent che identifica l'app, come chiedono le regole d'uso di Overpass e Nominatim */
 export function osmUserAgent(): string {
-  const contact = process.env.OSM_CONTACT?.trim() || process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  const contact = process.env.OSM_CONTACT?.trim() || siteUrl();
   return contact ? `Orienta/0.1 (+${contact})` : "Orienta/0.1 (app di orientamento sanitario)";
 }
 

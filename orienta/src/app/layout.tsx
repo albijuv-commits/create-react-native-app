@@ -5,6 +5,7 @@ import { SkipLink } from "@/components/layout/skip-link";
 import { TopBar } from "@/components/layout/top-bar";
 import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
 import { PREFS_BOOT_SCRIPT } from "@/lib/prefs/prefs";
+import { siteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 const atkinson = Atkinson_Hyperlegible({
@@ -16,8 +17,7 @@ const atkinson = Atkinson_Hyperlegible({
 
 export const metadata: Metadata = {
   // Indirizzo pubblico dell'app, per i link assoluti delle anteprime di condivisione
-  // Vuota in .env.local (come in .env.example) vale come assente: new URL("") farebbe fallire ogni pagina
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000"),
+  metadataBase: new URL(siteUrl() ?? "http://localhost:3000"),
   title: { default: "Orienta", template: "%s · Orienta" },
   description:
     "Orienta ti aiuta a capire i tuoi sintomi e a trovare il professionista giusto. Non sostituisce un medico.",

@@ -1,0 +1,5 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run import:aifa || echo 'Import AIFA non riuscito: il Mercato userà il campione di esempio'; npm run build",
+  "regions": ["fra1"]
+}
