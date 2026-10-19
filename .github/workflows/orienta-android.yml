@@ -69,6 +69,12 @@ jobs:
             echo "::warning title=Informativa privacy da completare::Mancano le variabili EXPO_PUBLIC_PRIVACY_CONTROLLER o EXPO_PUBLIC_PRIVACY_CONTACT."
           fi
 
+      - name: Spazio su disco
+        # La build per due architetture occupa diversi GB: via gli strumenti preinstallati che qui non servono
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost /opt/hostedtoolcache/CodeQL
+          df -h /
+
       - uses: actions/checkout@v5
 
       - uses: actions/setup-node@v5
