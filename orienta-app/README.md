@@ -33,6 +33,7 @@ Per l'intervista con l'intelligenza artificiale, la ricerca dei medici e il cata
 - `src/theme/`: colori della web app in chiaro e scuro, scala tipografica con Atkinson Hyperlegible, preferenze di tema e dimensione del testo (salvate sul telefono con lo stesso schema della web app).
 - Alias: `~/` è il codice dell'app, `@/` e `@data/` sono `../orienta/src` e `../orienta/data`. `metro.config.js` fa vedere a Metro i file condivisi e risolve i pacchetti che usano (per esempio `zod`) dai `node_modules` dell'app, così ogni pacchetto esiste in una sola copia. I moduli `server-only` della web app non si importano mai: la base di conoscenza sta in `lib/conditions/knowledge-base.ts`.
 - `patches/`: correzioni alle librerie, applicate da `patch-package` a ogni `npm install`. Per ora una sola: in react-native-svg 15.15.4 un gruppo con opacità animata usava su Android la tela del gruppo che lo contiene, e quando l'opacità tornava sotto 1 l'app si chiudeva («Underflow in restore»). Succedeva con le anteprime del vetrino nell'elenco delle Condizioni. Quando si aggiorna react-native-svg va ricontrollata: se la nuova versione corregge il problema il file si cancella, altrimenti si rifà con `npx patch-package react-native-svg`.
+- `scripts/build-android-apk.sh`: costruisce l'APK per Android, sul proprio computer o su GitHub (vedi [APK su GitHub](#apk-su-github))
 
 ## Il vetrino animato
 
@@ -126,21 +127,34 @@ Gli identificativi dell'app (`ios.bundleIdentifier` e `android.package` in `app.
 
 Prima di pubblicare l'app negli store valgono le stesse verifiche della web app: [nota sul Regolamento UE sui dispositivi medici](../orienta/README.md#regolamento-ue-sui-dispositivi-medici-mdr), dati del titolare per l'informativa privacy, revisione medica delle schede. In più vanno compilate, in modo coerente con l'informativa, la sezione privacy dell'App Store e quella sulla sicurezza dei dati di Google Play.
 
-### APK di prova, senza account
+### APK su GitHub
 
-Per provare l'app su un telefono Android senza un account Expo si può costruire l'APK sul proprio computer. Servono il JDK 17 o successivo e l'Android SDK con la piattaforma 36, i build-tools 36.0.0, l'NDK 27.1.12297006 e CMake 3.22.1, cioè le versioni che chiede React Native 0.86.
+Il workflow [`orienta-android.yml`](../.github/workflows/orienta-android.yml) costruisce l'APK su GitHub e lo pubblica nelle Releases del repository a ogni aggiornamento di `main` che tocca l'app o il codice condiviso, oppure a mano (Actions → Orienta Android → Run workflow). Ogni release contiene `Orienta.apk`, e l'ultima versione si scarica sempre da `https://github.com/<proprietario>/<repository>/releases/latest/download/Orienta.apk`. Il numero di versione Android è quello del run, così ogni build si installa sopra la precedente senza perdere i dati salvati sul telefono.
+
+Da fare una volta:
+
+1. Se il repository è un fork, GitHub tiene spente le Actions: nella scheda Actions premi «I understand my workflows, go ahead and enable them».
+2. In Settings → Secrets and variables → Actions, scheda Secrets, aggiungi la chiave di firma: `ANDROID_KEYSTORE_BASE64` (il keystore PKCS12 in base64, con la chiave sotto l'alias `orienta`) e `ANDROID_KEYSTORE_PASSWORD` (la sua password). Senza, il workflow si ferma: un APK pubblico non va firmato con la chiave di prova, che è uguale in tutti i progetti generati. Per crearne una:
+
+   ```bash
+   keytool -genkeypair -storetype PKCS12 -keystore orienta-release.keystore -alias orienta \
+     -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Orienta, C=IT"
+   base64 -w0 orienta-release.keystore      # il testo da incollare in ANDROID_KEYSTORE_BASE64
+   ```
+
+   Keystore e password vanno conservati in un posto sicuro: senza, le versioni nuove non si installano sopra quelle già sui telefoni.
+3. Nella scheda Variables aggiungi `EXPO_PUBLIC_API_URL` con l'indirizzo della web app pubblicata (vedi [Pubblicare su Vercel](../orienta/README.md#pubblicare-su-vercel)), ed `EXPO_PUBLIC_PRIVACY_CONTROLLER` ed `EXPO_PUBLIC_PRIVACY_CONTACT` con titolare e contatto per l'informativa privacy. Non sono segreti: finiscono nell'app. Senza `EXPO_PUBLIC_API_URL` l'app usa le regole fisse e i DATI DI ESEMPIO, e la release lo scrive.
+
+### APK sul proprio computer
+
+Lo stesso script del workflow costruisce l'APK anche senza GitHub e senza account. Servono il JDK 17 o successivo e l'Android SDK con la piattaforma 36, i build-tools 36.0.0, l'NDK 27.1.12297006 e CMake 3.22.1, cioè le versioni che chiede React Native 0.86.
 
 ```bash
-npx expo prebuild --platform android     # genera android/, che resta fuori dal repository
-cd android
-./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a \
-  -Pexpo.useLegacyPackaging=true \
-  -Pandroid.enableMinifyInReleaseBuilds=true \
-  -Pandroid.enableShrinkResourcesInReleaseBuilds=true
-# l'APK è in android/app/build/outputs/apk/release/app-release.apk
+ANDROID_HOME=~/Android/Sdk scripts/build-android-apk.sh
+# l'APK è in android/app/build/outputs/apk/release/Orienta.apk
 ```
 
-- `prebuild` cambia anche gli script `android` e `ios` di `package.json`: quella modifica non va salvata.
-- `arm64-v8a` limita l'APK ai telefoni a 64 bit, cioè quasi tutti quelli in uso. Le altre tre opzioni comprimono le librerie native e riducono il codice con R8: l'APK passa da circa 50 a meno di 30 MB.
-- L'APK è firmato con la chiave di prova del progetto generato: si installa sul telefono (consentendo l'installazione di app sconosciute), ma per Google Play serve la build `production` di EAS.
+- Lo script genera `android/` con `expo prebuild` (la cartella resta fuori dal repository) e lascia `app.json` e `package.json` come li ha trovati.
+- L'APK contiene le librerie native per `arm64-v8a` e `armeabi-v7a`, cioè per tutti i telefoni Android; con `ORIENTA_ABIS=arm64-v8a` vale solo per quelli a 64 bit, quasi tutti, ed è più piccolo. Le librerie sono compresse e R8 riduce il codice.
+- Con `ORIENTA_KEYSTORE` (il percorso del keystore) e `ORIENTA_KEYSTORE_PASSWORD` l'APK è firmato con la chiave di rilascio. Senza, resta firmato con la chiave di prova del progetto generato: si installa sul telefono (consentendo l'installazione di app sconosciute), ma non va distribuito. Per Google Play serve la build `production` di EAS.
 - Senza `EXPO_PUBLIC_API_URL` l'app usa le regole fisse sul telefono e i DATI DI ESEMPIO.

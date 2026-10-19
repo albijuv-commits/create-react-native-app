@@ -29,6 +29,8 @@ if [ -n "${ORIENTA_KEYSTORE:-}" ] && [ -z "${ORIENTA_KEYSTORE_PASSWORD:-}" ]; th
   echo "Con ORIENTA_KEYSTORE serve anche ORIENTA_KEYSTORE_PASSWORD" >&2
   exit 1
 fi
+# Un a capo finito nella password copiandola (per esempio in un secret di GitHub) non ne fa parte
+export ORIENTA_KEYSTORE_PASSWORD="${ORIENTA_KEYSTORE_PASSWORD//[$'\r\n']/}"
 
 # prebuild riscrive gli script di package.json e il numero di versione va in app.json:
 # alla fine i due file tornano com'erano

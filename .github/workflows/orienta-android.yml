@@ -50,7 +50,14 @@ jobs:
             echo "::error title=Manca la chiave di firma::Aggiungi i secret ANDROID_KEYSTORE_BASE64 e ANDROID_KEYSTORE_PASSWORD (orienta-app/README.md, «APK su GitHub»)."
             exit 1
           fi
-          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/orienta-release.keystore"
+          # Spazi e a capo arrivati con il copia e incolla non fanno parte della chiave
+          printf '%s' "$KEYSTORE_BASE64" | tr -d ' \r\n\t' | base64 --decode > "$RUNNER_TEMP/orienta-release.keystore"
+          export KEYSTORE_PASSWORD="${KEYSTORE_PASSWORD//[$'\r\n']/}"
+          # Una chiave sbagliata si scopre subito, non dopo mezz'ora di build
+          if ! keytool -list -keystore "$RUNNER_TEMP/orienta-release.keystore" -storepass:env KEYSTORE_PASSWORD -alias orienta > /dev/null; then
+            echo "::error title=Chiave di firma non valida::Controlla ANDROID_KEYSTORE_BASE64 e ANDROID_KEYSTORE_PASSWORD: il keystore deve contenere la chiave con l'alias «orienta»."
+            exit 1
+          fi
           echo "ORIENTA_KEYSTORE=$RUNNER_TEMP/orienta-release.keystore" >> "$GITHUB_ENV"
 
       - name: Collegamento al servizio
