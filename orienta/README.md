@@ -123,14 +123,25 @@ Si impostano in `.env.local` (vedi `.env.example`). Nessuna chiave arriva al bro
 | `DOCTORS_PROVIDER` | Facoltativa: forza la fonte dei medici (`google`, `osm`, `esempio`) |
 | `OVERPASS_URL` | Facoltativa: istanze Overpass separate da virgole (per un uso reale, un'istanza propria) |
 | `NOMINATIM_URL` | Facoltativa: servizio per cercare città e CAP |
-| `OSM_CONTACT` | Facoltativa: contatto del gestore nel User-Agent verso Overpass e Nominatim |
-| `NEXT_PUBLIC_SITE_URL` | Indirizzo pubblico dell'app, per i link assoluti delle anteprime di condivisione |
+| `OSM_CONTACT` | Facoltativa: contatto del gestore nel User-Agent verso Overpass e Nominatim; se manca vale l'indirizzo pubblico dell'app |
+| `NEXT_PUBLIC_SITE_URL` | Indirizzo pubblico dell'app, per i link assoluti delle anteprime di condivisione; su Vercel, se manca, vale l'indirizzo di produzione del progetto |
 | `MEDICINES_DB_PATH` | Facoltativa: percorso del database dei medicinali (predefinito `data/medicines/orienta.db`) |
 | `MEDICINES_SOURCE` | Facoltativa: `esempio` forza il campione di esempio anche se c'è il database (i test end-to-end lo usano) |
 | `PRIVACY_CONTROLLER` | Da impostare prima di pubblicare: titolare del trattamento mostrato nell'informativa privacy (nome o ragione sociale e indirizzo) |
 | `PRIVACY_CONTACT` | Da impostare prima di pubblicare: contatto per la privacy e per esercitare i diritti (email o pagina web) |
 
 Solo per i test end-to-end: `CHROMIUM_PATH` (un Chromium già installato) ed `E2E_BASE_URL` (un server già avviato invece della build di produzione).
+
+## Pubblicare su Vercel
+
+L'app nativa usa le route server di questa web app: per la versione vera dell'app (medici reali, catalogo completo dei farmaci, intervista con l'AI) la web app deve essere online. Su [Vercel](https://vercel.com), anche con il piano gratuito Hobby (per uso personale e non commerciale):
+
+1. Accedi con l'account GitHub, scegli Add New → Project e importa questo repository.
+2. In Root Directory scegli `orienta`. Il resto viene da `vercel.json`: la build importa il catalogo AIFA prima di `next build` (se l'import non riesce, il Mercato usa il campione di esempio, etichettato) e le funzioni girano a Francoforte (`fra1`), nell'UE e vicino a chi usa l'app.
+3. In Environment Variables aggiungi `PRIVACY_CONTROLLER` e `PRIVACY_CONTACT`, e `ANTHROPIC_API_KEY` se vuoi l'intervista con l'AI (senza, si usa il motore a regole). Le altre variabili della tabella sotto sono facoltative: `NEXT_PUBLIC_SITE_URL` vale da sola l'indirizzo di produzione del progetto, i medici arrivano da OpenStreetMap senza chiavi.
+4. Premi Deploy. L'indirizzo del progetto (per esempio `https://<progetto>.vercel.app`, in Settings → Domains) va nella variabile `EXPO_PUBLIC_API_URL` dell'app: vedi [APK su GitHub](../orienta-app/README.md#apk-su-github).
+
+A ogni aggiornamento di `main` Vercel ripubblica la web app da solo, con il catalogo AIFA del giorno. Il database dei medicinali viaggia con le funzioni che lo leggono grazie a `outputFileTracingIncludes` in `next.config.ts`. Non attivare Vercel Analytics né Speed Insights: le pagine dei sintomi non devono avere strumenti di analisi. Le istanze pubbliche di Overpass e Nominatim vanno bene per un uso personale; per un servizio aperto a tutti serve un'istanza propria (`OVERPASS_URL`, `NOMINATIM_URL`). Prima di aprire il servizio al pubblico vale la nota qui sotto.
 
 ## Regolamento UE sui dispositivi medici (MDR)
 

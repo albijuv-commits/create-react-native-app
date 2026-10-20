@@ -1,0 +1,159 @@
+# Costruisce l'APK di Orienta per Android e lo pubblica nelle Releases del repository:
+# a ogni aggiornamento di main che tocca l'app o il codice condiviso, oppure a mano
+# (Actions → Orienta Android → Run workflow). L'ultima versione si scarica sempre da
+# https://github.com/<proprietario>/<repository>/releases/latest/download/Orienta.apk
+#
+# Da impostare una volta in Settings → Secrets and variables → Actions (vedi orienta-app/README.md):
+# - secret ANDROID_KEYSTORE_BASE64 e ANDROID_KEYSTORE_PASSWORD: la chiave di firma, con l'alias
+#   «orienta». Senza, il workflow si ferma: un APK pubblico non si firma con la chiave di prova.
+# - variable EXPO_PUBLIC_API_URL: l'indirizzo della web app pubblicata, che collega l'app al
+#   servizio di Orienta (medici reali, catalogo completo dei farmaci, AI se configurata).
+#   Senza, l'app funziona con le regole fisse e i DATI DI ESEMPIO.
+# - variable EXPO_PUBLIC_PRIVACY_CONTROLLER ed EXPO_PUBLIC_PRIVACY_CONTACT: titolare del
+#   trattamento e contatto per l'informativa privacy.
+name: Orienta Android
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "orienta-app/**"
+      - "orienta/src/**"
+      - "orienta/data/**"
+      - "orienta/public/farmaci/foto/**"
+      - ".github/workflows/orienta-android.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: orienta-android-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    name: APK per Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
+      EXPO_PUBLIC_PRIVACY_CONTROLLER: ${{ vars.EXPO_PUBLIC_PRIVACY_CONTROLLER }}
+      EXPO_PUBLIC_PRIVACY_CONTACT: ${{ vars.EXPO_PUBLIC_PRIVACY_CONTACT }}
+    steps:
+      - name: Chiave di firma
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::error title=Manca la chiave di firma::Aggiungi i secret ANDROID_KEYSTORE_BASE64 e ANDROID_KEYSTORE_PASSWORD (orienta-app/README.md, «APK su GitHub»)."
+            exit 1
+          fi
+          # Spazi e a capo arrivati con il copia e incolla non fanno parte della chiave
+          printf '%s' "$KEYSTORE_BASE64" | tr -d ' \r\n\t' | base64 --decode > "$RUNNER_TEMP/orienta-release.keystore"
+          export KEYSTORE_PASSWORD="${KEYSTORE_PASSWORD//[$'\r\n']/}"
+          # Una chiave sbagliata si scopre subito, non dopo mezz'ora di build
+          if ! keytool -list -keystore "$RUNNER_TEMP/orienta-release.keystore" -storepass:env KEYSTORE_PASSWORD -alias orienta > /dev/null; then
+            echo "::error title=Chiave di firma non valida::Controlla ANDROID_KEYSTORE_BASE64 e ANDROID_KEYSTORE_PASSWORD: il keystore deve contenere la chiave con l'alias «orienta»."
+            exit 1
+          fi
+          echo "ORIENTA_KEYSTORE=$RUNNER_TEMP/orienta-release.keystore" >> "$GITHUB_ENV"
+
+      - name: Collegamento al servizio
+        run: |
+          if [ -z "$EXPO_PUBLIC_API_URL" ]; then
+            echo "::warning title=App non collegata al servizio::Manca la variabile EXPO_PUBLIC_API_URL: l'app userà le regole fisse e i DATI DI ESEMPIO."
+          fi
+          if [ -z "$EXPO_PUBLIC_PRIVACY_CONTROLLER" ] || [ -z "$EXPO_PUBLIC_PRIVACY_CONTACT" ]; then
+            echo "::warning title=Informativa privacy da completare::Mancano le variabili EXPO_PUBLIC_PRIVACY_CONTROLLER o EXPO_PUBLIC_PRIVACY_CONTACT."
+          fi
+
+      - name: Spazio su disco
+        # La build per due architetture occupa diversi GB: via gli strumenti preinstallati che qui non servono
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: orienta-app/package-lock.json
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Componenti dell'Android SDK
+        # Le versioni che chiede React Native 0.86
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" "ndk;27.1.12297006" "cmake;3.22.1" > /dev/null
+
+      - name: Dipendenze
+        working-directory: orienta-app
+        run: npm ci
+
+      - name: Build dell'APK
+        working-directory: orienta-app
+        env:
+          ORIENTA_VERSION_CODE: ${{ github.run_number }}
+          ORIENTA_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: scripts/build-android-apk.sh
+
+      - name: Pubblicazione nelle Releases
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="android-$GITHUB_RUN_NUMBER"
+          apk=orienta-app/android/app/build/outputs/apk/release/Orienta.apk
+          version=$(node -p 'require("./orienta-app/app.json").expo.version')
+          title="Orienta $version per Android (build $GITHUB_RUN_NUMBER)"
+          cert=$("$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$apk" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+          checksum=$(sha256sum "$apk" | cut -d' ' -f1)
+
+          if [ -n "$EXPO_PUBLIC_API_URL" ]; then
+            service="Collegata al servizio di Orienta ($EXPO_PUBLIC_API_URL): medici reali, catalogo completo dei farmaci e intervista con l'AI, se il servizio la offre."
+          else
+            service="Non collegata al servizio di Orienta: l'intervista usa le regole fisse sul telefono, Medici e Mercato mostrano DATI DI ESEMPIO."
+          fi
+          privacy=""
+          if [ -z "$EXPO_PUBLIC_PRIVACY_CONTROLLER" ] || [ -z "$EXPO_PUBLIC_PRIVACY_CONTACT" ]; then
+            privacy="L'informativa privacy è ancora da completare con il titolare del trattamento e il contatto."
+          fi
+
+          cat > "$RUNNER_TEMP/notes.md" <<EOF
+          $service
+
+          **Come installarla**
+          1. Sul telefono Android scarica **Orienta.apk** qui sotto.
+          2. Aprilo e, se il telefono lo chiede, consenti l'installazione di app da questa fonte.
+          3. Le versioni successive si installano sopra questa, senza perdere i dati salvati sul telefono.
+
+          Una versione di prova ricevuta in altro modo è firmata con un'altra chiave: va disinstallata prima di installare questa.
+
+          Orienta orienta, non diagnostica. È un prototipo: prima di diffonderla serve la verifica legale descritta nel README (Regolamento UE 2017/745 sui dispositivi medici e GDPR). $privacy
+
+          Commit: $GITHUB_SHA
+          SHA-256 dell'APK: $checksum
+          Certificato di firma (SHA-256): $cert
+          EOF
+
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            # Un run ripetuto sostituisce l'APK della stessa build
+            gh release upload "$tag" "$apk" --clobber --repo "$GITHUB_REPOSITORY"
+            gh release edit "$tag" --notes-file "$RUNNER_TEMP/notes.md" --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$tag" "$apk" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+              --title "$title" --notes-file "$RUNNER_TEMP/notes.md" --latest
+          fi
+
+          {
+            echo "### $title"
+            echo "$service"
+            echo
+            echo "Ultima versione, sempre allo stesso indirizzo: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/latest/download/Orienta.apk"
+          } >> "$GITHUB_STEP_SUMMARY"
