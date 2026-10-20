@@ -1,0 +1,54 @@
+# Vercel Speed Insights Installation Report
+
+## Summary
+Successfully installed and configured Vercel Speed Insights for the Orienta Next.js project following the latest official documentation from Vercel.
+
+## Changes Made
+
+### 1. Package Installation
+- **Added dependency**: `@vercel/speed-insights` version `^2.0.0`
+- **Files modified**: 
+  - `package.json` - Added @vercel/speed-insights to dependencies
+  - `package-lock.json` - Updated with new dependency and its sub-dependencies
+
+### 2. Component Integration
+- **File modified**: `src/app/layout.tsx`
+- **Changes**:
+  - Added import statement: `import { SpeedInsights } from "@vercel/speed-insights/next";`
+  - Added `<SpeedInsights />` component at the end of the `<body>` tag
+  - The component is placed after existing components (BottomNav, ServiceWorkerRegister) to avoid interference with app functionality
+
+## Implementation Details
+
+### Framework Detection
+- Identified the project as **Next.js 16.4.0** with App Router
+- Used the appropriate Next.js-specific import path: `@vercel/speed-insights/next`
+
+### Documentation Source
+- Fetched latest installation instructions from: https://vercel.com/docs/speed-insights/quickstart
+- Followed official Vercel guidelines for Next.js App Router integration
+
+### Code Location
+The SpeedInsights component was added to the root layout file (`src/app/layout.tsx`), which wraps the entire application. This ensures Speed Insights tracking is active across all pages.
+
+## Verification Steps Completed
+
+✅ **Linting**: Ran ESLint on modified file - no errors introduced
+✅ **Build**: Successfully built the project with `npm run build`
+✅ **Tests**: All 468 tests pass in 21 test suites
+✅ **Type Checking**: Layout file has no TypeScript errors related to our changes
+
+## Next Steps for Activation
+
+After deployment to Vercel:
+1. The tracking script will automatically be available at `/_vercel/speed-insights/*`
+2. Data collection begins immediately
+3. Metrics will be visible in the Vercel Dashboard under the Speed Insights section after users visit the site
+4. It may take several days of traffic to accumulate meaningful data
+
+## Technical Notes
+
+- The SpeedInsights component is a zero-config implementation that automatically collects Web Vitals
+- No additional configuration is required for basic functionality
+- The component works seamlessly with Next.js Server Components and App Router
+- Installation was done with `--ignore-scripts` flag to bypass build issues with better-sqlite3 native module
