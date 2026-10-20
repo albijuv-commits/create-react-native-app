@@ -1,0 +1,108 @@
+# Pubblica l'app su Expo (EAS Update) per aprirla con Expo Go su iPhone e iPad, nel progetto
+# dell'account Expo scritto in orienta-app/app.json («owner»): a ogni aggiornamento di main che tocca
+# l'app o il codice condiviso, oppure a mano (Actions → Orienta Expo Go → Run workflow).
+#
+# Da impostare una volta in Settings → Secrets and variables → Actions (vedi orienta-app/README.md):
+# - secret EXPO_TOKEN: un token di accesso creato su https://expo.dev/settings/access-tokens
+# - variable EXPO_PUBLIC_API_URL e le altre EXPO_PUBLIC_*, facoltative e uguali a quelle dell'APK
+#
+# Si pubblica solo per iOS: su Android serve la correzione di react-native-svg (patches/), che
+# Expo Go non contiene, quindi lì si usa l'APK.
+name: Orienta Expo Go
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "orienta-app/**"
+      - "orienta/src/**"
+      - "orienta/data/**"
+      - "orienta/public/farmaci/foto/**"
+      - ".github/workflows/orienta-expo-go.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: orienta-expo-go-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    name: Aggiornamento per Expo Go
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      EAS_CLI: eas-cli@24.14.0
+      CHANNEL: expo-go
+      EXPO_PUBLIC_API_URL: ${{ vars.EXPO_PUBLIC_API_URL }}
+      EXPO_PUBLIC_PRIVACY_CONTROLLER: ${{ vars.EXPO_PUBLIC_PRIVACY_CONTROLLER }}
+      EXPO_PUBLIC_PRIVACY_CONTACT: ${{ vars.EXPO_PUBLIC_PRIVACY_CONTACT }}
+    steps:
+      - name: Token di Expo
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error title=Manca il token di Expo::Aggiungi il secret EXPO_TOKEN (orienta-app/README.md, «Expo Go»)."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: orienta-app/package-lock.json
+
+      - name: Dipendenze
+        working-directory: orienta-app
+        run: npm ci
+
+      # Il token serve solo ai comandi di Expo, non agli script dei pacchetti installati sopra
+      - name: Progetto su Expo
+        working-directory: orienta-app
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          # Collega il progetto all'account di «owner» in app.json, o lo crea la prima volta
+          npx --yes "$EAS_CLI" init --non-interactive --force
+          {
+            echo "PROJECT_ID=$(node -p 'require("./app.json").expo.extra.eas.projectId')"
+            echo "OWNER=$(node -p 'require("./app.json").expo.owner')"
+            echo "SLUG=$(node -p 'require("./app.json").expo.slug')"
+          } >> "$GITHUB_ENV"
+
+      - name: Pubblicazione
+        working-directory: orienta-app
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          # La prima volta EAS installa expo-updates e scrive in app.json l'indirizzo degli aggiornamenti
+          # e la versione di runtime (quella dell'app): qui sul runner, senza toccare il repository
+          npx --yes "$EAS_CLI" update --channel "$CHANNEL" --platform ios \
+            --message "$(git log -1 --pretty=%s)" --non-interactive
+          echo "RUNTIME_VERSION=$(node -p 'require("./app.json").expo.version')" >> "$GITHUB_ENV"
+
+      - name: Link per Expo Go
+        run: |
+          query="projectId=$PROJECT_ID&runtimeVersion=$RUNTIME_VERSION&channel=$CHANNEL"
+          link=$(curl -fsS "https://qr.expo.dev/eas-update?$query&format=url")
+          {
+            echo "### Orienta su Expo Go"
+            echo "Pubblicata nel canale $CHANNEL del progetto @$OWNER/$SLUG."
+            echo
+            echo "1. Su iPhone o iPad installa Expo Go dall'App Store e accedi con l'account Expo $OWNER."
+            echo "2. Apri il progetto $SLUG da Expo Go, oppure incolla questo indirizzo nella barra di Safari:"
+            echo
+            echo "    $link"
+            echo
+            echo "Il link resta lo stesso: apre sempre l'ultima versione pubblicata."
+            echo
+            echo "![QR code per Expo Go, da inquadrare con un altro dispositivo](https://qr.expo.dev/eas-update?$query)"
+            echo
+            echo "Pannello del progetto: https://expo.dev/accounts/$OWNER/projects/$SLUG/updates"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Link per Expo Go: $link"
