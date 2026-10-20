@@ -145,6 +145,14 @@ Da fare una volta:
    Keystore e password vanno conservati in un posto sicuro: senza, le versioni nuove non si installano sopra quelle già sui telefoni.
 3. Nella scheda Variables aggiungi `EXPO_PUBLIC_API_URL` con l'indirizzo della web app pubblicata (vedi [Pubblicare su Vercel](../orienta/README.md#pubblicare-su-vercel)), ed `EXPO_PUBLIC_PRIVACY_CONTROLLER` ed `EXPO_PUBLIC_PRIVACY_CONTACT` con titolare e contatto per l'informativa privacy. Non sono segreti: finiscono nell'app. Senza `EXPO_PUBLIC_API_URL` l'app usa le regole fisse e i DATI DI ESEMPIO, e la release lo scrive.
 
+### Expo Go su iPhone e iPad
+
+Senza l'Apple Developer Program l'app si apre in Expo Go, l'app gratuita di Expo nell'App Store. Il workflow [`orienta-expo-go.yml`](../.github/workflows/orienta-expo-go.yml) la pubblica con EAS Update nel canale `expo-go` del progetto dell'account scritto in `owner` (in `app.json`), a ogni aggiornamento di `main` o a mano (Actions → Orienta Expo Go → Run workflow). Pubblica solo per iOS: su Android Expo Go non contiene la correzione di react-native-svg (`patches/`), e lì c'è l'APK.
+
+- Da fare una volta: il secret `EXPO_TOKEN`, con un token creato su https://expo.dev/settings/access-tokens. Al primo giro il workflow crea il progetto su Expo (`eas init`). expo-updates e la configurazione degli aggiornamenti si aggiungono solo sul runner, quindi l'APK e il repository non cambiano.
+- Per aprirla serve Expo Go con lo stesso account del progetto: da maggio 2026 Expo Go apre solo i progetti del proprio account. Il progetto `orienta` compare in Expo Go; in alternativa il riepilogo del run riporta il link `exp://u.expo.dev/…?runtime-version=…&channel-name=expo-go`, da incollare in Safari, che apre sempre l'ultima versione pubblicata.
+- Expo Go dell'App Store segue l'ultima SDK di Expo: quando passerà alla SDK 58 l'app andrà aggiornata per continuare ad aprirsi lì.
+
 ### APK sul proprio computer
 
 Lo stesso script del workflow costruisce l'APK anche senza GitHub e senza account. Servono il JDK 17 o successivo e l'Android SDK con la piattaforma 36, i build-tools 36.0.0, l'NDK 27.1.12297006 e CMake 3.22.1, cioè le versioni che chiede React Native 0.86.
