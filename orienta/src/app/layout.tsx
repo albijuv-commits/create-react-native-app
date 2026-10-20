@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { SkipLink } from "@/components/layout/skip-link";
 import { TopBar } from "@/components/layout/top-bar";
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
         <BottomNav />
         <ServiceWorkerRegister />
+        <Analytics />
       </body>
     </html>
   );
